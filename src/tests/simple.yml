@@ -1,0 +1,16 @@
+name: User mock
+services:
+- name: User creation
+  method: POST
+  path: /api/v1/user
+  data:
+    userName: string
+    password: string
+  response:
+    trigger: NONE
+    actions:
+    - type: message
+      status: 201
+      headers:
+        content-type: "application/json"
+      bodyFile: JSON/simple.json

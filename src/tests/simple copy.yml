@@ -1,0 +1,27 @@
+mock:
+  name: User mock
+  services:
+  - name: User creation
+    type: REST
+    method: POST
+    path: /api/v1/user
+    authentication:
+      type: basic
+      username: services_user
+      password: "1234"
+    data:
+      userName: string
+      password: string
+    behaviours:
+    - name: simpleBehaviour
+      trigger: null
+      actions:
+      - name: Validate
+        type: validate
+      - name: Delay
+        type: delay
+      - name: Save
+        type: save
+      - name: Message
+        type: message
+        jsonFile: test.json
