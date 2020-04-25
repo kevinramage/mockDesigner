@@ -1,3 +1,3 @@
 export interface IServiceAction {
-    generate() : string;
+    generate(tab: string) : string;
 }

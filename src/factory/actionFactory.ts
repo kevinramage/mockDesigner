@@ -12,13 +12,16 @@ export class ActionFactory {
     private static buildMessageAction(actionInterface: IMockMessageAction) {
         const serviceMessage : ServiceMessage = new ServiceMessage();
         serviceMessage.status = actionInterface.status;
-        Object.entries(actionInterface.headers).forEach(data => {
-            const header = new ServiceMessageHeader();
-            header.key = data[0];
-            header.value = data[1] as string;
-            serviceMessage.addHeader(header);
-        });
+        if ( actionInterface.headers ) {
+            Object.entries(actionInterface.headers).forEach(data => {
+                const header = new ServiceMessageHeader();
+                header.key = data[0];
+                header.value = data[1] as string;
+                serviceMessage.addHeader(header);
+            });
+        }
         serviceMessage.bodyFileName = actionInterface.bodyFile;
+        serviceMessage.body = actionInterface.body;
         return serviceMessage;
     }
 }

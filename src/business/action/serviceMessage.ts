@@ -7,42 +7,47 @@ export class ServiceMessage implements IServiceAction {
 
     private _status : number;
     private _headers : ServiceMessageHeader[];
-    private _bodyFileName : string;
+    private _body: string | undefined;
+    private _bodyFileName : string | undefined;
 
     constructor() {
         this._status = 200;
         this._headers = [];
-        this._bodyFileName = "";
     }
 
-    public generate() {
+    public generate(tab: string) {
         winston.debug("ServiceMessage.generate");
-        var code = this.generateEvaluateStatus();
-        code += this.generateEvaluateHeaders();
-        code += this.generateEvaluateBody();
+        var code = this.generateEvaluateStatus(tab);
+        code += this.generateEvaluateHeaders(tab);
+        code += this.generateEvaluateBody(tab);
         return code;
     }
 
-    private generateEvaluateStatus() {
+    private generateEvaluateStatus(tab: string) {
         winston.debug("ServiceMessage.generateEvaluateStatus");
-        return util.format("\t\tres.status(%s);\n", this._status);
+        return tab + util.format("res.status(%s);\n", this._status);
     }
 
-    private generateEvaluateHeaders() {
+    private generateEvaluateHeaders(tab: string) {
         winston.debug("ServiceMessage.generateEvaluateHeaders");
         var code = "";
         this._headers.forEach(header => {
-            code += header.generate();
+            code += header.generate(tab);
         });
         return code;
     }
 
-    private generateEvaluateBody() {
+    private generateEvaluateBody(tab: string) {
         winston.debug("ServiceMessage.generateEvaluateBody");
-        var code = util.format("\t\tvar body = fs.readFileSync(\"%s\");\n", this._bodyFileName);
-        code += "\t\tconst content = await TemplateManager.instance.evaluate(body.toString());"
-        code += "\t\tres.send(content);\n";
-        code += "\t\tres.end();\n";
+        var code = "";
+        if ( this._bodyFileName ) {
+            code += tab + util.format("var body = fs.readFileSync(\"%s\");\n", this._bodyFileName);
+            code += tab + "const content = await TemplateManager.instance.evaluate(body.toString());\n"
+        } else if ( this._body  ) {
+            code += tab + util.format("const content = await TemplateManager.instance.evaluate(\"%s\");\n", this._body);
+        }
+        code += tab + "res.send(content);\n";
+        code += tab + "res.end();\n";
         return code;
     }
 
@@ -63,5 +68,12 @@ export class ServiceMessage implements IServiceAction {
     }
     public set bodyFileName(value) {
         this._bodyFileName = value;
+    }
+    
+    public get body() {
+        return this._body;
+    }
+    public set body(value) {
+        this._body = value;
     }
 }

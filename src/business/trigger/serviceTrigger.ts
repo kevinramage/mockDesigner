@@ -1,3 +1,3 @@
 export interface IServiceTrigger {
-    generate() : void;
+    generate(tab: string) : string;
 }

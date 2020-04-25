@@ -13,8 +13,9 @@ export class Mock {
 
     public generate() {
         var code = "import * as fs from \"fs\";\n";
-        code += "import { Request, Response } from \"express\";\n\n";
-        code += "import { TemplateManager } from \"../templateManager\";\n\n";
+        code += "import { Request, Response } from \"express\";\n";
+        code += "import { TemplateManager } from \"../templateManager\";\n";
+        code += "import { AuthenticationManager } from \"../authenticationManager\";\n\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._services.forEach(service => {
             code += service.generate();
@@ -26,9 +27,7 @@ export class Mock {
     public generateImports() {
         winston.debug("Mock.generateImports");
         var code = "";
-        this._services.forEach(service => {
-            code += util.format("import { %s } from \"./routes/%s\";\n", this.controllerName, this.controllerName);
-        });
+        code += util.format("import { %s } from \"./routes/%s\";\n", this.controllerName, this.controllerName);
         return code;
     }
 
@@ -36,12 +35,13 @@ export class Mock {
         winston.debug("Mock.generateRoutes");
         var code = "";
         this._services.forEach(service => {
-            code += service.generateRoute(this);
+            code += service.generateRoute();
         });
         return code;
     }
 
     public addService(service : Service) {
+        service.mockName = this.controllerName;
         this._services.push(service);
     }
 
@@ -51,6 +51,7 @@ export class Mock {
 
     public set name(value) {
         this._name = value;
+        this._services.forEach(service => { service.mockName = this.controllerName; });
     }
 
     public get controllerName() {

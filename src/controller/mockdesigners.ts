@@ -16,7 +16,7 @@ export class MockDesigners {
         this._mockProjectManagement = new MockProjectManagement();
         this._mocks = new Mocks();
         const mockDesigner = new MockDesigner();
-        mockDesigner.read("tests/simple.yml");
+        mockDesigner.read("tests/authentication.yml");
         this._mocks.addMock(mockDesigner.mock as Mock);
     }
 
@@ -54,5 +54,6 @@ export class MockDesigners {
         this._mockProjectManagement.addTemplate("routes.ts");
         this._mockProjectManagement.addTemplate("redisManager.ts");
         this._mockProjectManagement.addTemplate("templateManager.ts");
+        this._mockProjectManagement.addTemplate("authenticationManager.ts");
     }
 }
