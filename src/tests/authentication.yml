@@ -5,8 +5,8 @@ services:
   path: /api/v1/basicAuthentication
   authentication:
     type: BASIC
-    userName: kramage
-    password: test
+    userName: myUserName
+    password: myPassword
   response:
     actions:
     - type: message

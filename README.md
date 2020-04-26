@@ -22,6 +22,7 @@ You can find more information about the command line options here.
 ### Create a simple mock
 
 We will a simple GET service. This service will return a basic 200 HTTP response.
+*basic.yml*
 ```yaml
 name: MyMock
 services:
@@ -38,3 +39,37 @@ services:
 ### Add some dynamics behaviour
 
 ### Add authentication mecanism
+
+You can add some authentication mecanism for an existing service.
+You can find all documentation about the authentication mecanism here
+Below an authentication example:
+*authentication.yml*
+```yaml
+name: authenticationService
+services: 
+- name: BasicAuthenticationService
+  method: POST
+  path: /api/v1/basicAuthentication
+  authentication:
+    type: BASIC
+    userName: myUserName
+    password: myPassword
+  response:
+    actions:
+    - type: message
+      status: 200
+      body: OK
+- name: ApiKeyAuthentictionService
+  method: POST
+  path: /api/v1/apiKeyAuthentication
+  authentication:
+    type: APIKEY
+    source: HEADER
+    keyName: api-key
+    keyValue: 123456
+  response:
+    actions:
+    - type: message
+      status: 200
+      body: OK
+```
