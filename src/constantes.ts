@@ -8,6 +8,27 @@ export module KEYS {
 export module ERRORS {
     export const MOCK_READING = "An error occured during the mock reading";
     export const FILE_UPDATE = "An error occured during the file update";
+    export const INVALID_PROJECTNAME = "Invalid project name, there are some invalid character in project name provided";
+    export const INVALID_PORT = "Invalid port number, the port must be a positive integer";
+    export const INVALID_INPUTDIR = "Invalid input directory, the input directory not exits";
+    export const INVALID_INPUTDIREXPRESSION = "Invalid input directory, the expression is not valid";
+    export const INVALID_INPUTDIR_FILENOTEXISTS = "Invalid input, the file mentionned not exists";
+    export const INVALID_INPUTDIR_ISDIRECTORY = "Invalid input, the file mentionned is a directory";
+    export const INVALID_INPUTDIR_NOFILES = "Invalid input, no files to proceed";
+
+    export const FAIL_READDIR = "An error occured during the directory reading";
+    export const FAIL_READFILE = "An error occured during the file reading";
+
+    export const VALIDATION_MOCK_NAME = "The mock must have a name string attribute";
+    export const VALIDATION_MOCK_SERVICES = "The mock must have a services array attribute";
+    export const VALIDATION_SERVICE_NAME = "The mock service must have a name string attribute";
+    export const VALIDATION_SERVICE_METHOD = "The mock service method must match with one of the following value: GET, POST, PUT, DELETE";
+    export const VALIDATION_SERVICE_PATH = "The mock service must have a path string attribute";
+    export const VALIDATION_SERVICE_RESPONSE = "The mock service must have a response attribute";
+    export const VALIDATION_RESPONSE_ACTIONS = "The mock response must have a actions attribute";
+    export const VALIDATION_ACTION_TYPE = "The mock action must have a type string attribute";
+    export const VALIDATION_ACTIONMSG_STATUS = "The mock message action must have a status number attribute";
+    export const VALIDATION_ACTIONMSG_BODY = "The mock message action must have a body or bodyFile string attribute";
 }
 export module AUTHENTICATION_TYPE {
     export const BASIC_AUTHENTICATION = "BASIC";

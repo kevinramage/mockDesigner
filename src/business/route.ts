@@ -13,9 +13,9 @@ export class Route {
         this._method = "";
     }
 
-    public generate(mock: Mock, service: Service) {
+    public generate(mockName: string, service: Service) {
         winston.debug("Route.generate");
-        return util.format("this.router.route(\"%s\").%s(%s.%s);\n", this.path, this.method.toLowerCase(), mock.controllerName, service.methodName);
+        return util.format("\t\tthis.router.route(\"%s\").%s(%s.%s);\n", this.path, this.method.toLowerCase(), mockName, service.methodName);
     }
 
     public get path() {

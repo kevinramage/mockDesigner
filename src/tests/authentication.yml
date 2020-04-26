@@ -1,0 +1,27 @@
+name: authenticationService
+services: 
+- name: BasicAuthenticationService
+  method: POST
+  path: /api/v1/basicAuthentication
+  authentication:
+    type: BASIC
+    userName: kramage
+    password: test
+  response:
+    actions:
+    - type: message
+      status: 200
+      body: OK
+- name: ApiKeyAuthentictionService
+  method: POST
+  path: /api/v1/apiKeyAuthentication
+  authentication:
+    type: APIKEY
+    source: HEADER
+    keyName: api-key
+    keyValue: 123456
+  response:
+    actions:
+    - type: message
+      status: 200
+      body: OK

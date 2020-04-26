@@ -1,0 +1,10 @@
+name: MyMock
+services:
+  - name: "myService"
+    method: GET
+    path: /api/v1/myService
+    response:
+      actions:
+      - type: message
+        status: 200
+        body: OK

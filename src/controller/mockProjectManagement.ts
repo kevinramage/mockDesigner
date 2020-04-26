@@ -21,7 +21,6 @@ export class MockProjectManagement {
     public updateFile(fileName: string, key: string, code: string) {
         winston.debug(util.format("MockProjectManagement.updateFile: %s on %s", key,fileName));
         if ( this._files[fileName] ) {
-            code += "\n" + key;
             this._files[fileName] = this._files[fileName].replace(key, code);
         } else {
             throw ERRORS.FILE_UPDATE;

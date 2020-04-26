@@ -29,7 +29,7 @@ export class Mocks {
     private updateImports(mockProjectManagement: MockProjectManagement) {
         winston.debug("Mocks.updateImports");
         var code = "";
-        this._mocks.forEach(mock => { code += mock?.generateImports(); })
+        this._mocks.forEach(mock => { code += mock.generateImports(); })
         mockProjectManagement.updateFile("routes.ts", KEYS.IMPORTS, code);
     }
 

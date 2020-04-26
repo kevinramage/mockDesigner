@@ -21,7 +21,7 @@ class DefaultRoute {
             next();
         });
 
-        // {{.routes}}
+// {{.routes}}
     }
 }
   
