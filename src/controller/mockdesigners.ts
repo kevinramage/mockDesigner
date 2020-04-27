@@ -109,6 +109,10 @@ export class MockDesigners {
         this._mockProjectManagement.addTemplate("redisManager.ts");
         this._mockProjectManagement.addTemplate("templateManager.ts");
         this._mockProjectManagement.addTemplate("authenticationManager.ts");
+        this._mockProjectManagement.addTemplate("Dockerfile");
+        this._mockProjectManagement.addTemplate("docker-compose.yml");
+        this._mockProjectManagement.addTemplate("run.sh");
+        this._mockProjectManagement.addTemplate("run.bat");
     }
 
     public get name() {

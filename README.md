@@ -14,7 +14,7 @@ Now, you can find a directory named "generated" that contains the source code of
 You can run the mock system with the following command:
 ```
 cd generated
-npm start
+./run.bat
 ```
 Now, you just have to do a GET request `http://localhost:7001/api/v1/myService` to test the service
 You can find more information about the command line options here.

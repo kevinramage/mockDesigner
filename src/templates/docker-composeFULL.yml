@@ -1,0 +1,53 @@
+version: '3.2'
+services:
+  redis:
+    image: "redis:alpine"
+    hostname: redis
+    ports:
+    - "6379:6379"
+    networks:
+    - md_network
+  was:
+    container_name: MyMock
+    build:
+      context: .
+    ports:
+    - "7001:7001"
+    networks:
+    - md_network
+  elasticsearch:
+    image: elasticsearch:5.4
+    volumes:
+    - type: volume
+      source: esdata
+      target: /usr/share/elasticsearch/data/
+    ports:
+    - "9002:9002"
+    networks:
+    - md_network
+  logstash:
+    image: logstash:5.4.3
+    volumes:
+    - ./logstash/logstash.conf:/etc/logstash/conf.d
+    command: logstash -f /logstash_dir/logstash.conf
+    depends_on:
+    - elasticsearch
+    ports:
+    - "5959:5959"
+    networks:
+    - md_network
+  kibana:
+    image: kibana:5.4.3
+    container_name: kibana
+    ports:
+    - "7003:5601"
+    environment:
+    - ELASTICSEARCH_URL=http://es:9200
+    depends_on:
+      - elasticsearch
+    networks:
+    - md_network
+volumes:
+  esdata:
+networks:
+  md_network:
