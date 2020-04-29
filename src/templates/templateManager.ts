@@ -1,32 +1,97 @@
+import * as util from "util";
+import * as winston from "winston";
 import { v4 } from "uuid";
 import { RedisManager } from "./redisManager";
 
+const regexFunction = /{{([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
+const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
+
 export class TemplateManager {
     private static _instance : TemplateManager;
+    private _functions : {[functionName: string]: Function};
+
+    private constructor() {
+        this._functions = {};
+        this.registerFunction();
+    }
+
+    private registerFunction() {
+        this._functions["UUID"] = this.uuid;
+        this._functions["UniqueID"] = this.uniqueId;
+        this._functions["Increment"] = this.increment;
+    }
 
     public async evaluate(body: string) {
-        return await this.useFunctions(body);
+        winston.debug("TemplateManager.evaluate");
+        var bodyResult = body;
+
+        // Apply functions
+        bodyResult = await this.evaluateFunctions(bodyResult);
+
+        // Apply properties
+
+        // Apply data
+
+        return bodyResult;
     }
 
-    private async useFunctions(body: string) {
-        body = body.replace(/UUID\(\)/g, v4())
-        body = await this.applyIncrementFunction(body);
-        return body;
-    }
-
-    private async applyIncrementFunction(body: string) {
-        const regex = /Increment\(([a-zA-Z]+)\)/g;
-        const matches = regex.exec(body);
-        if ( matches ) {
-            var value = await RedisManager.instance.getValue(matches[1]);
-            if ( !value ) { value = "1"; }
-            body = body.replace(regex, value);
-            const currentValue = Number.parseInt(value);
-            if ( !Number.isNaN(currentValue)) {
-                RedisManager.instance.setValue(matches[1], (currentValue+1) + "");
-            }
+    public async evaluateFunctions(body: string) {
+        winston.debug("TemplateManager.evaluateFunctions");
+        var bodyResult = body;
+        var match = regexFunction.exec(body);
+        while ( match != null && match.length > 2) {
+            const content = match[0];
+            const functionName = match[1];
+            const argumentsText = match[2];
+            const args = this.evaluateFunctionArguments(argumentsText);
+            const result = await this.evaluateFunction(functionName, args);
+            bodyResult = bodyResult.replace(content, result);
+            match = regexFunction.exec(body);
         }
-        return body;
+        return bodyResult;
+    }
+
+    private evaluateFunctionArguments(argsText: string) {
+        winston.debug("TemplateManager.evaluateFunctionArguments");
+        const args : string[] = [];
+        var match = regexFunctionArg.exec(argsText);
+        while ( match != null && match.length > 1) {
+            args.push(match[1]);
+            match = regexFunctionArg.exec(argsText);
+        }
+        return args;
+    }
+
+    private async evaluateFunction(functionName: string, args: string[]) {
+        winston.debug("TemplateManager.evaluateFunction");
+        if ( this._functions[functionName] ) {
+            return await this._functions[functionName].call(this, args);
+        } else {
+            return util.format("Error undefined function %s", functionName);
+        }
+    }
+
+
+    private async uuid() {
+        winston.debug("TemplateManager.uuid");
+        return v4();
+    }
+
+    private async uniqueId() {
+        winston.debug("TemplateManager.uniqueId");
+        return new Date().toISOString().replace(/\-/g, "").replace(/:/g, "")
+            .replace(/\./g, "").replace('T', '').replace('Z', '');
+    }
+
+    private async increment(key: string) {
+        winston.debug("TemplateManager.increment");
+        var value = await RedisManager.instance.getValue(key);
+        if ( !value ) { value = "1"; }
+        const currentValue = Number.parseInt(value);
+        if ( !Number.isNaN(currentValue)) {
+            await RedisManager.instance.setValue(key, (currentValue+1) + "");
+        }
+        return value;
     }
 
     public static get instance() {

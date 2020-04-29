@@ -6,7 +6,7 @@ import { ERRORS } from "./constantes";
 
 export class Main {
 
-    public run() {
+    public async run() {
 
         // Configure logs
         winston.add(new DailyRotateFile({ filename: "logs/WASP_%DATE%.log", datePattern: 'YYYY-MM-DD', 
@@ -70,7 +70,10 @@ export class Main {
         console.info("INFO  - MockDesigner - Start");
         if ( error == "" ) {
             try {
+
+                // Run the generation
                 mockDesigners.run();
+
                 console.info("INFO  - MockDesigner - Complete");
             } catch ( ex ) {
                 //winston.error("An error occured during the process: ", ex);

@@ -6,6 +6,7 @@ import { MockDesigner } from "./mockdesigner";
 import { KEYS, ERRORS } from "../constantes";
 import { Mocks } from "../business/mocks";
 import { Mock } from "../business/mock";
+import { FileManagement } from "../utils/fileManagement";
 
 export class MockDesigners {
 
@@ -87,6 +88,10 @@ export class MockDesigners {
 
         // Write files
         this._mockProjectManagement.writeFiles("generated");
+
+        // Copy data
+        FileManagement.copyDirectory("tests/JSON", "generated/JSON");
+        FileManagement.copyDirectory("tests/data", "generated/data");
     }
 
     private generateFiles() {
@@ -109,6 +114,7 @@ export class MockDesigners {
         this._mockProjectManagement.addTemplate("redisManager.ts");
         this._mockProjectManagement.addTemplate("templateManager.ts");
         this._mockProjectManagement.addTemplate("authenticationManager.ts");
+        this._mockProjectManagement.addTemplate("responseHandler.ts");
         this._mockProjectManagement.addTemplate("Dockerfile");
         this._mockProjectManagement.addTemplate("docker-compose.yml");
         this._mockProjectManagement.addTemplate("run.sh");

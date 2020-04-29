@@ -13,7 +13,7 @@ export class Main {
         winston.add(new winston.transports.Console({ level: "info",  }));
 
         // Redis manager
-        //RedisManager.instance.init();
+        RedisManager.instance.init();
 
         // Listen
         const port = Number.parseInt("{{.port}}");

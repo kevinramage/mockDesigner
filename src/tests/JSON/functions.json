@@ -1,0 +1,6 @@
+{
+    "id": 1,
+    "name": "{{Increment(USER)}}",
+    "uniqueString": "{{UUID()}}",
+    "uniqueValue": {{UniqueID()}}
+}

@@ -5,7 +5,11 @@ export class RedisManager {
     private _client : redis.RedisClient | undefined;
 
     public init() {
-        this._client = redis.createClient();
+        const options : redis.ClientOpts = {};
+        if ( process.env.REDIS_URL ) {
+            options.host = process.env.REDIS_URL;
+        }
+        this._client = redis.createClient(options);
     }
 
     public getValue(key: string) {
@@ -19,15 +23,25 @@ export class RedisManager {
                     }
                 });
             } else {
-                reject("Client null or undefined");
+                reject("Redis client null or undefined");
             }
         });
     }
 
     public setValue(key: string, value: string) {
-        if ( this._client ) {
-            this._client.set(key, value);
-        }
+        return new Promise<void>((resolve, reject) => {
+            if ( this._client ) {
+                this._client.set(key, value, (err, reply) => {
+                    if ( !err ) {
+                        resolve();
+                    } else {
+                        reject(err);
+                    }
+                });
+            } else {
+                reject("Redis client null or undefined");
+            }
+        });
     }
 
     public static get instance() {

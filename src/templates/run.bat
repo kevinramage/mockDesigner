@@ -7,4 +7,5 @@ for /f "delims=" %%i in ('"docker images --filter reference=generated_was --form
 IF DEFINED IMAGE_ID (
 	docker rmi %IMAGE_ID%
 )
-docker-compose up -d
+REM docker-compose up -d
+docker-compose up

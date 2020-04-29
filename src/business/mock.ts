@@ -15,7 +15,9 @@ export class Mock {
         var code = "import * as fs from \"fs\";\n";
         code += "import { Request, Response } from \"express\";\n";
         code += "import { TemplateManager } from \"../templateManager\";\n";
-        code += "import { AuthenticationManager } from \"../authenticationManager\";\n\n";
+        code += "import { AuthenticationManager } from \"../authenticationManager\";\n";
+        code += "import { ResponseHandler } from \"../responseHandler\";\n";
+        code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._services.forEach(service => {
             code += service.generate();

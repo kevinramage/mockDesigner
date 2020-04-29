@@ -10,14 +10,6 @@ export class ServiceMessageHeader {
         this._value = "";
     }
 
-    public generate(tab : string) {
-        winston.debug("ServiceMessageHeader.generate");
-        // Interpolation
-        const headerName = this._key;
-        const headerValue = this._value;
-        return tab + util.format("res.setHeader('%s', '%s');\n", headerName, headerValue);
-    }
-
     public get key() {
         return this._key;
     }

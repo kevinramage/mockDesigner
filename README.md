@@ -38,6 +38,27 @@ services:
 
 ### Add some dynamics behaviour
 
+- Use functions
+In some case, you must required some new data or some random value, you can use functions to add some dynamic values. More information about the function here.
+An example:
+*functions.json*
+```
+{
+    "id": 1,
+    "name": "{{Increment(USER)}}",
+    "uniqueString": "{{UUID()}}",
+    "uniqueValue": {{UniqueID()}}
+}
+```
+
+- Use stored data
+
+- Use random data
+
+- Use scripts
+
+### Simulate errors
+
 ### Add authentication mecanism
 
 You can add some authentication mecanism for an existing service.

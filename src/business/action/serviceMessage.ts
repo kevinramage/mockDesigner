@@ -17,37 +17,24 @@ export class ServiceMessage implements IServiceAction {
 
     public generate(tab: string) {
         winston.debug("ServiceMessage.generate");
-        var code = this.generateEvaluateStatus(tab);
-        code += this.generateEvaluateHeaders(tab);
-        code += this.generateEvaluateBody(tab);
-        return code;
-    }
-
-    private generateEvaluateStatus(tab: string) {
-        winston.debug("ServiceMessage.generateEvaluateStatus");
-        return tab + util.format("res.status(%s);\n", this._status);
-    }
-
-    private generateEvaluateHeaders(tab: string) {
-        winston.debug("ServiceMessage.generateEvaluateHeaders");
         var code = "";
-        this._headers.forEach(header => {
-            code += header.generate(tab);
+
+        // Generate headers
+        code += tab + "const headers : {[key: string]: string} = {};\n";
+        this._headers.forEach(h => {
+            code += tab + util.format("headers[\"%s\"] = \"%s\";\n", h.key, h.value);
         });
-        return code;
-    }
 
-    private generateEvaluateBody(tab: string) {
-        winston.debug("ServiceMessage.generateEvaluateBody");
-        var code = "";
+        // Send a body file
         if ( this._bodyFileName ) {
-            code += tab + util.format("var body = fs.readFileSync(\"%s\");\n", this._bodyFileName);
-            code += tab + "const content = await TemplateManager.instance.evaluate(body.toString());\n"
-        } else if ( this._body  ) {
-            code += tab + util.format("const content = await TemplateManager.instance.evaluate(\"%s\");\n", this._body);
+            code += tab + util.format("ResponseHandler.sendContentFromFile(res, %s, \"%s\", headers);\n", this.status, this.bodyFileName);
         }
-        code += tab + "res.send(content);\n";
-        code += tab + "res.end();\n";
+
+        // Send a body
+        else {
+            code += tab + util.format("ResponseHandler.sendContent(res, %s, \"%s\", headers);\n", this.status, this.body);
+        }
+
         return code;
     }
 
