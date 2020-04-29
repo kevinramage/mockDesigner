@@ -1,10 +1,12 @@
 import * as util from "util";
 import * as winston from "winston";
 import { v4 } from "uuid";
+import { Request } from "express";
 import { RedisManager } from "./redisManager";
 
 const regexFunction = /{{([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
 const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
+const regexRequestData = /{{\.([a-z|A-Z|0-9|_]+)\.([a-z|A-Z|0-9|_]+)}}/g;
 
 export class TemplateManager {
     private static _instance : TemplateManager;
@@ -21,12 +23,17 @@ export class TemplateManager {
         this._functions["Increment"] = this.increment;
     }
 
-    public async evaluate(body: string) {
+    public async evaluate(body: string, req?: Request) {
         winston.debug("TemplateManager.evaluate");
         var bodyResult = body;
 
         // Apply functions
         bodyResult = await this.evaluateFunctions(bodyResult);
+
+        // Evaluate requests
+        if ( req ) {
+            bodyResult = this.evaluateRequests(bodyResult, req.body);
+        }
 
         // Apply properties
 
@@ -35,7 +42,7 @@ export class TemplateManager {
         return bodyResult;
     }
 
-    public async evaluateFunctions(body: string) {
+    private async evaluateFunctions(body: string) {
         winston.debug("TemplateManager.evaluateFunctions");
         var bodyResult = body;
         var match = regexFunction.exec(body);
@@ -68,6 +75,30 @@ export class TemplateManager {
             return await this._functions[functionName].call(this, args);
         } else {
             return util.format("Error undefined function %s", functionName);
+        }
+    }
+
+    private evaluateRequests(body: string, requestBody: any) {
+        winston.debug("TemplateManager.evaluateRequests");
+        var bodyResult = body;
+        var match = regexRequestData.exec(body);
+        while ( match != null && match.length > 2) {
+            console.info(match);
+            const content = match[0];
+            const propertyText = match[2];
+            const result = this.evaluateRequest(propertyText, requestBody);
+            bodyResult = bodyResult.replace(content, result);
+            match = regexRequestData.exec(body);
+        }
+        return bodyResult;
+    }
+
+    private evaluateRequest(property: string, requestBody: {[id: string]: string}) {
+        console.info(property);
+        if ( requestBody[property] ) {
+            return requestBody[property];
+        } else {
+            return "undefined";
         }
     }
 

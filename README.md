@@ -39,7 +39,7 @@ services:
 ### Add some dynamics behaviour
 
 - Use functions
-In some case, you must required some new data or some random value, you can use functions to add some dynamic values. More information about the function here.
+In some case, you must have some unique data or some random value, you can use functions to add some dynamic values. More information about the function here.
 An example:
 *functions.json*
 ```
@@ -48,6 +48,19 @@ An example:
     "name": "{{Increment(USER)}}",
     "uniqueString": "{{UUID()}}",
     "uniqueValue": {{UniqueID()}}
+}
+```
+
+- Use request data
+In some case, it can be interesting to have the extract request values to sent it in the response
+More information about the function here
+*request.json*
+```
+{
+    "id": 1,
+    "username": "{{.request.username}}",
+    "password": "****",
+    "group": "{{.request.group}}"
 }
 ```
 

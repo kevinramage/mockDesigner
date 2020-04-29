@@ -1,12 +1,12 @@
 import * as fs from "fs";
 import * as util from "util";
 import * as path from "path";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { TemplateManager } from "./templateManager";
 
 export class ResponseHandler {
 
-    public static sendContentFromFile(res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
+    public static sendContentFromFile(req: Request, res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
         var body = "", errorMessage = "";
         try {
             const JSONDirectory = fs.existsSync("JSON") ? "JSON" : "../JSON";
@@ -22,11 +22,11 @@ export class ResponseHandler {
             this.sendError(res, errorMessage, contentType);
         }
         if ( errorMessage == "") {
-            this.sendContent(res, status, body, headers);
+            this.sendContent(req, res, status, body, headers);
         }
     }
 
-    public static async sendContent(res: Response, status: number, body: string, headers: {[key: string]: string}) {
+    public static async sendContent(req: Request, res: Response, status: number, body: string, headers: {[key: string]: string}) {
         res.status(status);
 
         // Headers
@@ -37,7 +37,7 @@ export class ResponseHandler {
 
         // Body
         if ( body ) {
-            const bodyEvaluated = await TemplateManager.instance.evaluate(body);
+            const bodyEvaluated = await TemplateManager.instance.evaluate(body, req);
             res.write(bodyEvaluated); 
         }
         res.end();

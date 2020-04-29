@@ -27,12 +27,12 @@ export class ServiceMessage implements IServiceAction {
 
         // Send a body file
         if ( this._bodyFileName ) {
-            code += tab + util.format("ResponseHandler.sendContentFromFile(res, %s, \"%s\", headers);\n", this.status, this.bodyFileName);
+            code += tab + util.format("ResponseHandler.sendContentFromFile(req, res, %s, \"%s\", headers);\n", this.status, this.bodyFileName);
         }
 
         // Send a body
         else {
-            code += tab + util.format("ResponseHandler.sendContent(res, %s, \"%s\", headers);\n", this.status, this.body);
+            code += tab + util.format("ResponseHandler.sendContent(req, res, %s, \"%s\", headers);\n", this.status, this.body);
         }
 
         return code;
