@@ -17,6 +17,8 @@ export class Mock {
         code += "import { TemplateManager } from \"../templateManager\";\n";
         code += "import { AuthenticationManager } from \"../authenticationManager\";\n";
         code += "import { ResponseHandler } from \"../responseHandler\";\n";
+        code += "import { RedisManager } from \"../redisManager\";\n";
+        code += "import { Context } from \"../context\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._services.forEach(service => {

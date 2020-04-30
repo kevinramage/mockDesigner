@@ -1,0 +1,6 @@
+{
+    "id": {{NewIntegerId()}},
+    "username": "{{.data.username}}",
+    "password": "****",
+    "group": "{{.data.group}}"
+}

@@ -21,7 +21,10 @@ export class ServiceFactory {
         // Trigger
         const trigger = new ServiceWithoutTrigger();
         serviceInterface.response.actions.forEach(action => {
-            trigger.addAction(ActionFactory.build(action));
+            const actionBuilt = ActionFactory.build(action);
+            if ( actionBuilt != null ) {
+                trigger.addAction(actionBuilt);
+            }
         });
         service.trigger = trigger;
 

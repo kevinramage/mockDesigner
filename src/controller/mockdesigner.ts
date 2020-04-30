@@ -5,11 +5,12 @@ import * as winston from "winston";
 import { IMock } from "../interface/mock";
 import { Mock } from "../business/mock";
 import { MockFactory } from "../factory/mockFactory";
-import { ERRORS } from "../constantes";
+import { ERRORS, IDGENERATION_TYPE } from "../constantes";
 import { IMockService } from "interface/mockService";
 import { IMockResponse } from "interface/mockResponse";
 import { IMockAction } from "interface/mockAction";
 import { IMockMessageAction } from "interface/mockMessageAction";
+import { IMockSaveAction } from "interface/mockSaveAction";
 
 export class MockDesigner {
 
@@ -124,8 +125,11 @@ export class MockDesigner {
         else {
             switch ( mockAction.type ) {
                 case "message":
-                        this.validateMessageAction(mockAction as IMockMessageAction, validationErrors);
-                    break;
+                    this.validateMessageAction(mockAction as IMockMessageAction, validationErrors);
+                break;
+                case "save":
+                    this.validateSaveAction(mockAction as IMockSaveAction, validationErrors);
+                break;
                 default:
                     validationErrors.push(ERRORS.VALIDATION_ACTION_TYPE);
             }
@@ -147,6 +151,26 @@ export class MockDesigner {
         } else if ( mockAction.bodyFile && typeof mockAction.bodyFile != "string" ) {
             validationErrors.push(ERRORS.VALIDATION_ACTIONMSG_BODY);
         }
+    }
+
+    private validateSaveAction(mockAction: IMockSaveAction, validationErrors: string[]) {
+
+        // Key mandatory (string)
+        if ( !mockAction.key ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_KEY); }
+        else if ( typeof mockAction.key != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_KEY); } 
+
+        // Source mandatory (object)
+        if ( !mockAction.source ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE); }
+        else if ( typeof mockAction.source != "object") { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE); }
+
+        // Source type mandatory (string equals to NEWID)
+        else if ( !mockAction.source.type ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_TYPE); }
+        else if ( typeof mockAction.source.type != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_TYPE); }
+        else if ( mockAction.source.type != IDGENERATION_TYPE.NEWINTEGERID && mockAction.source.type != IDGENERATION_TYPE.NEWUUID ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_TYPE); }
+
+        // Source field name mandatory (string)
+        else if ( !mockAction.source.fieldName ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME); }
+        else if ( typeof mockAction.source.fieldName != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME); }
     }
 
     public get mock() {

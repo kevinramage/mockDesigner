@@ -29,8 +29,17 @@ export module ERRORS {
     export const VALIDATION_ACTION_TYPE = "The mock action must have a type string attribute";
     export const VALIDATION_ACTIONMSG_STATUS = "The mock message action must have a status number attribute";
     export const VALIDATION_ACTIONMSG_BODY = "The mock message action must have a body or bodyFile string attribute";
+    export const VALIDATION_ACTIONSAVE_KEY = "The mock save action must have a key string attribute";
+    export const VALIDATION_ACTIONSAVE_SOURCE = "The mock save action must have a source object defined";
+    export const VALIDATION_ACTIONSAVE_SOURCE_TYPE = "The mock save action must have a source type attribute";
+    export const VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME = "The mock save action must have a source field name attribute";
 }
 export module AUTHENTICATION_TYPE {
     export const BASIC_AUTHENTICATION = "BASIC";
     export const APIKEY_AUTHENTICATION = "APIKEY";
+}
+
+export module IDGENERATION_TYPE {
+    export const NEWINTEGERID = "NewIntegerId";
+    export const NEWUUID = "NewUUID";
 }

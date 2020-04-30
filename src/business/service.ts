@@ -31,18 +31,23 @@ export class Service {
 
         // Generate response handler
         var code = tab + util.format("public static async %s(req: Request, res: Response) {\n", this.methodName);
+
+        // Define context
+        code += tab + "\tconst context = new Context(req);\n";
+
+        // Manage authentication
         if ( this.authentication ) {
             code += this.authentication.generate(tab + "\t", this.methodName);
             code += tab + "\tif ( authenticationSucceed ) {\n";
-            code += tab + util.format("\t\t%s._%s(req, res);\n", this.mockName, this.methodName);
+            code += tab + util.format("\t\t%s._%s(context, res);\n", this.mockName, this.methodName);
             code += tab + "\t}\n";
         } else {
-            code += tab + util.format("\t%s._%s(req, res);\n", this.mockName, this.methodName);
+            code += tab + util.format("\t%s._%s(context, res);\n", this.mockName, this.methodName);
         }
         code += tab + "}\n";
 
         // Generate business method
-        code += tab + util.format("public static async _%s(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("public static async _%s(context: Context, res: Response) {\n", this.methodName);
         code += this._trigger.generate(tab + "\t");
         code += tab + "}\n";
 

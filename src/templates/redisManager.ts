@@ -1,4 +1,5 @@
 import * as redis from "redis";
+import * as util from "util";
 
 export class RedisManager {
     private static _instance : RedisManager;
@@ -32,6 +33,24 @@ export class RedisManager {
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
                 this._client.set(key, value, (err, reply) => {
+                    if ( !err ) {
+                        resolve();
+                    } else {
+                        reject(err);
+                    }
+                });
+            } else {
+                reject("Redis client null or undefined");
+            }
+        });
+    }
+
+    public saveObject(key: string, fieldIdName: string, fieldIdValue: string, body: object) {
+        return new Promise<void>((resolve, reject) => {
+            if ( this._client ) {
+                const saveKey = util.format("_obj_%s_%s", key, fieldIdValue);
+                const data = { fieldName: fieldIdName, fieldValue: fieldIdValue, body };
+                this._client.set(saveKey, JSON.stringify(data), (err, reply) => {
                     if ( !err ) {
                         resolve();
                     } else {

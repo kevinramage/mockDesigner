@@ -113,6 +113,7 @@ export class MockDesigners {
         this._mockProjectManagement.addTemplate("routes.ts");
         this._mockProjectManagement.addTemplate("redisManager.ts");
         this._mockProjectManagement.addTemplate("templateManager.ts");
+        this._mockProjectManagement.addTemplate("context.ts");
         this._mockProjectManagement.addTemplate("authenticationManager.ts");
         this._mockProjectManagement.addTemplate("responseHandler.ts");
         this._mockProjectManagement.addTemplate("Dockerfile");

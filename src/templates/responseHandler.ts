@@ -1,12 +1,14 @@
 import * as fs from "fs";
 import * as util from "util";
-import * as path from "path";
-import { Request, Response } from "express";
+import * as winston from "winston";
+import { Response } from "express";
 import { TemplateManager } from "./templateManager";
+import { Context } from "./context";
 
 export class ResponseHandler {
 
-    public static sendContentFromFile(req: Request, res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
+    public static sendContentFromFile(context: Context, res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
+        winston.debug("ResponseHandler.sendContentFromFile");
         var body = "", errorMessage = "";
         try {
             const JSONDirectory = fs.existsSync("JSON") ? "JSON" : "../JSON";
@@ -22,28 +24,30 @@ export class ResponseHandler {
             this.sendError(res, errorMessage, contentType);
         }
         if ( errorMessage == "") {
-            this.sendContent(req, res, status, body, headers);
+            this.sendContent(context, res, status, body, headers);
         }
     }
 
-    public static async sendContent(req: Request, res: Response, status: number, body: string, headers: {[key: string]: string}) {
+    public static async sendContent(context: Context, res: Response, status: number, body: string, headers: {[key: string]: string}) {
+        winston.debug("ResponseHandler.sendContent");
         res.status(status);
 
         // Headers
         Object.keys(headers).forEach(async key => {
-            const headerValue = await TemplateManager.instance.evaluate(headers[key]);
+            const headerValue = await TemplateManager.instance.evaluate(headers[key], context);
             res.setHeader(key, headerValue);
         });
 
         // Body
         if ( body ) {
-            const bodyEvaluated = await TemplateManager.instance.evaluate(body, req);
+            const bodyEvaluated = await TemplateManager.instance.evaluate(body, context);
             res.write(bodyEvaluated); 
         }
         res.end();
     }
 
     public static sendError(res: Response, errorMessage: string, type: string) {
+        winston.debug("ResponseHandler.sendError");
         if ( type.toLowerCase() == "application/json") {
             this.sendJSONError(res, errorMessage);
         } else if ( type.toLowerCase() == "application/xml" ) {
