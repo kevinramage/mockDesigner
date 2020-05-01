@@ -22,6 +22,11 @@ export class ServiceFactory {
             service.soapAction = serviceInterface.soapAction;
         }
 
+        // Delay
+        if ( serviceInterface.delay ) {
+            service.delay = serviceInterface.delay;
+        }
+
         // Route
         service.route.path = serviceInterface.path;
         if ( serviceInterface.method ) {

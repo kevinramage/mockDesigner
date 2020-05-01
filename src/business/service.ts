@@ -9,6 +9,7 @@ export class Service {
     private _mockName: string;
     private _name : string;
     private _soapAction : string | undefined;
+    private _delay : number | undefined;
     private _authentication : IAuthentication | undefined;
     private _triggers : IServiceTrigger[];
     private _route : Route;
@@ -37,14 +38,22 @@ export class Service {
         // Define context
         code += tab + "\tconst context = new Context(req);\n";
 
+        // Prepare the call to the service method
+        var codeToCallService = "";
+        if ( this.delay ) {
+            codeToCallService = util.format("setTimeout(%s._%s.bind(this, context, res), %s);\n", this.mockName, this.methodName, this.delay + "");
+        } else {
+            codeToCallService = util.format("%s._%s(context, res);\n", this.mockName, this.methodName)
+        }
+
         // Manage authentication
         if ( this.authentication ) {
             code += this.authentication.generate(tab + "\t", this.methodName);
             code += tab + "\tif ( authenticationSucceed ) {\n";
-            code += tab + util.format("\t\t%s._%s(context, res);\n", this.mockName, this.methodName);
+            code += tab + "\t\t" + codeToCallService;
             code += tab + "\t}\n";
         } else {
-            code += tab + util.format("\t%s._%s(context, res);\n", this.mockName, this.methodName);
+            code += tab + "\t" + codeToCallService;
         }
         code += tab + "}\n";
 
@@ -115,6 +124,13 @@ export class Service {
     }
     public set soapAction(value) {
         this._soapAction = value;
+    }
+
+    public get delay() {
+        return this._delay;
+    }
+    public set delay(value) {
+        this._delay = value;
     }
 
     public get methodName() {
