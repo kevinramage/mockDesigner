@@ -6,11 +6,13 @@ import { IMock } from "../interface/mock";
 import { Mock } from "../business/mock";
 import { MockFactory } from "../factory/mockFactory";
 import { ERRORS, IDGENERATION_TYPE } from "../constantes";
-import { IMockService } from "interface/mockService";
-import { IMockResponse } from "interface/mockResponse";
-import { IMockAction } from "interface/mockAction";
-import { IMockMessageAction } from "interface/mockMessageAction";
-import { IMockSaveAction } from "interface/mockSaveAction";
+import { IMockService } from "../interface/mockService";
+import { IMockResponse } from "../interface/mockResponse";
+import { IMockAction } from "../interface/mockAction";
+import { IMockMessageAction } from "../interface/mockMessageAction";
+import { IMockSaveAction } from "../interface/mockSaveAction";
+import { IMockTrigger } from "../interface/mockTrigger";
+import { IMockDataTriger } from "../interface/mockDataTrigger";
 
 export class MockDesigner {
 
@@ -104,14 +106,48 @@ export class MockDesigner {
 
     private validateResponse(mockResponse: IMockResponse, validationErrors: string[]) {
 
-        // Trigger
+        // Triggers
+        if ( mockResponse.triggers ) {
+            const instance = this;
+            mockResponse.triggers.forEach(trigger => {
+                instance.validateTrigger(trigger, validationErrors);
+            });
+        }
 
         // Actions
-        if ( !mockResponse.actions ) { validationErrors.push(ERRORS.VALIDATION_RESPONSE_ACTIONS); }
+        else if ( !mockResponse.actions ) { validationErrors.push(ERRORS.VALIDATION_RESPONSE_ACTIONS); }
         else if ( !mockResponse.actions.length ) { validationErrors.push(ERRORS.VALIDATION_RESPONSE_ACTIONS); }
         if ( mockResponse.actions ) {
             const instance = this;
             mockResponse.actions.forEach(action => {
+                instance.validateAction(action, validationErrors);
+            });
+        }
+    }
+
+    private validateTrigger(mockTrigger: IMockTrigger, validationErrors: string[]) {
+
+        // Type
+        if ( !mockTrigger.type ) { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
+        else if ( mockTrigger.type != "data" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
+        else {
+            this.validationDataTrigger(mockTrigger as IMockDataTriger, validationErrors);
+        }
+    }
+
+    private validationDataTrigger(mockDataTrigger: IMockDataTriger, validationErrors: string[]) {
+
+        // XPath or JSON
+        if ( !mockDataTrigger.xpath && !mockDataTrigger.json) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_DATA); }
+        else if ( mockDataTrigger.xpath && typeof mockDataTrigger.xpath != "string" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_DATA); }
+        else if ( mockDataTrigger.json && typeof mockDataTrigger.json != "string" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_DATA); }
+
+        // Actions
+        else if ( !mockDataTrigger.actions ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_ACTIONS); }
+        else if ( !mockDataTrigger.actions.length ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_ACTIONS); }
+        if ( mockDataTrigger.actions ) {
+            const instance = this;
+            mockDataTrigger.actions.forEach(action => {
                 instance.validateAction(action, validationErrors);
             });
         }

@@ -7,6 +7,7 @@ import { Context } from "./context";
 const regexFunction = /{{([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
 const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
 const regexRequestData = /{{\.([a-z|A-Z|0-9|_]+)\.([a-z|A-Z|0-9|_]+)}}/g;
+const regexRequestXML = /{{\s*\.request\.([a-zA-Z0-9|_|-|:|\.]+)\s*}}/g;
 
 export class TemplateManager {
     private static _instance : TemplateManager;
@@ -34,9 +35,7 @@ export class TemplateManager {
         bodyResult = await this.evaluateFunctions(content, context);
 
         // Evaluate requests
-        if ( context ) {
-            bodyResult = this.evaluateRequests(bodyResult, context);
-        }
+        bodyResult = this.evaluateRequests(bodyResult, context);
 
         // Apply properties
 
@@ -84,26 +83,97 @@ export class TemplateManager {
         }
     }
 
-    private evaluateRequests(body: string, context: Context) {
+    private evaluateRequests(content: string, context: Context) {
         winston.debug("TemplateManager.evaluateRequests");
+        if ( context.isJSONRequest ) {
+            return content = this.evaluateJSONRequests(content, context);
+        } else if ( context.isXMLRequest ) {
+            return content = this.evaluateXMLRequests(content, context);
+        } else {
+            return content;
+        }
+    }
+
+    private evaluateJSONRequests(body: string, context: Context) {
+        winston.debug("TemplateManager.evaluateJSONRequests");
         var bodyResult = body;
         var match = regexRequestData.exec(body);
         while ( match != null && match.length > 2) {
             const content = match[0];
             const propertyText = match[2];
-            const result = this.evaluateRequest(propertyText, context.request?.body);
+            const result = this.evaluateJSONRequest(propertyText, context.request?.body);
             bodyResult = bodyResult.replace(content, result);
             match = regexRequestData.exec(body);
         }
         return bodyResult;
     }
 
-    private evaluateRequest(property: string, requestBody: {[id: string]: string}) {
+    private evaluateJSONRequest(property: string, requestBody: {[id: string]: string}) {
         winston.debug(util.format("TemplateManager.evaluateRequest: %s", property));
         if ( requestBody[property] ) {
             return requestBody[property];
         } else {
             return "undefined";
+        }
+    }
+
+    private evaluateXMLRequests(content: string, context: Context) {
+        winston.debug("TemplateManager.evaluateXMLRequests");
+        var bodyResult = content;
+        var match = regexRequestXML.exec(content);
+        while ( match != null && match.length > 1) {
+            const content = match[0];
+            const path = match[1];
+            const result = this.evaluateXMLRequest(path, context.request?.body);
+            if ( result != null ) {
+                bodyResult = bodyResult.replace(content, result);
+            }
+            match = regexRequestXML.exec(content);
+        }
+        return bodyResult;
+    }
+
+    private evaluateXMLRequest(path: string, requestBody: any) {
+        winston.debug("TemplateManager.evaluateXMLRequest");
+        if ( requestBody ) {
+            const subPaths = path.split(".");
+            var currentElement = requestBody;
+            currentElement = this.navigateThroughtXMLNode(currentElement, "soapenv:Envelope");
+            currentElement = this.navigateThroughtXMLNode(currentElement, "soapenv:Body");
+            subPaths.forEach(subPath => {
+                const element = this.navigateThroughtXMLNode(currentElement, subPath);
+                if ( element ) {
+                    currentElement = element;
+                } else {
+                    return null;
+                }
+            });
+            if ( currentElement.length ) {
+                return currentElement[0];
+            } else {
+                return currentElement;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private navigateThroughtXMLNode(element: any, path: string) {
+        var subElement;
+        if ( element.length ) {
+            subElement = element.find((elt : {[id: string]: any}) => { return elt[path];});
+            if ( subElement ) {
+                subElement = subElement[path];
+            }
+        } else {
+            subElement = element[path];
+        }
+        if ( subElement ) {
+            return subElement;
+        } else {
+            const message = util.format("Invalid path expression. Impossible to find sub expression %s", path);
+            winston.warn("TemplateManager.evaluateXMLRequest - " + message);
+            return null;
         }
     }
 

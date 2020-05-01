@@ -1,6 +1,7 @@
 import { IMockAction } from "./mockAction";
+import { IMockTrigger } from "./mockTrigger";
 
 export interface IMockResponse {
-    trigger: string
+    triggers: IMockTrigger[];
     actions: IMockAction[]
 }

@@ -25,7 +25,7 @@ export module ERRORS {
     export const VALIDATION_SERVICE_METHOD = "The mock service method must match with one of the following value: GET, POST, PUT, DELETE";
     export const VALIDATION_SERVICE_PATH = "The mock service must have a path string attribute";
     export const VALIDATION_SERVICE_RESPONSE = "The mock service must have a response attribute";
-    export const VALIDATION_RESPONSE_ACTIONS = "The mock response must have a actions attribute";
+    export const VALIDATION_RESPONSE_ACTIONS = "The mock response must have an actions attribute";
     export const VALIDATION_ACTION_TYPE = "The mock action must have a type string attribute";
     export const VALIDATION_ACTIONMSG_STATUS = "The mock message action must have a status number attribute";
     export const VALIDATION_ACTIONMSG_BODY = "The mock message action must have a body or bodyFile string attribute";
@@ -33,6 +33,9 @@ export module ERRORS {
     export const VALIDATION_ACTIONSAVE_SOURCE = "The mock save action must have a source object defined";
     export const VALIDATION_ACTIONSAVE_SOURCE_TYPE = "The mock save action must have a source type attribute";
     export const VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME = "The mock save action must have a source field name attribute";
+    export const VALIDATION_TRIGGER_TYPE = "The mock trigger must have a type string attribute";
+    export const VALIDATION_TRIGGERDATA_DATA = "The mock trigger must have a xpath or a json string attribute";
+    export const VALIDATION_TRIGGERDATA_ACTIONS = "The mock trigger must have an actions attribute";
 }
 
 export module HTTP_METHODS {

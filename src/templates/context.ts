@@ -27,4 +27,20 @@ export class Context {
     public set newUUID(value) {
         this._newUUID = value;
     }
+
+    public get isXMLRequest() {
+        if ( this._request && this._request.headers ) {
+            return this._request.headers["content-type"]?.includes("text/xml") || this._request.headers["content-type"]?.includes("application/xml");
+        } else {
+            return false;
+        }
+    }
+
+    public get isJSONRequest() {
+        if ( this._request && this._request.headers ) {
+            return this._request.headers["content-type"]?.includes("application/json");
+        } else {
+            return false;
+        }
+    }
 }

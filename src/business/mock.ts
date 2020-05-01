@@ -13,6 +13,7 @@ export class Mock {
 
     public generate() {
         var code = "import * as fs from \"fs\";\n";
+        code += "import * as winston from \"winston\";\n";
         code += "import { Request, Response } from \"express\";\n";
         code += "import { TemplateManager } from \"../templateManager\";\n";
         code += "import { AuthenticationManager } from \"../authenticationManager\";\n";

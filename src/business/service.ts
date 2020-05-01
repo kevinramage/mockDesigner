@@ -10,13 +10,13 @@ export class Service {
     private _name : string;
     private _soapAction : string | undefined;
     private _authentication : IAuthentication | undefined;
-    private _trigger : IServiceTrigger;
+    private _triggers : IServiceTrigger[];
     private _route : Route;
 
     constructor() {
         this._mockName = "";
         this._name = "";
-        this._trigger = new ServiceWithoutTrigger();
+        this._triggers = [];
         this._route = new Route();
     }
 
@@ -50,7 +50,19 @@ export class Service {
 
         // Generate business method
         code += tab + util.format("public static async _%s(context: Context, res: Response) {\n", this.methodName);
-        code += this._trigger.generate(tab + "\t");
+
+        // Apply triggers
+        code += tab + "\tvar triggerApplied = false, expression, evaluation;\n\n"
+        this._triggers.forEach(trigger => {
+            code += trigger.generate(tab + "\t");
+        });        
+
+        // Apply a default trigger if there are no trigger to apply
+        code += tab + "\tif ( !triggerApplied ) {\n";
+        code += tab + util.format("\t\twinston.warn(\"%s.%s: No trigger to apply\");\n", this.mockName, this.methodName);
+        code += tab + "\t\tResponseHandler.sendError(res, \"No trigger to apply\", \"\");\n";
+        code += tab + "\t}\n";
+
         code += tab + "}\n";
 
         return code;
@@ -66,18 +78,15 @@ export class Service {
         return this._route.generate(this.mockName ,this);
     }
 
+    public addTrigger(trigger: IServiceTrigger) {
+        this._triggers.push(trigger);
+    }
+
     public get name() {
         return this._name;
     }
     public set name(value) {
         this._name = value;
-    }
-
-    public get trigger() {
-        return this._trigger;
-    }
-    public set trigger(value) {
-        this._trigger = value;
     }
 
     public get route() {
