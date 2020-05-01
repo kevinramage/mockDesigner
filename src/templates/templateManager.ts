@@ -26,6 +26,7 @@ export class TemplateManager {
         this._functions["Increment"] = TemplateManager.increment;
         this._functions["NewIntegerId"] = TemplateManager.newIntegerId;
         this._functions["NewUUID"] = TemplateManager.newUUID;
+        this._functions["Random"] = TemplateManager.random;
     }
 
     public async evaluate(content: string, context: Context) {
@@ -168,6 +169,11 @@ export class TemplateManager {
             await RedisManager.instance.setValue(key, (currentValue+1) + "");
         }
         return value;
+    }
+
+    public static async random(context: Context, maxValue: number) {
+        winston.debug("TemplateManager.random: " + maxValue);
+        return Math.trunc(Math.random() * maxValue);
     }
 
     private static async newIntegerId(context: Context) {
