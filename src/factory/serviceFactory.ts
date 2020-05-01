@@ -76,11 +76,8 @@ export class ServiceFactory {
 
         const serviceDataTrigger = new ServiceData();
 
-        // XPath
-        serviceDataTrigger.xpath = dataTrigger.xpath;
-
-        // JSON
-        serviceDataTrigger.json = dataTrigger.json;
+        // Expression
+        serviceDataTrigger.expression = dataTrigger.expression;
 
         // Actions
         dataTrigger.actions.forEach(action => {

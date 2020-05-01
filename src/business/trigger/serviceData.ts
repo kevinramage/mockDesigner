@@ -5,8 +5,7 @@ import { IServiceAction } from "../action/serviceAction";
 
 export class ServiceData implements IServiceTrigger {
 
-    private _xpath : string | undefined;
-    private _json : string | undefined;
+    private _expression : string | undefined;
     private _actions :  IServiceAction[];
 
     constructor() {
@@ -18,7 +17,7 @@ export class ServiceData implements IServiceTrigger {
         var code = "";
 
         // Evaluate expression
-        code += tab + util.format("expression = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.xpath);
+        code += tab + util.format("expression = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.expression);
         code += tab + "winston.info(\"Expression to evaluate:\" + expression);\n";
         code += tab + "try {\n"
         code += tab + "\tevaluation = eval(expression);\n";
@@ -43,16 +42,10 @@ export class ServiceData implements IServiceTrigger {
         this._actions.push(action);
     }
 
-    public get xpath() {
-        return this._xpath;
+    public get expression() {
+        return this._expression;
     }
-    public set xpath(value) {
-        this._xpath = value;
-    }
-    public get json() {
-        return this._json;
-    }
-    public set json(value) {
-        this._json = value;
+    public set expression(value) {
+        this._expression = value;
     }
 }

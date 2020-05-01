@@ -137,10 +137,9 @@ export class MockDesigner {
 
     private validationDataTrigger(mockDataTrigger: IMockDataTriger, validationErrors: string[]) {
 
-        // XPath or JSON
-        if ( !mockDataTrigger.xpath && !mockDataTrigger.json) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_DATA); }
-        else if ( mockDataTrigger.xpath && typeof mockDataTrigger.xpath != "string" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_DATA); }
-        else if ( mockDataTrigger.json && typeof mockDataTrigger.json != "string" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_DATA); }
+        // Expression
+        if ( !mockDataTrigger.expression) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_EXPRESSION); }
+        else if ( typeof mockDataTrigger.expression != "string" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_EXPRESSION); }
 
         // Actions
         else if ( !mockDataTrigger.actions ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_ACTIONS); }

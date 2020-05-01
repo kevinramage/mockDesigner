@@ -34,7 +34,7 @@ export module ERRORS {
     export const VALIDATION_ACTIONSAVE_SOURCE_TYPE = "The mock save action must have a source type attribute";
     export const VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME = "The mock save action must have a source field name attribute";
     export const VALIDATION_TRIGGER_TYPE = "The mock trigger must have a type string attribute";
-    export const VALIDATION_TRIGGERDATA_DATA = "The mock trigger must have a xpath or a json string attribute";
+    export const VALIDATION_TRIGGERDATA_EXPRESSION = "The mock trigger must have an expression string attribute";
     export const VALIDATION_TRIGGERDATA_ACTIONS = "The mock trigger must have an actions attribute";
 }
 
