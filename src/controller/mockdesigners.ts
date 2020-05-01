@@ -121,6 +121,7 @@ export class MockDesigners {
         this._mockProjectManagement.addTemplate("docker-compose.yml");
         this._mockProjectManagement.addTemplate("run.sh");
         this._mockProjectManagement.addTemplate("run.bat");
+        this._mockProjectManagement.addTemplate("XMLUtils.ts");
     }
 
     public get name() {

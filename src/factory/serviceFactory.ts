@@ -7,6 +7,9 @@ import { BasicAuthentication } from "../business/authentication/BasicAuthenticat
 import { ApiKeyAuthentication } from "../business/authentication/ApiKeyAuthentication";
 import { IMockDataTriger } from "../interface/mockDataTrigger";
 import { ServiceData } from "../business/trigger/serviceData";
+import { IMockCheckTrigger } from "../interface/mockCheckTrigger";
+import { ServiceCheck } from "../business/trigger/serviceCheck";
+import { IMockTrigger } from "interface/mockTrigger";
 
 export class ServiceFactory {
 
@@ -27,28 +30,21 @@ export class ServiceFactory {
             service.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
         }
 
-        // Default trigger if no triggers defined
-        if ( !serviceInterface.response.triggers) {
-            const trigger = new ServiceWithoutTrigger();
-            serviceInterface.response.actions.forEach(action => {
-                const actionBuilt = ActionFactory.build(action);
-                if ( actionBuilt != null ) {
-                    trigger.addAction(actionBuilt);
-                }
-            });
-            service.addTrigger(trigger);
-
         // Triggers
-        } else {
-            const instance = this;
-            serviceInterface.response.triggers.forEach(trigger => {
-                switch ( trigger.type ) {
-                    case "data":
-                        service.addTrigger(instance.buildDataTrigger(trigger as IMockDataTriger));
-                    break;
-                }
-            });
-        }
+        const instance = this;
+        serviceInterface.response.triggers.forEach(trigger => {
+            switch ( trigger.type ) {
+                case "none":
+                    service.addTrigger(instance.buildWithoutTrigger(trigger));
+                break;
+                case "data":
+                    service.addTrigger(instance.buildDataTrigger(trigger as IMockDataTriger));
+                break;
+                case "check":
+                    service.addTrigger(instance.buildCheckTrigger(trigger as IMockCheckTrigger));
+                break;
+            }
+        });
 
         // Authentication
         if ( serviceInterface.authentication ) {
@@ -72,8 +68,21 @@ export class ServiceFactory {
         return service;
     }
 
-    private static buildDataTrigger(dataTrigger: IMockDataTriger) {
+    private static buildWithoutTrigger(dataTrigger: IMockTrigger) {
+        const serviceWithoutTrigger = new ServiceWithoutTrigger();
 
+        // Actions
+        dataTrigger.actions.forEach(action => {
+            const actionBuilt = ActionFactory.build(action);
+            if ( actionBuilt != null ) {
+                serviceWithoutTrigger.addAction(actionBuilt);
+            }
+        });
+
+        return serviceWithoutTrigger;
+    }
+
+    private static buildDataTrigger(dataTrigger: IMockDataTriger) {
         const serviceDataTrigger = new ServiceData();
 
         // Expression
@@ -88,5 +97,25 @@ export class ServiceFactory {
         });
 
         return serviceDataTrigger;
+    }
+
+    private static buildCheckTrigger(dataTrigger: IMockCheckTrigger) {
+
+        const serviceCheckTrigger = new ServiceCheck();
+
+        // Mandatories
+        dataTrigger.mandatories.forEach(mandatory => {
+            serviceCheckTrigger.addMandatory(mandatory);
+        });
+
+        // Actions
+        dataTrigger.actions.forEach(action => {
+            const actionBuilt = ActionFactory.build(action);
+            if ( actionBuilt != null ) {
+                serviceCheckTrigger.addAction(actionBuilt);
+            }
+        });
+
+        return serviceCheckTrigger;
     }
 }

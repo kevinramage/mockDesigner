@@ -3,6 +3,7 @@ import * as winston from "winston";
 import { v4 } from "uuid";
 import { RedisManager } from "./redisManager";
 import { Context } from "./context";
+import { XMLUtils } from "./XMLUtils";
 
 const regexFunction = /{{([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
 const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
@@ -136,43 +137,8 @@ export class TemplateManager {
     private evaluateXMLRequest(path: string, requestBody: any) {
         winston.debug("TemplateManager.evaluateXMLRequest");
         if ( requestBody ) {
-            const subPaths = path.split(".");
-            var currentElement = requestBody;
-            currentElement = this.navigateThroughtXMLNode(currentElement, "soapenv:Envelope");
-            currentElement = this.navigateThroughtXMLNode(currentElement, "soapenv:Body");
-            subPaths.forEach(subPath => {
-                const element = this.navigateThroughtXMLNode(currentElement, subPath);
-                if ( element ) {
-                    currentElement = element;
-                } else {
-                    return null;
-                }
-            });
-            if ( currentElement.length ) {
-                return currentElement[0];
-            } else {
-                return currentElement;
-            }
+            return XMLUtils.getValue(requestBody, path);
         } else {
-            return null;
-        }
-    }
-
-    private navigateThroughtXMLNode(element: any, path: string) {
-        var subElement;
-        if ( element.length ) {
-            subElement = element.find((elt : {[id: string]: any}) => { return elt[path];});
-            if ( subElement ) {
-                subElement = subElement[path];
-            }
-        } else {
-            subElement = element[path];
-        }
-        if ( subElement ) {
-            return subElement;
-        } else {
-            const message = util.format("Invalid path expression. Impossible to find sub expression %s", path);
-            winston.warn("TemplateManager.evaluateXMLRequest - " + message);
             return null;
         }
     }

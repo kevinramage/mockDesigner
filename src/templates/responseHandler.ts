@@ -7,7 +7,7 @@ import { Context } from "./context";
 
 export class ResponseHandler {
 
-    public static sendContentFromFile(context: Context, res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
+    public static async sendContentFromFile(context: Context, res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
         winston.debug("ResponseHandler.sendContentFromFile");
         var body = "", errorMessage = "";
         const defaultResponseDirectory = "responses";
@@ -25,7 +25,7 @@ export class ResponseHandler {
             this.sendError(res, errorMessage, contentType);
         }
         if ( errorMessage == "") {
-            this.sendContent(context, res, status, body, headers);
+            await this.sendContent(context, res, status, body, headers);
         }
     }
 

@@ -113,24 +113,14 @@ export class MockDesigner {
                 instance.validateTrigger(trigger, validationErrors);
             });
         }
-
-        // Actions
-        else if ( !mockResponse.actions ) { validationErrors.push(ERRORS.VALIDATION_RESPONSE_ACTIONS); }
-        else if ( !mockResponse.actions.length ) { validationErrors.push(ERRORS.VALIDATION_RESPONSE_ACTIONS); }
-        if ( mockResponse.actions ) {
-            const instance = this;
-            mockResponse.actions.forEach(action => {
-                instance.validateAction(action, validationErrors);
-            });
-        }
     }
 
     private validateTrigger(mockTrigger: IMockTrigger, validationErrors: string[]) {
 
         // Type
         if ( !mockTrigger.type ) { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
-        else if ( mockTrigger.type != "data" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
-        else {
+        else if ( mockTrigger.type != "data" && mockTrigger.type != "check" && mockTrigger.type != "none") { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
+        else if ( mockTrigger.type == "data" ) {
             this.validationDataTrigger(mockTrigger as IMockDataTriger, validationErrors);
         }
     }

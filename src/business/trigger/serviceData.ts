@@ -16,23 +16,26 @@ export class ServiceData implements IServiceTrigger {
         winston.debug("ServiceData.generate");
         var code = "";
 
-        // Evaluate expression
-        code += tab + util.format("expression = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.expression);
-        code += tab + "winston.info(\"Expression to evaluate:\" + expression);\n";
-        code += tab + "try {\n"
-        code += tab + "\tevaluation = eval(expression);\n";
-        code += tab + "} catch (err) {\n"
-        code += tab + "\twinston.warn(\"An error occured during the expression evaluation: \", err);\n";
-        code += tab + "}\n\n"
+        // Generate code to evaluate expression
+        code += tab + "if ( !triggerApplied ) {\n";
+        code += tab + util.format("\texpression = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.expression);
+        code += tab + "\twinston.info(\"Expression to evaluate:\" + expression);\n";
+        code += tab + "\ttry {\n"
+        code += tab + "\t\tevaluation = eval(expression);\n";
+        code += tab + "\t} catch (err) {\n"
+        code += tab + "\t\twinston.warn(\"An error occured during the expression evaluation: \", err);\n";
+        code += tab + "\t}\n\n"
 
-        // Apply actions
-        code += tab + "if ( evaluation ) {\n";
-        code += tab + "\ttriggerApplied = true;\n";
+        // Execute actions
+        code += tab + "\tif ( evaluation ) {\n";
+        code += tab + "\t\ttriggerApplied = true;\n";
         this._actions.forEach(action => {
-            code += action.generate(tab + "\t" );
+            code += action.generate(tab + "\t\t" );
         });
-        code += tab + "\treturn;\n";
-        code += tab + "}\n\n\n";
+        code += tab + "\t}\n;"
+        code += tab + "}\n;"
+        
+        code += "\n\n";
 
         return code;
     }

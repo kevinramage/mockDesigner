@@ -25,7 +25,6 @@ export module ERRORS {
     export const VALIDATION_SERVICE_METHOD = "The mock service method must match with one of the following value: GET, POST, PUT, DELETE";
     export const VALIDATION_SERVICE_PATH = "The mock service must have a path string attribute";
     export const VALIDATION_SERVICE_RESPONSE = "The mock service must have a response attribute";
-    export const VALIDATION_RESPONSE_ACTIONS = "The mock response must have an actions attribute";
     export const VALIDATION_ACTION_TYPE = "The mock action must have a type string attribute";
     export const VALIDATION_ACTIONMSG_STATUS = "The mock message action must have a status number attribute";
     export const VALIDATION_ACTIONMSG_BODY = "The mock message action must have a body or bodyFile string attribute";

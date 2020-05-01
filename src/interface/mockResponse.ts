@@ -3,5 +3,4 @@ import { IMockTrigger } from "./mockTrigger";
 
 export interface IMockResponse {
     triggers: IMockTrigger[];
-    actions: IMockAction[]
 }

@@ -12,10 +12,13 @@ export class ServiceWithoutTrigger implements IServiceTrigger {
 
     public generate(tab: string) {
         winston.debug("ServiceWithoutTrigger.generate");
-        var code = "";
+        var code = tab + "if ( !triggerApplied ) {\n";
         this._actions.forEach(action => {
-            code += action.generate(tab);
+            code += action.generate(tab + "\t");
         });
+        code += tab + "\ttriggerApplied = true;\n";
+        code += tab + "}\n";
+        code += "\n\n";
         return code;
     }
 

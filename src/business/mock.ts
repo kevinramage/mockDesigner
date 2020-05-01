@@ -20,6 +20,7 @@ export class Mock {
         code += "import { ResponseHandler } from \"../responseHandler\";\n";
         code += "import { RedisManager } from \"../redisManager\";\n";
         code += "import { Context } from \"../context\";\n";
+        code += "import { XMLUtils } from \"../XMLUtils\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._services.forEach(service => {
