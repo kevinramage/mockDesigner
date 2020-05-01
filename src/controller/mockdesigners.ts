@@ -90,8 +90,9 @@ export class MockDesigners {
         this._mockProjectManagement.writeFiles("generated");
 
         // Copy data
-        FileManagement.copyDirectory("tests/JSON", "generated/JSON");
+        FileManagement.copyDirectory("tests/responses", "generated/responses");
         FileManagement.copyDirectory("tests/data", "generated/data");
+        FileManagement.copyDirectory("tests/scripts", "generated/scripts");
     }
 
     private generateFiles() {

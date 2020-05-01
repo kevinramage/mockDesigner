@@ -34,6 +34,14 @@ export module ERRORS {
     export const VALIDATION_ACTIONSAVE_SOURCE_TYPE = "The mock save action must have a source type attribute";
     export const VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME = "The mock save action must have a source field name attribute";
 }
+
+export module HTTP_METHODS {
+    export const GET = "GET";
+    export const POST = "POST";
+    export const PUT = "PUT";
+    export const DELETE = "DELETE";
+}
+
 export module AUTHENTICATION_TYPE {
     export const BASIC_AUTHENTICATION = "BASIC";
     export const APIKEY_AUTHENTICATION = "APIKEY";

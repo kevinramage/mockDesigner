@@ -8,6 +8,7 @@ import { IAuthentication } from "./authentication/authentication";
 export class Service {
     private _mockName: string;
     private _name : string;
+    private _soapAction : string | undefined;
     private _authentication : IAuthentication | undefined;
     private _trigger : IServiceTrigger;
     private _route : Route;
@@ -21,6 +22,7 @@ export class Service {
 
     public generate() {
         winston.debug("Service.generate");
+
         var code = this.generateService("\t");
         code += this.generateContextService();
         return code;
@@ -97,6 +99,13 @@ export class Service {
     }
     public set mockName(value) {
         this._mockName = value;
+    }
+
+    public get soapAction() {
+        return this._soapAction;
+    }
+    public set soapAction(value) {
+        this._soapAction = value;
     }
 
     public get methodName() {

@@ -18,7 +18,7 @@ export class Main {
         // Listen
         const port = Number.parseInt("{{.port}}");
         app.listen(port,() => {
-            winston.info("The {{.name}} server started");
+            winston.info("The {{.name}} server started on " + port);
         });
     }
 }

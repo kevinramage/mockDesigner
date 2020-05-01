@@ -10,12 +10,13 @@ export class ResponseHandler {
     public static sendContentFromFile(context: Context, res: Response, status: number, fileName: string, headers: {[key: string]: string} ) {
         winston.debug("ResponseHandler.sendContentFromFile");
         var body = "", errorMessage = "";
+        const defaultResponseDirectory = "responses";
         try {
-            const JSONDirectory = fs.existsSync("JSON") ? "JSON" : "../JSON";
-            const buffer = fs.readFileSync(util.format("%s/%s", JSONDirectory, fileName));
+            const responseDirectory = fs.existsSync(defaultResponseDirectory) ? defaultResponseDirectory : "../" +defaultResponseDirectory;
+            const buffer = fs.readFileSync(util.format("%s/%s", responseDirectory, fileName));
             body = buffer.toString();
         } catch (err) {
-            errorMessage = util.format("Impossible to find the file: JSON/%s", fileName);
+            errorMessage = util.format("Impossible to find the file: %s/%s", defaultResponseDirectory, fileName);
             const contentTypeKey = Object.keys(headers).find(h => { return h.toLowerCase() == "content-type"; });
             var contentType = "plain/text";
             if ( contentTypeKey ) {

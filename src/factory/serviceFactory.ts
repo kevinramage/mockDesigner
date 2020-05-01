@@ -2,7 +2,7 @@ import { IMockService } from "../interface/mockService";
 import { Service } from "../business/service";
 import { ServiceWithoutTrigger } from "../business/trigger/serviceWithoutTrigger";
 import { ActionFactory } from "./actionFactory";
-import { AUTHENTICATION_TYPE } from "../constantes";
+import { AUTHENTICATION_TYPE, HTTP_METHODS } from "../constantes";
 import { BasicAuthentication } from "../business/authentication/BasicAuthentication";
 import { ApiKeyAuthentication } from "../business/authentication/ApiKeyAuthentication";
 
@@ -12,10 +12,17 @@ export class ServiceFactory {
         const service : Service = new Service();
         service.name = serviceInterface.name;
 
+        // Soap action
+        if ( serviceInterface.soapAction ) {
+            service.soapAction = serviceInterface.soapAction;
+        }
+
         // Route
         service.route.path = serviceInterface.path;
         if ( serviceInterface.method ) {
             service.route.method = serviceInterface.method;
+        } else {
+            service.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
         }
 
         // Trigger

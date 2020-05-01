@@ -7,7 +7,6 @@
     "start": "npm run build && npm run copy:tests && node dist/mockGeneration.js",
     "build": "tsc",
     "copy:tests": "cpx tests/** dist/tests",
-    "copy:JSON": "cpx tests/JSON/** generated/JSON",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -35,6 +34,7 @@
     "@types/winston": "^2.4.4",
     "@types/yaml": "^1.9.7",
     "body-parser": "^1.19.0",
+    "body-parser-xml": "^2.0.0",
     "cpx": "^1.5.0",
     "dotenv": "^8.2.0",
     "errorhandler": "^1.5.1",
