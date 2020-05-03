@@ -245,6 +245,7 @@ export class TemplateManager {
                     if ( currentElement ) {
                         currentElement = currentElement[subpaths[i]];
                     } else {
+                        winston.warn(util.format("TemplateManager.evaluateDataSource: %s - Impossible to navigate throught undefined element (Previous element %s)", path, subpaths[i-1]));
                         return "undefined";
                     }
                 }
@@ -252,10 +253,12 @@ export class TemplateManager {
                 if ( currentElement ) {
                     return currentElement as string;
                 } else {
+                    winston.warn(util.format("TemplateManager.evaluateDataSource: %s - Impossible to navigate throught undefined element (Previous element %s)", path, subpaths[subpaths.length-1]));
                     return "undefined";
                 }
             }
         } else {
+            winston.warn(util.format("TemplateManager.evaluateDataSource: %s - Impossible to evaluate undefined path"));
             return "undefined";
         }
     }
@@ -269,11 +272,11 @@ export class TemplateManager {
                 const index = TemplateManager._random(length);
                 return dataSource[index];
             } else {
-                winston.error("TemplateManager.randomDataSource - Datasource not exists: " + dataSourceName);    
+                winston.warn("TemplateManager.randomDataSource - Datasource not exists: " + dataSourceName);    
                 return "undefined";
             }
         } catch (err) {
-            winston.error("TemplateManager.randomDataSource - Error during the access of datasource " + dataSourceName, err);
+            winston.warn("TemplateManager.randomDataSource - Error during the access of datasource " + dataSourceName, err);
             return "undefined";
         }
     }
