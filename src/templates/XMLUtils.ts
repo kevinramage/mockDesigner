@@ -48,8 +48,49 @@ export class XMLUtils {
         return (exists && currentElement.length && currentElement.length > 0);
     }
 
+    public static getSoapBodyNodeValue(content: any, paths: string[]) {
+        winston.debug(util.format("XMLUtils.getSoapBodyNodeValue: %s", paths.join(".")));
+        var currentElement = content;
+        currentElement = XMLUtils.navigateThroughtXMLNode(currentElement, "soapenv:Envelope");
+        currentElement = XMLUtils.navigateThroughtXMLNode(currentElement, "soapenv:Body");
+        if ( currentElement && typeof currentElement != "string" && currentElement.length && currentElement.length > 0 ) {
+            currentElement = currentElement[0];
+        }
+        return XMLUtils.getNodeValue(currentElement, paths);
+    }
+
+    public static getSoapHeaderNodeValue(content: any, paths: string[]) {
+        winston.debug(util.format("XMLUtils.getSoapHeaderNodeValue: %s", paths.join(".")));
+        var currentElement = content;
+        currentElement = XMLUtils.navigateThroughtXMLNode(currentElement, "soapenv:Envelope");
+        currentElement = XMLUtils.navigateThroughtXMLNode(currentElement, "soapenv:Header");
+        if ( currentElement && typeof currentElement != "string" && currentElement.length && currentElement.length > 0 ) {
+            currentElement = currentElement[0];
+        }
+        return XMLUtils.getNodeValue(currentElement, paths);
+    }
+
+    public static getNodeValue(content: any, paths: string[]) {
+        winston.debug(util.format("XMLUtils.getNodeValue: %s", paths.join(".")));
+        var currentElement = content;
+        for ( var i = 0; i < paths.length; i++) {
+            if ( currentElement[paths[i]]) {
+                currentElement = XMLUtils.navigateThroughtXMLNode(currentElement, paths[i]);
+                if ( currentElement && typeof currentElement != "string" && currentElement.length && currentElement.length > 0 ) {
+                    currentElement = currentElement[0];
+                }
+            } else {
+                return undefined;
+            }
+        }
+        if ( currentElement && currentElement["_"]) {
+            currentElement = currentElement["_"];
+        }
+        return currentElement as string;
+    }
+
     private static navigateThroughtXMLNode(element: any, path: string) {
-        //winston.debug("XMLUtils.navigateThrough");
+        winston.debug(util.format("XMLUtils.navigateThroughtXMLNode: %s", path));
         var subElement;
         if ( element.length ) {
             subElement = element.find((elt : {[id: string]: any}) => { return elt[path];});

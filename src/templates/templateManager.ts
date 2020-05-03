@@ -9,13 +9,8 @@ import { XMLUtils } from "./XMLUtils";
 
 // Request
 const regexRequestData = /{{\.([a-z|A-Z|0-9|_]+)\.([a-z|A-Z|0-9|_]+)}}/g;
-const regexRequestXML = /{{\s*\.request\.([a-zA-Z0-9|_|-|:|\.]+)\s*}}/g;
+//const regexRequestXML = /{{\s*\.request\.([a-zA-Z0-9|_|-|:|\.]+)\s*}}/g;
 
-
-export module DATASOURCE_NAME {
-    export const FIRSTNAME = "firstname";
-    export const LASTNAME = "lastname";
-}
 
 export class TemplateManager {
     private static _instance : TemplateManager;
@@ -70,18 +65,25 @@ export class TemplateManager {
         winston.debug("TemplateManager.evaluate");
         var bodyResult = content;
 
-        // Apply functions
-        bodyResult = await this.evaluateFunctions(content, context);
+        try {
 
-        // Evaluate requests
-        bodyResult = this.evaluateRequests(bodyResult, context);
+            // Apply functions
+            bodyResult = await this.evaluateFunctions(content, context);
 
-        // Apply properties
+            // Evaluate requests
+            bodyResult = this.evaluateRequests(bodyResult, context);
 
-        // Apply scripts
+            // Apply properties
 
-        // Apply data
-        bodyResult = this.evaluateDataSources(bodyResult, context);
+            // Apply scripts
+
+            // Apply data
+            bodyResult = this.evaluateDataSources(bodyResult, context);
+
+        } catch ( err ) {
+            winston.error("TemplateManager.evaluate - An internal error during the body evaluation: ", err);
+            bodyResult = "An internal error during the body evaluation";
+        }
 
         return bodyResult;
     }
@@ -147,40 +149,150 @@ export class TemplateManager {
         }
     }
 
-    private evaluateRequests(content: string, context: Context) {
+    private evaluateRequests(content: string, context: Context) : string {
         winston.debug("TemplateManager.evaluateRequests");
-        if ( context.isJSONRequest ) {
-            return content = this.evaluateJSONRequests(content, context);
-        } else if ( context.isXMLRequest ) {
-            return content = this.evaluateXMLRequests(content, context);
-        } else {
-            return content;
-        }
-    }
+        var bodyResult = content;
+        const regexRequests = /{{\s*\.request\.([a-zA-Z0-9|_|\-|:|\.|\$]+)\s*}}/g;
+        var match = regexRequests.exec(content);
+        if ( match && match.length > 1 ) {
 
-    private evaluateJSONRequests(body: string, context: Context) {
-        winston.debug("TemplateManager.evaluateJSONRequests");
-        var bodyResult = body;
-        var match = regexRequestData.exec(body);
-        while ( match != null && match.length > 2) {
-            const content = match[0];
-            const propertyText = match[2];
-            const result = this.evaluateJSONRequest(propertyText, context.request?.body);
-            bodyResult = bodyResult.replace(content, result);
-            match = regexRequestData.exec(body);
+            // Evaluate the data source
+            const fullMatch = match[0];
+            const path = match[1];
+            const result = this.evaluateRequest(path, context);
+
+            // Update the content 
+            if ( result ) {
+                bodyResult = bodyResult.replace(fullMatch, result);
+                return this.evaluateRequests(bodyResult, context);
+            } else {
+                return bodyResult;
+            }
         }
         return bodyResult;
     }
 
-    private evaluateJSONRequest(property: string, requestBody: {[id: string]: string}) {
-        winston.debug(util.format("TemplateManager.evaluateRequest: %s", property));
-        if ( requestBody[property] ) {
-            return requestBody[property];
+    private evaluateRequest(path: string, context: Context) {
+        winston.debug("TemplateManager.evaluateRequest");
+        if ( context.isJSONRequest ) {
+            return this.evaluateJSONRequest(path, context);
+        } else if ( context.isXMLRequest ) {
+            return this.evaluateXMLRequest(path, context);
         } else {
+            winston.warn("TemplateManager.evaluateRequest - Content Type not defined or not supported");
             return "undefined";
         }
     }
 
+    private evaluateJSONRequest(path: string, context: Context) {
+        winston.debug("TemplateManager.evaluateJSONRequest");
+        if ( context.request ) {
+            if ( path ) {
+                const subPath = path.split(".");
+                const pathRemaining = subPath.slice(1);
+                switch (subPath[0]) {
+                    case "query":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.query);
+                    case "params":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.params);
+                    case "headers":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.headers);
+                    case "body":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.body);
+                    default:
+                        winston.warn("TemplateManager.evaluateJSONRequest - Path not correctly defined");
+                        return "undefined";
+                }
+            } else {
+                winston.warn("TemplateManager.evaluateJSONRequest - Path undefined");
+                return "undefined";
+            }
+        } else {
+            winston.warn("TemplateManager.evaluateJSONRequest - Request undefined");
+            return "undefined";
+        }
+    }
+
+    private evaluateJSONRequestPath(paths: string[], content: any) {
+        winston.debug("TemplateManager.evaluateJSONRequestPath");
+        if ( paths && paths.length > 0) {
+            if ( content ) {
+                var currentElement = content;
+                for ( var i = 0; i < paths.length; i++) {
+                    if ( currentElement[paths[i]]) {
+                        currentElement = currentElement[paths[i]];
+                    } else {
+                        winston.warn(util.format("TemplateManager.evaluateJSONRequestPath - Path not correctly defined: %s", paths[i]));
+                        return "undefined";
+                    }
+                }
+                return currentElement as string;
+            } else {
+                winston.warn("TemplateManager.evaluateJSONRequestPath - Invalid content");
+                return "undefined";
+            }
+        } else {
+            winston.warn("TemplateManager.evaluateJSONRequestPath - Paths not correctly defined");
+            return "undefined";
+        }
+    }
+
+    private evaluateXMLRequest(path: string, context: Context) {
+        winston.debug("TemplateManager.evaluateXMLRequest");
+        if ( context.request ) {
+            if ( path ) {
+                const subPath = path.split(".");
+                const pathRemaining = subPath.slice(1);
+                switch (subPath[0]) {
+                    case "query":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.query);
+                    case "params":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.params);
+                    case "headers":
+                        return this.evaluateJSONRequestPath(pathRemaining, context.request.headers);
+                    case "body":
+                        return this.evaluateXMLRequestPath(pathRemaining, context.request.body, XMLUtils.getNodeValue);
+                    case "soapHeaders":
+                        return this.evaluateXMLRequestPath(pathRemaining, context.request.body, XMLUtils.getSoapHeaderNodeValue);
+                    case "soapBody":
+                        return this.evaluateXMLRequestPath(pathRemaining, context.request.body, XMLUtils.getSoapBodyNodeValue);
+                    default:
+                        winston.warn("TemplateManager.evaluateXMLRequest - Path not correctly defined");
+                        return "undefined";
+                }
+            } else {
+                winston.warn("TemplateManager.evaluateXMLRequest - Path undefined");
+                return "undefined";
+            }
+        } else {
+            winston.warn("TemplateManager.evaluateXMLRequest - Request undefined");
+            return "undefined";
+        }
+    }
+
+    private evaluateXMLRequestPath(paths: string[], content: any, getNodeValue: Function) {
+        winston.debug("TemplateManager.evaluateXMLRequestPath");
+        if ( paths && paths.length > 0) {
+            if ( content ) {
+                //const result = XMLUtils.getNodeValue(content, paths);
+                const result = getNodeValue.apply(null, [content, paths]);
+                if ( result ) {
+                    return result;
+                } else {
+                    winston.warn(util.format("TemplateManager.evaluateXMLRequestPath - Impossible to navigate throught the path: %s", paths.join(".")));
+                    return "undefined";
+                }
+            } else {
+                winston.warn("TemplateManager.evaluateXMLRequestPath - Invalid content");
+                return "undefined";
+            }
+        } else {
+            winston.warn("TemplateManager.evaluateXMLRequestPath - Paths not correctly defined");
+            return "undefined";
+        }
+    }
+
+    /*
     private evaluateXMLRequests(content: string, context: Context) {
         winston.debug("TemplateManager.evaluateXMLRequests");
         var bodyResult = content;
@@ -196,15 +308,18 @@ export class TemplateManager {
         }
         return bodyResult;
     }
+    */
 
-    private evaluateXMLRequest(path: string, requestBody: any) {
+/*
+    private evaluateXMLRequest(content: any, path: string) {
         winston.debug("TemplateManager.evaluateXMLRequest");
-        if ( requestBody ) {
-            return XMLUtils.getValue(requestBody, path);
+        if ( content ) {
+            return XMLUtils.getValue(content, path);
         } else {
             return null;
         }
     }
+    */
 
     private evaluateDataSources(content: string, context: Context) : string{
         winston.debug("TemplateManager.evaluateDataSources");
