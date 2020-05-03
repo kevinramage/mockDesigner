@@ -1,22 +1,39 @@
 import * as util from "util";
 import * as winston from "winston";
+import * as fs from "fs";
+import * as path from "path";
 import { v4 } from "uuid";
 import { RedisManager } from "./redisManager";
 import { Context } from "./context";
 import { XMLUtils } from "./XMLUtils";
 
+// Function
 const regexFunction = /{{([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
 const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
+
+// Request
 const regexRequestData = /{{\.([a-z|A-Z|0-9|_]+)\.([a-z|A-Z|0-9|_]+)}}/g;
 const regexRequestXML = /{{\s*\.request\.([a-zA-Z0-9|_|-|:|\.]+)\s*}}/g;
+
+
+export module DATASOURCE_NAME {
+    export const FIRSTNAME = "firstname";
+    export const LASTNAME = "lastname";
+}
 
 export class TemplateManager {
     private static _instance : TemplateManager;
     private _functions : {[functionName: string]: Function};
+    private _dataSources : {[functionName: string]: object[]};
 
     private constructor() {
         this._functions = {};
+        this._dataSources = {};
+    }
+
+    public init() {
         this.registerFunction();
+        this.registerDataSources();
     }
 
     private registerFunction() {
@@ -27,6 +44,28 @@ export class TemplateManager {
         this._functions["NewIntegerId"] = TemplateManager.newIntegerId;
         this._functions["NewUUID"] = TemplateManager.newUUID;
         this._functions["Random"] = TemplateManager.random;
+    }
+
+    private registerDataSources() {
+        winston.debug("TemplateManager.registerDataSources");
+        const instance = this;
+        try {
+            fs.readdirSync("data").forEach(file => {
+                if ( file.endsWith(".json")) {
+                    try {
+                        const fileName = path.basename(file, ".json");
+                        const fileUri = path.join("data", file);
+                        const content = fs.readFileSync(fileUri);
+                        const data = JSON.parse(content.toString());
+                        instance._dataSources[fileName] = data as object[];
+                    } catch ( err ) {
+                        winston.error("TemplateManager.registerDataSources - Error during the datasource reading ", err);
+                    }
+                }
+            });
+        } catch (err) {
+            winston.error("TemplateManager.registerDataSources - Error during the datasource directory reading ", err);
+        }
     }
 
     public async evaluate(content: string, context: Context) {
@@ -41,7 +80,10 @@ export class TemplateManager {
 
         // Apply properties
 
+        // Apply scripts
+
         // Apply data
+        bodyResult = this.evaluateDataSources(bodyResult, context);
 
         return bodyResult;
     }
@@ -58,7 +100,7 @@ export class TemplateManager {
             args.unshift(context);
             const result = await this.evaluateFunction(functionName, args);
             bodyResult = bodyResult.replace(content, result);
-            match = regexFunction.exec(content);
+            match = regexFunction.exec(bodyResult);
         }
         return bodyResult;
     }
@@ -130,7 +172,7 @@ export class TemplateManager {
             if ( result != null ) {
                 bodyResult = bodyResult.replace(content, result);
             }
-            match = regexRequestXML.exec(content);
+            match = regexRequestXML.exec(bodyResult);
         }
         return bodyResult;
     }
@@ -144,6 +186,97 @@ export class TemplateManager {
         }
     }
 
+    private evaluateDataSources(content: string, context: Context) : string{
+        winston.debug("TemplateManager.evaluateDataSources");
+        var bodyResult = content;
+        const regexData = /{{\s*\.data\.([a-zA-Z0-9|_|-|\.]+)\s*}}/g;
+        var match = regexData.exec(bodyResult);
+        if ( match && match.length > 1 ) {
+
+            // Evaluate the data source
+            const fullMatch = match[0];
+            const path = match[1];
+            const result = this.evaluateDataSource(path, context);
+
+            // Update the content 
+            if ( result ) {
+                bodyResult = bodyResult.replace(fullMatch, result);
+                return this.evaluateDataSources(bodyResult, context);
+            } else {
+                return bodyResult;
+            }
+        }
+        return bodyResult;
+
+        /*
+        while ( match != null && match.length > 1) {
+            const content = match[0];
+            const path = match[1];
+            const result = this.evaluateDataSource(path, context);
+            if ( result != null ) {
+                bodyResult = bodyResult.replace(content, result);
+            }
+            match = regexData.exec(bodyResult);
+        }
+        return bodyResult;
+        */
+    }
+
+    private evaluateDataSource(path: string, context: Context) {
+        winston.debug("TemplateManager.evaluateDataSource: " + path);
+        if ( path ) {
+            const subpaths = path.split(".");
+            if ( subpaths.length == 1 ) {
+                return this.randomDataSource(subpaths[0]) + "";
+            } else if ( subpaths.length > 1 ) {
+
+                // Identify datasource
+                var dataSource;
+                if ( !context.dataSources[subpaths[0]]) {
+                    dataSource = this.randomDataSource(subpaths[0]) as object;
+                    context.dataSources[subpaths[0]] = dataSource;
+                } else {
+                    dataSource = context.dataSources[subpaths[0]];
+                }
+
+                // Navigate through the object
+                var currentElement : any = dataSource;
+                for ( var i = 1; i < subpaths.length; i++) {
+                    if ( currentElement ) {
+                        currentElement = currentElement[subpaths[i]];
+                    } else {
+                        return "undefined";
+                    }
+                }
+
+                if ( currentElement ) {
+                    return currentElement as string;
+                } else {
+                    return "undefined";
+                }
+            }
+        } else {
+            return "undefined";
+        }
+    }
+
+    private randomDataSource(dataSourceName: string) {
+        winston.debug("TemplateManager.randomDataSource: " + dataSourceName);
+        try {
+            const dataSource = TemplateManager.instance._dataSources[dataSourceName];
+            if ( dataSource ) {
+                const length = dataSource.length;
+                const index = TemplateManager._random(length);
+                return dataSource[index];
+            } else {
+                winston.error("TemplateManager.randomDataSource - Datasource not exists: " + dataSourceName);    
+                return "undefined";
+            }
+        } catch (err) {
+            winston.error("TemplateManager.randomDataSource - Error during the access of datasource " + dataSourceName, err);
+            return "undefined";
+        }
+    }
 
     public static async uuid(context?: Context) {
         winston.debug("TemplateManager.uuid");
@@ -173,6 +306,9 @@ export class TemplateManager {
 
     public static async random(context: Context, maxValue: number) {
         winston.debug("TemplateManager.random: " + maxValue);
+        return TemplateManager._random(maxValue);
+    }
+    private static _random(maxValue: number) {
         return Math.trunc(Math.random() * maxValue);
     }
 

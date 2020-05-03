@@ -2,11 +2,13 @@ import { Request } from "express";
 
 export class Context {
     private _request : Request | undefined;
+    private _dataSources : {[key: string] : object};
     private _newIntegerId : number | undefined;
     private _newUUID : string | undefined ;
 
     constructor(request ?: Request) {
         this._request = request;
+        this._dataSources = {};
     }
 
     public get request() {
@@ -26,6 +28,10 @@ export class Context {
     }
     public set newUUID(value) {
         this._newUUID = value;
+    }
+
+    public get dataSources() {
+        return this._dataSources;
     }
 
     public get isXMLRequest() {

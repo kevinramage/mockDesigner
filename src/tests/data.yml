@@ -4,14 +4,11 @@ services:
     method: POST
     path: /api/v1/myService
     response:
-      actions:
-      - type: save
-        key: user
-        source: 
-          type: NewIntegerId
-          fieldName: id
-      - type: message
-        status: 200
-        headers:
-          Content-Type: application/json
-        bodyFile: data.json
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          headers:
+            Content-Type: application/json
+          bodyFile: data.json

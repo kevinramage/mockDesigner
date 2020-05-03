@@ -1,6 +1,13 @@
 {
-    "id": {{NewIntegerId()}},
-    "username": "{{.data.username}}",
+    "id": 1,
+    "username": "test",
     "password": "****",
-    "group": "{{.data.group}}"
+    "fisrtName": "{{.data.firstname}}",
+    "lastName": "{{.data.lastname}}",
+    "cityname": "{{.data.cityname}}",
+    "postalcode": "{{.data.postalcode_fr}}",
+    "city": {
+        "postalCode": "{{.data.city_fr.codePostal}}",
+        "name": "{{.data.city_fr.nomCommune}}"
+    }
 }

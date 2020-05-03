@@ -2,6 +2,7 @@ import * as winston from "winston";
 import DailyRotateFile = require("winston-daily-rotate-file");
 import app from "./app";
 import { RedisManager } from "./redisManager";
+import { TemplateManager } from "./templateManager";
 
 export class Main {
 
@@ -14,6 +15,9 @@ export class Main {
 
         // Redis manager
         RedisManager.instance.init();
+
+        // Initialize template manager
+        TemplateManager.instance.init();
 
         // Listen
         const port = Number.parseInt("{{.port}}");
