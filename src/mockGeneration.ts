@@ -78,7 +78,7 @@ export class Main {
             } catch ( ex ) {
                 //winston.error("An error occured during the process: ", ex);
                 const errorMessage = ex.message as string;
-                if ( errorMessage.includes('\n')) {
+                if ( errorMessage && errorMessage.includes('\n')) {
                     errorMessage.split('\n').forEach(message => {
                         console.error("ERROR - " + message);
                     });

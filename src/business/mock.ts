@@ -15,12 +15,12 @@ export class Mock {
         var code = "import * as fs from \"fs\";\n";
         code += "import * as winston from \"winston\";\n";
         code += "import { Request, Response } from \"express\";\n";
-        code += "import { TemplateManager } from \"../templateManager\";\n";
-        code += "import { AuthenticationManager } from \"../authenticationManager\";\n";
-        code += "import { ResponseHandler } from \"../responseHandler\";\n";
-        code += "import { RedisManager } from \"../redisManager\";\n";
+        code += "import { TemplateManager } from \"../manager/templateManager\";\n";
+        code += "import { AuthenticationManager } from \"../manager/authenticationManager\";\n";
+        code += "import { ResponseHandler } from \"../manager/responseHandler\";\n";
+        code += "import { RedisManager } from \"../manager/redisManager\";\n";
         code += "import { Context } from \"../context\";\n";
-        code += "import { XMLUtils } from \"../XMLUtils\";\n";
+        code += "import { XMLUtils } from \"../util/XMLUtils\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._services.forEach(service => {

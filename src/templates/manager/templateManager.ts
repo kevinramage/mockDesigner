@@ -4,8 +4,8 @@ import * as fs from "fs";
 import * as path from "path";
 import { v4 } from "uuid";
 import { RedisManager } from "./redisManager";
-import { Context } from "./context";
-import { XMLUtils } from "./XMLUtils";
+import { Context } from "../context";
+import { XMLUtils } from "../util/XMLUtils";
 
 
 export class TemplateManager {

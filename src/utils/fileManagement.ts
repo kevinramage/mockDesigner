@@ -31,4 +31,19 @@ export class FileManagement {
         });
     }
 
+    public static readDirectoryReccursively(source: string) {
+        var files : string[] = [];
+
+        fs.readdirSync(source).forEach(file => {
+            const fileName = path.join(source, file);
+            if ( fs.lstatSync(fileName).isDirectory() ) {
+                const subFiles = FileManagement.readDirectoryReccursively(fileName);
+                files = files.concat(subFiles);
+            } else {
+                files.push(fileName);
+            }
+        });
+
+        return files;
+    }
 }

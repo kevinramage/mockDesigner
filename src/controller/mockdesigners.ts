@@ -7,6 +7,7 @@ import { KEYS, ERRORS } from "../constantes";
 import { Mocks } from "../business/mocks";
 import { Mock } from "../business/mock";
 import { FileManagement } from "../utils/fileManagement";
+import { IKeyValue } from "../interface/keyValue";
 
 export class MockDesigners {
 
@@ -107,21 +108,26 @@ export class MockDesigners {
 
     private addProjectFiles() {
         winston.debug("MockDesigners.addProjectFiles");
-        this._mockProjectManagement.addTemplate("package.json", {key: KEYS.APPNAME, value: this._name.toLowerCase()});
-        this._mockProjectManagement.addTemplate("tsconfig.json");
-        this._mockProjectManagement.addTemplate("index.ts", {key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""});
-        this._mockProjectManagement.addTemplate("app.ts");
-        this._mockProjectManagement.addTemplate("routes.ts");
-        this._mockProjectManagement.addTemplate("redisManager.ts");
-        this._mockProjectManagement.addTemplate("templateManager.ts");
-        this._mockProjectManagement.addTemplate("context.ts");
-        this._mockProjectManagement.addTemplate("authenticationManager.ts");
-        this._mockProjectManagement.addTemplate("responseHandler.ts");
-        this._mockProjectManagement.addTemplate("Dockerfile");
-        this._mockProjectManagement.addTemplate("docker-compose.yml");
-        this._mockProjectManagement.addTemplate("run.sh");
-        this._mockProjectManagement.addTemplate("run.bat");
-        this._mockProjectManagement.addTemplate("XMLUtils.ts");
+
+        // Variables
+        const variables : {[key: string] : IKeyValue[]} = {};
+        variables["package.json"] = [{key: KEYS.APPNAME, value: this._name.toLowerCase()}];
+        variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}];
+        
+        // Read all files present in templates directory
+        const instance = this;
+        FileManagement.readDirectoryReccursively("templates").forEach(file => {
+            const fileName = file.substring(("generated/").length);
+            if ( variables[fileName] ) {
+                var args : [string, ...IKeyValue[]] = [fileName];
+                variables[fileName].forEach(conf => {
+                    args.push(conf);
+                });
+                instance._mockProjectManagement.addTemplate.apply(instance._mockProjectManagement, args);
+            } else {
+              instance._mockProjectManagement.addTemplate(fileName);
+            }
+        });
     }
 
     public get name() {

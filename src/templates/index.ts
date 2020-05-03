@@ -1,8 +1,8 @@
 import * as winston from "winston";
 import DailyRotateFile = require("winston-daily-rotate-file");
 import app from "./app";
-import { RedisManager } from "./redisManager";
-import { TemplateManager } from "./templateManager";
+import { RedisManager } from "./manager/redisManager";
+import { TemplateManager } from "./manager/templateManager";
 
 export class Main {
 

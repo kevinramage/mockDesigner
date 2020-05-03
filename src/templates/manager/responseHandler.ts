@@ -3,7 +3,7 @@ import * as util from "util";
 import * as winston from "winston";
 import { Response } from "express";
 import { TemplateManager } from "./templateManager";
-import { Context } from "./context";
+import { Context } from "../context";
 
 export class ResponseHandler {
 
