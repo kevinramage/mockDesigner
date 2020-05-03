@@ -11,6 +11,8 @@ Mock designer system provide you some natives functions to generate values:
 * RandomInteger
 * RandomString
 * RandomDate
+* UpperCase
+* LowerCase
 
 ### UUID
 This function will use the Universally Unique Identifier version 4 to generate unique hexadecimal value.
@@ -145,9 +147,71 @@ RandomString()
 }
 ```
 
+### UpperCase
+Classic string uppercase function
+> **Usage**:
+UpperCase(content)
+*Inputs*:
+--- content: The content to proceed
+*Output*: An uppercase string
+
+> **Example**:
+```json
+{
+    "id": 1,
+    "upperCaseConstant": "{{UpperCase(test)}}",
+    "upperCaseRequest": "{{UpperCase({{.request.body.username}})}}",
+}
+```
+
+> **Result**:
+```json
+{
+    "id": 1,
+    "upperCaseConstant": "TEST",
+    "upperCaseRequest": "TEST",
+}
+```
+
+### LowerCase
+Classic string lower case function
+> **Usage**:
+LowerCase(content)
+*Inputs*:
+--- content: The content to proceed
+*Output*: A lowercase string
+
+> **Example**:
+```json
+{
+    "id": 1,
+    "lowerCaseConstant": "{{LowerCase(Test)}}",
+    "lowerCaseRequest": "{{LowerCase({{.request.body.username}})}}",
+}
+```
+
+> **Result**:
+```json
+{
+    "id": 1,
+    "lowerCaseConstant": "test",
+    "lowerCaseRequest": "test",
+}
+```
+
+
 ## Complexe usage 
 
-Mock designer allow you to call some functions 
+Mock designer allow you to call functions on expression. The expression will be evaluated first and after the function will be applied on the result of the evaluation
+
+**Example**:
+```json
+{
+    "id": 1,
+    "upperCaseConstant": "{{UpperCase(test)}}",
+    "upperCaseRequest": "{{UpperCase({{.request.body.username}})}}",
+}
+```
 
 ## Extends functions
 

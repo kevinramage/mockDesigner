@@ -7,10 +7,6 @@ import { RedisManager } from "./redisManager";
 import { Context } from "./context";
 import { XMLUtils } from "./XMLUtils";
 
-// Request
-const regexRequestData = /{{\.([a-z|A-Z|0-9|_]+)\.([a-z|A-Z|0-9|_]+)}}/g;
-//const regexRequestXML = /{{\s*\.request\.([a-zA-Z0-9|_|-|:|\.]+)\s*}}/g;
-
 
 export class TemplateManager {
     private static _instance : TemplateManager;
@@ -37,6 +33,8 @@ export class TemplateManager {
         this._functions["CurrentDate"] = TemplateManager.currentDate;
         this._functions["RandomInteger"] = TemplateManager.randomInteger;
         this._functions["RandomString"] = TemplateManager.randomString;
+        this._functions["UpperCase"] = TemplateManager.upperCase;
+        this._functions["LowerCase"] = TemplateManager.lowerCase;
     }
 
     private registerDataSources() {
@@ -91,7 +89,7 @@ export class TemplateManager {
     private async evaluateFunctions(content: string, context: Context) : Promise<string>{
         winston.debug("TemplateManager.evaluateFunctions");
         var bodyResult = content;
-        const regexFunction = /{{\s*([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
+        const regexFunction = /{{\s*([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_|{|}|\.]+(\s*,\s*[a-zA-Z0-9|_|{|}|\.]+)*)?\s*\)\s*)}}/g;
         var match = regexFunction.exec(content);
         if ( match && match.length > 2 ) {
 
@@ -112,19 +110,19 @@ export class TemplateManager {
         return bodyResult;
     }
 
-    private evaluateFunctionArguments(content: string) {
+    private async evaluateFunctionArguments(content: string, context: Context) {
         winston.debug("TemplateManager.evaluateFunctionArguments");
 
         var args : any[] = [];
-        const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
+        const regexFunctionArg = /([a-zA-Z0-9|_|{|}|\.]+)/g;
         var match = regexFunctionArg.exec(content);
         if ( match && match.length > 1 ) {
 
             // Evaluate argument
-            const argument = match[1];
+            const argument = await this.evaluate(match[1], context)
             args.push(argument);
             const remaining = content.substring(argument.length);
-            const remainingArguments = this.evaluateFunctionArguments(remaining);
+            const remainingArguments = await this.evaluateFunctionArguments(remaining, context);
             if ( remainingArguments && remainingArguments.length > 0 ) {
                 args = args.concat(remainingArguments);
             }
@@ -136,7 +134,7 @@ export class TemplateManager {
         winston.debug(util.format("TemplateManager.evaluateFunction: %s", functionName));
 
         // Parse arguments
-        const args = this.evaluateFunctionArguments(argumentsText);
+        const args = await this.evaluateFunctionArguments(argumentsText, context);
         args.unshift(context);
 
         // Call the function
@@ -274,7 +272,6 @@ export class TemplateManager {
         winston.debug("TemplateManager.evaluateXMLRequestPath");
         if ( paths && paths.length > 0) {
             if ( content ) {
-                //const result = XMLUtils.getNodeValue(content, paths);
                 const result = getNodeValue.apply(null, [content, paths]);
                 if ( result ) {
                     return result;
@@ -292,34 +289,6 @@ export class TemplateManager {
         }
     }
 
-    /*
-    private evaluateXMLRequests(content: string, context: Context) {
-        winston.debug("TemplateManager.evaluateXMLRequests");
-        var bodyResult = content;
-        var match = regexRequestXML.exec(content);
-        while ( match != null && match.length > 1) {
-            const content = match[0];
-            const path = match[1];
-            const result = this.evaluateXMLRequest(path, context.request?.body);
-            if ( result != null ) {
-                bodyResult = bodyResult.replace(content, result);
-            }
-            match = regexRequestXML.exec(bodyResult);
-        }
-        return bodyResult;
-    }
-    */
-
-/*
-    private evaluateXMLRequest(content: any, path: string) {
-        winston.debug("TemplateManager.evaluateXMLRequest");
-        if ( content ) {
-            return XMLUtils.getValue(content, path);
-        } else {
-            return null;
-        }
-    }
-    */
 
     private evaluateDataSources(content: string, context: Context) : string{
         winston.debug("TemplateManager.evaluateDataSources");
@@ -445,6 +414,26 @@ export class TemplateManager {
     private static randomString(context: Context) {
         winston.debug("TemplateManager.randomString");
         return TemplateManager.instance.randomValueFromDataSource("words");
+    }
+
+    private static upperCase(context: string, content: string) {
+        winston.debug("TemplateManager.upperCase");
+        if ( content ) {
+            return content.toUpperCase();
+        } else {
+            winston.warn("TemplateManager.upperCase - upperCase function require one parameter");
+            return "undefined";
+        }
+    }
+
+    private static lowerCase(context: string, content: string) {
+        winston.debug("TemplateManager.lowerCase");
+        if ( content ) {
+            return content.toLowerCase();
+        } else {
+            winston.warn("TemplateManager.lowerCase - lowerCase function require one parameter");
+            return "undefined";
+        }
     }
 
 

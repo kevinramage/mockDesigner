@@ -5,5 +5,9 @@
     "uniqueValue": {{UniqueID()}},
     "currentDate": "{{CurrentDate()}}",
     "randomInteger": "{{RandomInteger(100)}}",
-    "randomString": "{{RandomString()}}"
+    "randomString": "{{RandomString()}}",
+    "upperCaseConstant": "{{UpperCase(test)}}",
+    "upperCaseRequest": "{{UpperCase({{.request.body.username}})}}",
+    "lowerCaseConstant": "{{LowerCase(Test)}}",
+    "lowerCaseRequest": "{{LowerCase({{.request.body.username}})}}",
 }
