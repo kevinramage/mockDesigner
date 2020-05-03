@@ -1,6 +1,9 @@
 {
     "id": 1,
-    "name": "{{Increment(USER)}}",
-    "uniqueString": "{{UUID()}}",
-    "uniqueValue": {{UniqueID()}}
+    "increment": {{ Increment(USER) }},
+    "uniqueString": "{{ UUID() }}",
+    "uniqueValue": {{UniqueID()}},
+    "currentDate": "{{CurrentDate()}}",
+    "randomInteger": "{{RandomInteger(100)}}",
+    "randomString": "{{RandomString()}}"
 }

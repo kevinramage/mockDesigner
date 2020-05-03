@@ -1,12 +1,14 @@
 name: MyMock
 services:
   - name: "myService"
-    method: GET
+    method: POST
     path: /api/v1/myService
     response:
-      actions:
-      - type: message
-        status: 200
-        headers:
-          content-type: application/json
-        bodyFile: functions.json
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          headers:
+            content-type: application/json
+          bodyFile: functions.json

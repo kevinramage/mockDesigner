@@ -7,10 +7,6 @@ import { RedisManager } from "./redisManager";
 import { Context } from "./context";
 import { XMLUtils } from "./XMLUtils";
 
-// Function
-const regexFunction = /{{([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
-const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
-
 // Request
 const regexRequestData = /{{\.([a-z|A-Z|0-9|_]+)\.([a-z|A-Z|0-9|_]+)}}/g;
 const regexRequestXML = /{{\s*\.request\.([a-zA-Z0-9|_|-|:|\.]+)\s*}}/g;
@@ -41,9 +37,11 @@ export class TemplateManager {
         this._functions["UUID"] = TemplateManager.uuid;
         this._functions["UniqueID"] = TemplateManager.uniqueId;
         this._functions["Increment"] = TemplateManager.increment;
-        this._functions["NewIntegerId"] = TemplateManager.newIntegerId;
-        this._functions["NewUUID"] = TemplateManager.newUUID;
-        this._functions["Random"] = TemplateManager.random;
+        //this._functions["NewIntegerId"] = TemplateManager.newIntegerId;
+        //this._functions["NewUUID"] = TemplateManager.newUUID;
+        this._functions["CurrentDate"] = TemplateManager.currentDate;
+        this._functions["RandomInteger"] = TemplateManager.randomInteger;
+        this._functions["RandomString"] = TemplateManager.randomString;
     }
 
     private registerDataSources() {
@@ -88,36 +86,58 @@ export class TemplateManager {
         return bodyResult;
     }
 
-    private async evaluateFunctions(content: string, context: Context) {
+    private async evaluateFunctions(content: string, context: Context) : Promise<string>{
         winston.debug("TemplateManager.evaluateFunctions");
         var bodyResult = content;
+        const regexFunction = /{{\s*([a-zA-Z0-9|_]+)\s*(\(\s*([a-zA-Z0-9|_]+(\s*,\s*[a-zA-Z0-9|_]+)*)?\s*\)\s*)}}/g;
         var match = regexFunction.exec(content);
-        while ( match != null && match.length > 2) {
-            const content = match[0];
+        if ( match && match.length > 2 ) {
+
+            // Evaluate the data source
+            const fullMatch = match[0];
             const functionName = match[1];
             const argumentsText = match[2];
-            const args = this.evaluateFunctionArguments(argumentsText);
-            args.unshift(context);
-            const result = await this.evaluateFunction(functionName, args);
-            bodyResult = bodyResult.replace(content, result);
-            match = regexFunction.exec(bodyResult);
+            const result = await this.evaluateFunction(functionName, argumentsText, context);
+
+            // Update the content 
+            if ( result ) {
+                bodyResult = bodyResult.replace(fullMatch, result);
+                return await this.evaluateFunctions(bodyResult, context);
+            } else {
+                return bodyResult;
+            }
         }
         return bodyResult;
     }
 
-    private evaluateFunctionArguments(argsText: string) {
+    private evaluateFunctionArguments(content: string) {
         winston.debug("TemplateManager.evaluateFunctionArguments");
-        const args : any[] = [];
-        var match = regexFunctionArg.exec(argsText);
-        while ( match != null && match.length > 1) {
-            args.push(match[1] as string);
-            match = regexFunctionArg.exec(argsText);
+
+        var args : any[] = [];
+        const regexFunctionArg = /([a-zA-Z0-9|_]+)/g;
+        var match = regexFunctionArg.exec(content);
+        if ( match && match.length > 1 ) {
+
+            // Evaluate argument
+            const argument = match[1];
+            args.push(argument);
+            const remaining = content.substring(argument.length);
+            const remainingArguments = this.evaluateFunctionArguments(remaining);
+            if ( remainingArguments && remainingArguments.length > 0 ) {
+                args = args.concat(remainingArguments);
+            }
         }
         return args;
     }
 
-    private async evaluateFunction(functionName: string, args: string[]) {
+    private async evaluateFunction(functionName: string, argumentsText: string, context: Context) {
         winston.debug(util.format("TemplateManager.evaluateFunction: %s", functionName));
+
+        // Parse arguments
+        const args = this.evaluateFunctionArguments(argumentsText);
+        args.unshift(context);
+
+        // Call the function
         if ( this._functions[functionName] ) {
             const value = await this._functions[functionName].apply(null, args);
             return value + "";
@@ -207,19 +227,6 @@ export class TemplateManager {
             }
         }
         return bodyResult;
-
-        /*
-        while ( match != null && match.length > 1) {
-            const content = match[0];
-            const path = match[1];
-            const result = this.evaluateDataSource(path, context);
-            if ( result != null ) {
-                bodyResult = bodyResult.replace(content, result);
-            }
-            match = regexData.exec(bodyResult);
-        }
-        return bodyResult;
-        */
     }
 
     private evaluateDataSource(path: string, context: Context) {
@@ -227,13 +234,13 @@ export class TemplateManager {
         if ( path ) {
             const subpaths = path.split(".");
             if ( subpaths.length == 1 ) {
-                return this.randomDataSource(subpaths[0]) + "";
+                return this.randomValueFromDataSource(subpaths[0]) + "";
             } else if ( subpaths.length > 1 ) {
 
                 // Identify datasource
                 var dataSource;
                 if ( !context.dataSources[subpaths[0]]) {
-                    dataSource = this.randomDataSource(subpaths[0]) as object;
+                    dataSource = this.randomValueFromDataSource(subpaths[0]) as object;
                     context.dataSources[subpaths[0]] = dataSource;
                 } else {
                     dataSource = context.dataSources[subpaths[0]];
@@ -263,7 +270,7 @@ export class TemplateManager {
         }
     }
 
-    private randomDataSource(dataSourceName: string) {
+    private randomValueFromDataSource(dataSourceName: string) {
         winston.debug("TemplateManager.randomDataSource: " + dataSourceName);
         try {
             const dataSource = TemplateManager.instance._dataSources[dataSourceName];
@@ -307,13 +314,24 @@ export class TemplateManager {
         return value;
     }
 
-    public static async random(context: Context, maxValue: number) {
+    public static async randomInteger(context: Context, maxValue: number) {
         winston.debug("TemplateManager.random: " + maxValue);
         return TemplateManager._random(maxValue);
     }
     private static _random(maxValue: number) {
         return Math.trunc(Math.random() * maxValue);
     }
+
+    private static currentDate(context: Context) {
+        winston.debug("TemplateManager.currentDate");
+        return new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    }
+
+    private static randomString(context: Context) {
+        winston.debug("TemplateManager.randomString");
+        return TemplateManager.instance.randomValueFromDataSource("words");
+    }
+
 
     private static async newIntegerId(context: Context) {
         winston.debug("TemplateManager.newIntegerId");

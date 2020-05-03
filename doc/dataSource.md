@@ -12,7 +12,7 @@ By default Mock Designer provide theses data sources:
 * postalcode_fr: Provide a FR postal code
 
 **data.json**
-```
+```json
 {
     "id": 1,
     "username": "test",
@@ -31,7 +31,7 @@ By default Mock Designer provide theses data sources:
 * city_fr: Provide a list of french cities
 
 **data.json**
-```
+```json
 {
     "id": 1,
     "username": "test",
@@ -52,5 +52,5 @@ To have perfomance issue, don't too heavy file.
 
 ## Next features
 
-* Support CSV format for datasource
-* Support XML format for datasource
+- [ ] Support CSV format for datasource
+- [ ] Support XML format for datasource

@@ -84,6 +84,7 @@ export class Main {
                     });
                 } else {
                     console.error("ERROR - " + ex.message);
+                    console.error(ex);
                 }
             }
         } else {
