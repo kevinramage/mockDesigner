@@ -1,6 +1,8 @@
 import * as winston from "winston";
 import * as path from "path";
 import * as fs from "fs";
+import * as util from "util";
+import { exec } from "child_process";
 import { MockProjectManagement } from "./mockProjectManagement";
 import { MockDesigner } from "./mockdesigner";
 import { KEYS, ERRORS } from "../constantes";
@@ -94,6 +96,7 @@ export class MockDesigners {
         FileManagement.copyDirectory("tests/responses", "generated/responses");
         FileManagement.copyDirectory("tests/data", "generated/data");
         FileManagement.copyDirectory("tests/scripts", "generated/scripts");
+        FileManagement.copyDirectory("tests/functions", "generated/functions");
     }
 
     private generateFiles() {
@@ -114,10 +117,18 @@ export class MockDesigners {
         variables["package.json"] = [{key: KEYS.APPNAME, value: this._name.toLowerCase()}];
         variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}];
         
+        // Update template code
+        const data = this.importExternalsFunctions();
+        variables["manager/templateManager.ts"] = [ 
+            { key: KEYS.IMPORTS, value: data.imports.join(" ") },
+            { key: KEYS.REGISTER, value: data.codes.join("\n") }
+        ];
+
         // Read all files present in templates directory
         const instance = this;
         FileManagement.readDirectoryReccursively("templates").forEach(file => {
-            const fileName = file.substring(("generated/").length);
+            var fileName = file.substring(("generated/").length);
+            fileName = fileName.replace("\\", "/");
             if ( variables[fileName] ) {
                 var args : [string, ...IKeyValue[]] = [fileName];
                 variables[fileName].forEach(conf => {
@@ -128,6 +139,44 @@ export class MockDesigners {
               instance._mockProjectManagement.addTemplate(fileName);
             }
         });
+    }
+
+    private importExternalsFunctions() {
+        winston.debug("MockDesigners.importExternalsFunctions");
+        const codes : string[] = [];
+        const imports : string[] = [];
+        fs.readdirSync("tests/functions").forEach(file => {
+            const className = path.basename(file, ".ts");
+            const anImport = util.format("import { %s } from \"../functions/%s\";", className, className);
+            imports.push(anImport);
+            const code = util.format("%s.functions.forEach(f => { instance._functions[f.name] = f.func });", className);
+            codes.push(code);
+        });
+        return { codes: codes, imports: imports };
+    }
+
+    private compileExternalFunctions() {
+        const fileNames : string[]= [];
+        fs.readdirSync("functions").forEach(file => {
+            // Add file
+            const fileName = path.join("functions", file);
+            fileNames.push(fileName);
+
+            // Change imports
+        });
+
+        // Compile
+        /*
+        const instance = this;
+        const tscCmdLine = "tsc -t es6 -m commonjs --esModuleInterop";
+        const cmdLine = fileNames.map(file => { return util.format("%s %s",tscCmdLine ,file); }).join(";");
+        console.info(cmdLine);
+        exec(cmdLine, (err, stdout, stderr) => {
+            console.info(err);
+            console.info(stderr);
+            //instance.includeExternalFunctions(fileNames);
+        });
+        */
     }
 
     public get name() {

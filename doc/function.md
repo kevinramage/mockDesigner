@@ -215,9 +215,34 @@ Mock designer allow you to call functions on expression. The expression will be 
 
 ## Extends functions
 
+Mock designer have an option to extends functions proposed by Mock Designer.
+You can some external functions, you just have to add typescript class in functions directory.
+You must respect some constraints:
+* The file name must have the same name than the class name
+* The class must included functions getter
+
+*functions/HelloWorld.ts*
+```typescript
+export class HelloWorld {
+
+    public static hello(context: any, name: string) {
+        return "Hello " + name;
+    }
+
+    public static get functions() {
+        return [
+            { name: "HelloWorld", func: HelloWorld.hello }
+        ]
+    }
+}
+```
+
 ## Next features
 
 - [ ] Add the possibility to parameter the expire value for increment function
 - [ ] Add the possibility to inject integer functions in JSON body file and repect JSON format
 - [ ] Add a format parameter to generate current date in specific format
 - [ ] Add a random date function to generate random date
+- [ ] Improve external function to be able to use TemplateManager methods
+- [ ] Improve external function to limit the restriction
+- [ ] Improve external function - Add interface in external function

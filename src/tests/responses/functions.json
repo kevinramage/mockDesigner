@@ -10,4 +10,5 @@
     "upperCaseRequest": "{{UpperCase({{.request.body.username}})}}",
     "lowerCaseConstant": "{{LowerCase(Test)}}",
     "lowerCaseRequest": "{{LowerCase({{.request.body.username}})}}",
+    "helloWorld": "{{HelloWorld(Kevin)}}",
 }

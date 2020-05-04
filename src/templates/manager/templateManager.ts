@@ -6,7 +6,7 @@ import { v4 } from "uuid";
 import { RedisManager } from "./redisManager";
 import { Context } from "../context";
 import { XMLUtils } from "../util/XMLUtils";
-
+// {{.imports}}
 
 export class TemplateManager {
     private static _instance : TemplateManager;
@@ -21,6 +21,7 @@ export class TemplateManager {
     public init() {
         this.registerFunction();
         this.registerDataSources();
+        this.registerExternalFunctions();
     }
 
     private registerFunction() {
@@ -59,6 +60,16 @@ export class TemplateManager {
         }
     }
 
+    private registerExternalFunctions() {
+        winston.debug("TemplateManager.registerExternalFunctions");
+        const instance = this;
+        try {
+            // {{.register}}
+        } catch (err) {
+            winston.error("TemplateManager.registerExternalFunctions - Internal error: ", err);
+        }
+    }
+
     public async evaluate(content: string, context: Context) {
         winston.debug("TemplateManager.evaluate");
         var bodyResult = content;
@@ -72,8 +83,6 @@ export class TemplateManager {
             bodyResult = this.evaluateRequests(bodyResult, context);
 
             // Apply properties
-
-            // Apply scripts
 
             // Apply data
             bodyResult = this.evaluateDataSources(bodyResult, context);
@@ -139,11 +148,16 @@ export class TemplateManager {
 
         // Call the function
         if ( this._functions[functionName] ) {
-            const value = await this._functions[functionName].apply(null, args);
-            return value + "";
+            try {
+                const value = await this._functions[functionName].apply(null, args);
+                return value + "";
+            } catch (err) {
+                winston.error("TemplateManager.evaluateFunction - Internal error during the function call: ", err);
+                return "undefined";
+            }
         } else {
             winston.warn(util.format("TemplateManager.evaluateFunction - Error undefined function %s", functionName));
-            return util.format("Error undefined function %s", functionName);
+            return "undefined";
         }
     }
 

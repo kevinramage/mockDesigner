@@ -3,6 +3,7 @@ export module KEYS {
     export const APPPORT = "{{.port}}";
     export const IMPORTS = "// {{.imports}}";
     export const ROUTES = "// {{.routes}}";
+    export const REGISTER = "// {{.register}}";
 }
 
 export module ERRORS {
