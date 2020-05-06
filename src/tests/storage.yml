@@ -1,0 +1,23 @@
+name: MyMock
+services:
+  - name: myService
+    method: POST
+    path: /api/v1/myService
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: save
+          expressions:
+          - key: name
+            value: "{{.request.body.name}}"
+          - key: description
+            value: "{{.request.body.description}}"
+          storage: command
+          keys:
+          - "{{Increment(commandCounter)}}"
+        - type: message
+          status: 200
+          headers:
+            Content-Type: application/json
+          bodyFile: storage.json

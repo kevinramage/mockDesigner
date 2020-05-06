@@ -1,9 +1,9 @@
 import { IMockAction } from "./mockAction";
+import { IKeyValue } from "./keyValue";
 
 export interface IMockSaveAction extends IMockAction {
-    key: string;
-    source: {
-        type: string,
-        fieldName: string
-    };
+    type: "save",
+    expressions: IKeyValue[],
+    storage: string,
+    keys: string[]
 }

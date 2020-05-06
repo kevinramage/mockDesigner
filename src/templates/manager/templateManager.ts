@@ -29,8 +29,6 @@ export class TemplateManager {
         this._functions["UUID"] = TemplateManager.uuid;
         this._functions["UniqueID"] = TemplateManager.uniqueId;
         this._functions["Increment"] = TemplateManager.increment;
-        //this._functions["NewIntegerId"] = TemplateManager.newIntegerId;
-        //this._functions["NewUUID"] = TemplateManager.newUUID;
         this._functions["CurrentDate"] = TemplateManager.currentDate;
         this._functions["RandomInteger"] = TemplateManager.randomInteger;
         this._functions["RandomString"] = TemplateManager.randomString;
@@ -82,7 +80,11 @@ export class TemplateManager {
             // Evaluate requests
             bodyResult = this.evaluateRequests(bodyResult, context);
 
-            // Apply properties
+            // Apply context
+            bodyResult = this.evaluateContext(bodyResult, context);
+
+            // Apply storage
+            bodyResult = await this.evaluateStorage(bodyResult, context);
 
             // Apply data
             bodyResult = this.evaluateDataSources(bodyResult, context);
@@ -386,10 +388,77 @@ export class TemplateManager {
         }
     }
 
+    private evaluateContext(content: string, context: Context) {
+        winston.debug("TemplateManager.evaluateContext");
+        const regex = /{{\s*\.ctx\.([a-zA-Z0-9|_|\.]+)\s*}}/g;        
+        var match = regex.exec(content);
+        if ( match && match.length > 1 ) {
+            const fullMatch = match[0];
+            const pathText = match[1];
+            const paths = pathText.split(".");
+            const result = TemplateManager.navigateThroughtObject(context.data, paths);
+            content = content.replace(fullMatch, result);
+            content = this.evaluateContext(content, context);
+        }
+        return content;
+    }
+
+    private async evaluateStorage(content: string, context: Context) {
+        winston.debug("TemplateManager.evaluateStorage");
+        const regex = /{{\s*\.store\.([a-zA-Z0-9|_]+)\[([a-zA-Z0-9|,\s|{|}|\.]+)\]([\.a-zA-Z0-9|_]+)\s*}}/g;
+        var match = regex.exec(content);
+        if ( match && match.length > 3 ) {
+            const fullMatch = match[0];
+            const storageText = match[1];
+            const keyText = await TemplateManager.instance.evaluate(match[2], context);
+            const propertyText = match[3];
+            if (propertyText.trim().startsWith(".")) {
+                const key = TemplateManager.determineKey(storageText, keyText);
+                const dataText = await RedisManager.instance.getValue(key);
+                const data = JSON.parse(dataText);
+                const paths = TemplateManager.determinePath(propertyText);
+                const result = TemplateManager.navigateThroughtObject(data, paths);
+                content = content.replace(fullMatch, result);
+                content = await this.evaluateStorage(content, context);
+            }
+        }
+
+        return content;
+    }
+
+    private static determineKey(storageText: string, keyText: string) {
+        var key = storageText + "$$";
+        keyText.split(",").forEach(k => {
+            key += k.trim() + "$$";
+        });
+        key = key.substring(0, key.length - 2);
+        return key;
+    }
+
+    private static determinePath(propertyText: string) {
+        propertyText = propertyText.trim().substring(1);
+        return propertyText.split(".");
+    }
+
+    private static navigateThroughtObject(data: any, paths: string[]) {
+        var currentElement = data;
+        for ( var i = 0; i < paths.length; i++) {
+            if ( data[paths[i]]) {
+                currentElement = data[paths[i]];
+            } else {
+                return "undefined";
+            }
+        }
+        return currentElement;
+    }
+ 
     public static async uuid(context?: Context) {
         winston.debug("TemplateManager.uuid");
         const id = v4();
         winston.info(util.format("TemplateManager.uuid: New ID generated: %s", id));
+        if ( context ) {
+            Object.defineProperty(context.data, "lastUUID", { value: id });
+        }
         return id;
     }
 
@@ -398,6 +467,9 @@ export class TemplateManager {
         const id = new Date().toISOString().replace(/\-/g, "").replace(/:/g, "")
             .replace(/\./g, "").replace('T', '').replace('Z', '');
         winston.info(util.format("TemplateManager.uniqueId: New ID generated: %s", id));
+        if ( context ) {
+            Object.defineProperty(context.data, "lastUniqueID", { value: id });
+        }
         return Number.parseInt(id);
     }
 
@@ -408,6 +480,10 @@ export class TemplateManager {
         const currentValue = Number.parseInt(value);
         if ( !Number.isNaN(currentValue)) {
             await RedisManager.instance.setValue(key, (currentValue+1) + "");
+            if ( context ) {
+                Object.defineProperty(context.data, "lastIncrement", { value: value });
+                Object.defineProperty(context.data, "increment" + key, { value: value });
+            }
         }
         return value;
     }
@@ -446,27 +522,6 @@ export class TemplateManager {
             return content.toLowerCase();
         } else {
             winston.warn("TemplateManager.lowerCase - lowerCase function require one parameter");
-            return "undefined";
-        }
-    }
-
-
-    private static async newIntegerId(context: Context) {
-        winston.debug("TemplateManager.newIntegerId");
-        if ( context.newIntegerId ) {
-            return context.newIntegerId;
-        } else {
-            winston.warn("TemplateManager.newIntegerId - The context not correctly set before usage");
-            return "undefined";
-        }
-    }
-
-    private static async newUUID(context: Context) {
-        winston.debug("TemplateManager.newUUID");
-        if ( context.newUUID ) {
-            return context.newUUID;
-        } else {
-            winston.warn("TemplateManager.newUUID - The context not correctly set before usage");
             return "undefined";
         }
     }

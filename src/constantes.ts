@@ -29,10 +29,9 @@ export module ERRORS {
     export const VALIDATION_ACTION_TYPE = "The mock action must have a type string attribute";
     export const VALIDATION_ACTIONMSG_STATUS = "The mock message action must have a status number attribute";
     export const VALIDATION_ACTIONMSG_BODY = "The mock message action must have a body or bodyFile string attribute";
-    export const VALIDATION_ACTIONSAVE_KEY = "The mock save action must have a key string attribute";
-    export const VALIDATION_ACTIONSAVE_SOURCE = "The mock save action must have a source object defined";
-    export const VALIDATION_ACTIONSAVE_SOURCE_TYPE = "The mock save action must have a source type attribute";
-    export const VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME = "The mock save action must have a source field name attribute";
+    export const VALIDATION_ACTIONSAVE_EXPRESSIONS = "The mock save action must have a expressions array attribute";
+    export const VALIDATION_ACTIONSAVE_STORAGE = "The mock save action must have a storage string attribute";
+    export const VALIDATION_ACTIONSAVE_KEYS = "The mock save action must have a keys array attribute";
     export const VALIDATION_TRIGGER_TYPE = "The mock trigger must have a type string attribute";
     export const VALIDATION_TRIGGERDATA_EXPRESSION = "The mock trigger must have an expression string attribute";
     export const VALIDATION_TRIGGERDATA_ACTIONS = "The mock trigger must have an actions attribute";

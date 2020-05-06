@@ -3,12 +3,14 @@ import { Request } from "express";
 export class Context {
     private _request : Request | undefined;
     private _dataSources : {[key: string] : object};
-    private _newIntegerId : number | undefined;
-    private _newUUID : string | undefined ;
+    private _data : object;
 
     constructor(request ?: Request) {
         this._request = request;
         this._dataSources = {};
+        this._data = {
+            increment: {}
+        }
     }
 
     public get request() {
@@ -17,17 +19,12 @@ export class Context {
     public set request(value) {
         this._request = value;
     }
-    public get newIntegerId() {
-        return this._newIntegerId;
+    
+    public get data() {
+        return this._data;
     }
-    public set newIntegerId(value) {
-        this._newIntegerId = value;
-    }
-    public get newUUID() {
-        return this._newUUID;
-    }
-    public set newUUID(value) {
-        this._newUUID = value;
+    public set data(value) {
+        this._data = value;
     }
 
     public get dataSources() {

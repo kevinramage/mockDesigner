@@ -1,0 +1,5 @@
+{
+    "id": "{{.ctx.incrementcommandCounter}}",
+    "name": "{{.store.command[{{.ctx.incrementcommandCounter}}].name}}",
+    "description": "{{.store.command[{{.ctx.lastIncrement}}].description}}"
+}

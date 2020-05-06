@@ -20,6 +20,7 @@ export class ServiceMessage implements IServiceAction {
         var code = "";
 
         // Generate headers
+        code += tab + "// Write the response\n";
         code += tab + "const headers : {[key: string]: string} = {};\n";
         this._headers.forEach(h => {
             code += tab + util.format("headers[\"%s\"] = \"%s\";\n", h.key, h.value);

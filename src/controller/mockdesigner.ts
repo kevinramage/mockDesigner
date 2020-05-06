@@ -180,22 +180,18 @@ export class MockDesigner {
 
     private validateSaveAction(mockAction: IMockSaveAction, validationErrors: string[]) {
 
-        // Key mandatory (string)
-        if ( !mockAction.key ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_KEY); }
-        else if ( typeof mockAction.key != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_KEY); } 
+        // Expressions
+        if ( !mockAction.expressions ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_EXPRESSIONS); }
+        else if ( typeof mockAction.expressions != "object" || !mockAction.expressions.length ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_EXPRESSIONS); }
 
-        // Source mandatory (object)
-        if ( !mockAction.source ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE); }
-        else if ( typeof mockAction.source != "object") { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE); }
+        // Storage
+        if ( !mockAction.storage ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_STORAGE); }
+        else if ( typeof mockAction.storage != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_STORAGE); } 
 
-        // Source type mandatory (string equals to NEWID)
-        else if ( !mockAction.source.type ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_TYPE); }
-        else if ( typeof mockAction.source.type != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_TYPE); }
-        else if ( mockAction.source.type != IDGENERATION_TYPE.NEWINTEGERID && mockAction.source.type != IDGENERATION_TYPE.NEWUUID ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_TYPE); }
+        // Keys
+        if ( !mockAction.keys ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_KEYS); }
+        else if ( typeof mockAction.keys != "object" || !mockAction.expressions.length ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_KEYS); }
 
-        // Source field name mandatory (string)
-        else if ( !mockAction.source.fieldName ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME); }
-        else if ( typeof mockAction.source.fieldName != "string" ) { validationErrors.push(ERRORS.VALIDATION_ACTIONSAVE_SOURCE_FIELDNAME); }
     }
 
     public get mock() {

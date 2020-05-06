@@ -1,39 +1,66 @@
 import * as util from "util";
 import { IServiceAction } from "./serviceAction";
-import { ServiceSaveSource } from "./serviceSaveSource";
-import { IDGENERATION_TYPE } from "../../constantes";
 
 export class ServiceSave implements IServiceAction {
 
-    private _key : string | undefined;
-    private _source : ServiceSaveSource; 
+    private _expressions : {[key: string]: string};
+    private _storage : string | undefined;
+    private _keys : string[];
 
     constructor() {
-        this._source = new ServiceSaveSource();
+        this._expressions = {};
+        this._keys = [];
     }
 
     generate(tab: string): string {
         var code = "";
-        if ( this.source.type == IDGENERATION_TYPE.NEWINTEGERID ) {
-            code += tab + "context.newIntegerId = await TemplateManager.uniqueId();\n";
-            code += tab + util.format("await RedisManager.instance.saveObject(\"%s\", \"%s\", context.newIntegerId + \"\", context?.request?.body);\n", this.key, this.source.fieldName)
-        } else if ( this.source.type == IDGENERATION_TYPE.NEWUUID ) {
-            code += tab + "context.newUUID = await TemplateManager.uuid();\n";
-            code += tab + util.format("await RedisManager.instance.saveObject(\"%s\", \"%s\", context.newUUID, context?.request?.body);\n", this.key, this.source.fieldName)
-        }
+        
+        // Compute object to store
+        code += tab + "// Save object to redis\n";
+        code += tab + "const obj = {\n";
+        Object.keys(this.expressions).forEach(key => {
+            code += tab + "\t" + util.format("\"%s\": await TemplateManager.instance.evaluate(\"%s\", context),\n", key, this.expressions[key]);
+        });
+        code = code.substring(0, code.length - 2);
+        code += "\n";
+        code += tab + "};\n";
+        code += "\n";
+
+        // Compute storage key
+        code += tab + util.format("var key = \"%s$$\";\n", this.storage);
+        this.keys.forEach(k => {
+            code += tab + util.format("key += await TemplateManager.instance.evaluate(\"%s\", context) + \"$$\";\n", k);
+        });
+        code += tab + "key = key.substring(0, key.length - 2);\n";
+        code += "\n";
+
+        // Add code to save the object in redis
+        code += tab + "RedisManager.instance.setValue(key, JSON.stringify(obj));\n";
+        code += "\n";
+
         return code;
     }
+
+    public addExpression(key: string, value: string) {
+        this._expressions[key] = value;
+    }
+
+    public addKey(key: string) {
+        this._keys.push(key);
+    }
     
-    public get key() {
-        return this._key;
+    public get expressions() {
+        return this._expressions;
     }
-    public set key(value) {
-        this._key = value;
+
+    public get storage() {
+        return this._storage;
     }
-    public get source() {
-        return this._source;
+    public set storage(value) {
+        this._storage = value;
     }
-    public set source(value) {
-        this._source = value;
+
+    public get keys() {
+        return this._keys;
     }
 }

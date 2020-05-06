@@ -35,9 +35,20 @@ export class ActionFactory {
     }
     private static buildSaveAction(actionInterface: IMockSaveAction) {
         const serviceSave : ServiceSave = new ServiceSave();
-        serviceSave.key = actionInterface.key;
-        serviceSave.source.type = actionInterface.source.type;
-        serviceSave.source.fieldName = actionInterface.source.fieldName;
+        
+        // Expression
+        actionInterface.expressions.forEach(exp => {
+            serviceSave.addExpression(exp.key, exp.value);
+        });
+
+        // Storage
+        serviceSave.storage = actionInterface.storage;
+
+        // Keys
+        actionInterface.keys.forEach(key => {
+            serviceSave.addKey(key); 
+        });
+
         return serviceSave;
     }
 }

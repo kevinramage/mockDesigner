@@ -110,3 +110,4 @@ You can reuse the request body values in your mock response.
 ## Next features
 
 - [ ] Support the url encoded format
+- [ ] Support the usage of object directly in the body response
