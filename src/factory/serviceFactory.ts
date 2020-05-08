@@ -9,7 +9,11 @@ import { IMockDataTriger } from "../interface/mockDataTrigger";
 import { ServiceData } from "../business/trigger/serviceData";
 import { IMockCheckTrigger } from "../interface/mockCheckTrigger";
 import { ServiceCheck } from "../business/trigger/serviceCheck";
-import { IMockTrigger } from "interface/mockTrigger";
+import { IMockTrigger } from "../interface/mockTrigger";
+import { IMockRandomTrigger } from "../interface/mockRandomTrigger";
+import { ServiceRandom } from "../business/trigger/serviceRandom";
+import { IMockRandomTriggerMessage } from "../interface/mockRandomTriggerMessage";
+import { ServiceRandomMessage } from "../business/trigger/serviceRandomMessage";
 
 export class ServiceFactory {
 
@@ -47,6 +51,9 @@ export class ServiceFactory {
                 break;
                 case "check":
                     service.addTrigger(instance.buildCheckTrigger(trigger as IMockCheckTrigger));
+                break;
+                case "random":
+                    service.addTrigger(instance.buildRandomTrigger(trigger as IMockRandomTrigger));
                 break;
             }
         });
@@ -122,5 +129,37 @@ export class ServiceFactory {
         });
 
         return serviceCheckTrigger;
+    }
+
+    private static buildRandomTrigger(randomTrigger: IMockRandomTrigger) {
+
+        const serviceRandom = new ServiceRandom();
+
+        // Messages
+        randomTrigger.messages.forEach(msg => {
+            serviceRandom.addMessage(ServiceFactory.buildRandomTriggerMessage(msg));
+        });
+
+        return serviceRandom;
+    }
+
+    private static buildRandomTriggerMessage(randomTriggerMessage: IMockRandomTriggerMessage) {
+
+        const serviceRandomMessage = new ServiceRandomMessage();
+
+        // Probability
+        if ( randomTriggerMessage.probability ) {
+            serviceRandomMessage.probability = randomTriggerMessage.probability;
+        }
+
+        // Actions
+        randomTriggerMessage.actions.forEach(action => {
+            const actionBuilt = ActionFactory.build(action);
+            if ( actionBuilt != null ) {
+                serviceRandomMessage.addAction(actionBuilt);
+            }
+        });
+
+        return serviceRandomMessage;
     }
 }

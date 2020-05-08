@@ -493,7 +493,7 @@ export class TemplateManager {
         return TemplateManager._random(maxValue);
     }
     private static _random(maxValue: number) {
-        return Math.trunc(Math.random() * maxValue);
+        return Math.round(Math.random() * maxValue);
     }
 
     private static currentDate(context: Context) {
