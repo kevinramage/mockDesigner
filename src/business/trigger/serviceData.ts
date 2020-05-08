@@ -12,7 +12,7 @@ export class ServiceData implements IServiceTrigger {
         this._actions = [];
     }
     
-    public generate(tab: string) {
+    public generate(mockName: string, tab: string) {
         winston.debug("ServiceData.generate");
         var code = "";
 

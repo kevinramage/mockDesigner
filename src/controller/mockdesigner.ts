@@ -118,7 +118,7 @@ export class MockDesigner {
     private validateTrigger(mockTrigger: IMockTrigger, validationErrors: string[]) {
 
         // Type
-        const triggerType = [ "data", "check", "random", "none"];
+        const triggerType = [ "data", "check", "random", "sequential", "none"];
         if ( !mockTrigger.type ) { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
         else if ( !triggerType.includes(mockTrigger.type) ) { validationErrors.push(ERRORS.VALIDATION_TRIGGER_TYPE); }
         else if ( mockTrigger.type == "data" ) {

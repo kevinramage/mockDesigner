@@ -14,6 +14,10 @@ import { IMockRandomTrigger } from "../interface/mockRandomTrigger";
 import { ServiceRandom } from "../business/trigger/serviceRandom";
 import { IMockRandomTriggerMessage } from "../interface/mockRandomTriggerMessage";
 import { ServiceRandomMessage } from "../business/trigger/serviceRandomMessage";
+import { IMockSequentialTrigger } from "../interface/mockSequentialTrigger";
+import { IMockSequentialTriggerMessage } from "../interface/mockSequentialTriggerMessage";
+import { ServiceSequentialMessage } from "../business/trigger/serviceSequentialTriggerMessage";
+import { ServiceSequential } from "../business/trigger/serviceSequential";
 
 export class ServiceFactory {
 
@@ -54,6 +58,9 @@ export class ServiceFactory {
                 break;
                 case "random":
                     service.addTrigger(instance.buildRandomTrigger(trigger as IMockRandomTrigger));
+                break;
+                case "sequential":
+                    service.addTrigger(instance.buildSequentialTrigger(trigger as IMockSequentialTrigger ));
                 break;
             }
         });
@@ -161,5 +168,35 @@ export class ServiceFactory {
         });
 
         return serviceRandomMessage;
+    }
+
+    private static buildSequentialTrigger(dataSequential: IMockSequentialTrigger) {
+        const serviceSequential = new ServiceSequential();
+
+        // Messages
+        dataSequential.messages.forEach(msg => {
+            serviceSequential.addMessage(ServiceFactory.buildSequentialTriggerMessage(msg));
+        });
+
+        return serviceSequential;
+    }
+
+    private static buildSequentialTriggerMessage(dataMessage: IMockSequentialTriggerMessage) {
+        const serviceSequentialMessage = new ServiceSequentialMessage();
+
+        // Repeat
+        if ( dataMessage.repeat ) {
+            serviceSequentialMessage.repeat = dataMessage.repeat;
+        }
+
+        // Actions
+        dataMessage.actions.forEach(action => {
+            const actionBuilt = ActionFactory.build(action);
+            if ( actionBuilt != null ) {
+                serviceSequentialMessage.addAction(actionBuilt);
+            }
+        });
+
+        return serviceSequentialMessage;
     }
 }

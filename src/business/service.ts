@@ -25,15 +25,17 @@ export class Service {
         winston.debug("Service.generate");
 
         var code = this.generateService("\t");
-        code += this.generateContextService();
         return code;
     }
 
     private generateService(tab: string) {
         winston.debug("Service.generateService");
 
+        // Generate counter
+        var code = tab +util.format("private static _counter : number = 0;\n\n");
+
         // Generate response handler
-        var code = tab + util.format("public static async %s(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("public static async %s(req: Request, res: Response) {\n", this.methodName);
 
         // Define context
         code += tab + "\tconst context = new Context(req);\n";
@@ -63,7 +65,7 @@ export class Service {
         // Apply triggers
         code += tab + "\tvar triggerApplied = false, expression, evaluation;\n\n"
         this._triggers.forEach(trigger => {
-            code += trigger.generate(tab + "\t");
+            code += trigger.generate(this.mockName, tab + "\t");
         });        
 
         // Apply a default trigger if there are no trigger to apply
@@ -75,11 +77,6 @@ export class Service {
         code += tab + "}\n";
 
         return code;
-    }
-
-    private generateContextService() {
-        winston.debug("Service.generateContextService");
-        return "";
     }
 
     public generateRoute() {

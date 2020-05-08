@@ -13,7 +13,7 @@ export class ServiceCheck implements IServiceTrigger {
         this._actions = [];
     }
 
-    generate(tab: string) {
+    generate(mockName: string, tab: string) {
         winston.debug("ServiceCheck.generate");
         var code = "";
         if ( this._mandatories.length > 0 ) {

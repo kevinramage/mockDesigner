@@ -1,3 +1,3 @@
 export interface IServiceTrigger {
-    generate(tab: string) : string;
+    generate(mockName: string, tab: string) : string;
 }
