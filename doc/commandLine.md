@@ -21,3 +21,7 @@ You must define the input directory. You can use several syntaxes:
 You can define the output directory of the generated files with the following command:
 `npm run start -- --input tests/*.yml --output mySuperProject`
 The default value of this attribute is the generated directory
+
+## Next features
+
+[ ] - Add the possibility to disable redis
