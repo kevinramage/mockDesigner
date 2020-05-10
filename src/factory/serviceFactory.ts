@@ -18,6 +18,7 @@ import { IMockSequentialTrigger } from "../interface/mockSequentialTrigger";
 import { IMockSequentialTriggerMessage } from "../interface/mockSequentialTriggerMessage";
 import { ServiceSequentialMessage } from "../business/trigger/serviceSequentialTriggerMessage";
 import { ServiceSequential } from "../business/trigger/serviceSequential";
+import { BehaviourFactory } from "./behaviourFactory";
 
 export class ServiceFactory {
 
@@ -82,6 +83,13 @@ export class ServiceFactory {
                     service.authentication = apiKeyAuthentication;
                 break;
             }
+        }
+
+        // Behaviours
+        if ( serviceInterface.response.behaviours) {
+            serviceInterface.response.behaviours.forEach(behaviour => {
+                service.addBehaviour(BehaviourFactory.build(behaviour));
+            });
         }
 
         return service;

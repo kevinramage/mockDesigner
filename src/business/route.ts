@@ -1,7 +1,6 @@
 import * as winston from "winston";
 import * as util from "util";
 import { Service } from "./service";
-import { Mock } from "./mock";
 
 export class Route {
 
@@ -15,7 +14,13 @@ export class Route {
 
     public generate(mockName: string, service: Service) {
         winston.debug("Route.generate");
-        return util.format("\t\tthis.router.route(\"%s\").%s(%s.%s);\n", this.path, this.method.toLowerCase(), mockName, service.methodName);
+        var code = "";
+        code += util.format("\t\tthis.router.route(\"%s/_behaviour/:name\").get(%s._%s_getBehaviour);\n", this.path, service.mockName, service.methodName);
+        code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").get(%s._%s_getAllBehaviours);\n", this.path, service.mockName, service.methodName);
+        code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").post(%s._%s_createBehaviour);\n", this.path, service.mockName, service.methodName);
+        code += util.format("\t\tthis.router.route(\"%s/_behaviour/:name\").delete(%s._%s_deleteBehaviour);\n", this.path, service.mockName, service.methodName);
+        code += util.format("\t\tthis.router.route(\"%s\").%s(%s.%s);\n", this.path, this.method.toLowerCase(), mockName, service.methodName);
+        return code;
     }
 
     public get path() {

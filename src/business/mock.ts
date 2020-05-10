@@ -19,6 +19,7 @@ export class Mock {
         code += "import { AuthenticationManager } from \"../manager/authenticationManager\";\n";
         code += "import { ResponseHandler } from \"../manager/responseHandler\";\n";
         code += "import { RedisManager } from \"../manager/redisManager\";\n";
+        code += "import { BehaviourManager } from \"../manager/behaviourManager\";\n";
         code += "import { Context } from \"../context\";\n";
         code += "import { XMLUtils } from \"../util/XMLUtils\";\n";
         code += "\n";

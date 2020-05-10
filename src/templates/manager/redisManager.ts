@@ -1,3 +1,4 @@
+import * as winston from "winston";
 import * as redis from "redis";
 import * as util from "util";
 
@@ -30,16 +31,19 @@ export class RedisManager {
     }
 
     public setValue(key: string, value: string) {
+        winston.debug("RedisManager.setValue");
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
                 this._client.set(key, value, (err, reply) => {
                     if ( !err ) {
                         resolve();
                     } else {
+                        winston.error("RedisManager.setValue: Internal error: ", err);
                         reject(err);
                     }
                 });
             } else {
+                winston.error("RedisManager.setValue: Redis client null or undefined");
                 reject("Redis client null or undefined");
             }
         });

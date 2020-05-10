@@ -1,0 +1,22 @@
+name: MyMock
+services:
+  - name: "myService"
+    method: POST
+    path: /api/v1/myService
+    response:
+      behaviours:
+      - name: ERROR_500
+        repeat: 3
+        conditions:
+        - "'{{.request.body.name}}' == 'MyName'"
+        - "'{{.request.body.description}}' == 'myDescription'"
+        actions:
+        - type: message
+          status: 500
+          body: An internal error occured
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          body: Operation completed successfully
