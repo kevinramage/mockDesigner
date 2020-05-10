@@ -12,7 +12,7 @@ export class ServiceRandom implements IServiceTrigger {
         this._messages = [];
     }
     
-    public generate(mockName: string, tab: string) {
+    public generate(mockName: string, serviceName: string, tab: string) {
         winston.debug("ServiceRandom.generate");
         var code = "";
         

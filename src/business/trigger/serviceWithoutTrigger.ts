@@ -10,7 +10,7 @@ export class ServiceWithoutTrigger implements IServiceTrigger {
         this._actions = [];
     }
 
-    public generate(mockName: string, tab: string) {
+    public generate(mockName: string, serviceName: string, tab: string) {
         winston.debug("ServiceWithoutTrigger.generate");
         var code = tab + "if ( !triggerApplied ) {\n\n";
         this._actions.forEach(action => {

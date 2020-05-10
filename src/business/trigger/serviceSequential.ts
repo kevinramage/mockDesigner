@@ -16,7 +16,7 @@ export class ServiceSequential implements IServiceTrigger {
         this._messages.push(message);
     }
 
-    public generate(mockName: string, tab: string) {
+    public generate(mockName: string, serviceName: string, tab: string) {
         var code = "";
 
         // Generate threshold
@@ -31,7 +31,7 @@ export class ServiceSequential implements IServiceTrigger {
         });
 
         // Increment counter
-        code += tab + util.format("%s._counter = (%s._counter + 1) % %d;\n", mockName, mockName, this._max);
+        code += tab + util.format("%s.%s_counter = (%s.%s_counter + 1) % %d;\n", mockName, serviceName, mockName, serviceName, this._max);
         code += "\n";
 
         return code;

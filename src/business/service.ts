@@ -1,7 +1,6 @@
 import * as winston from "winston";
 import * as util from "util";
 import { IServiceTrigger } from "./trigger/serviceTrigger";
-import { ServiceWithoutTrigger } from "./trigger/serviceWithoutTrigger";
 import { Route } from "./route";
 import { IAuthentication } from "./authentication/authentication";
 import { Behaviour } from "./behaviour";
@@ -35,7 +34,7 @@ export class Service {
         winston.debug("Service.generateService");
 
         // Generate counter
-        var code = tab +util.format("private static _counter : number = 0;\n\n");
+        var code = tab + util.format("private static %s_counter : number = 0;\n\n", this.methodName);
 
         // Generate response handler
         code += tab + util.format("public static async %s(req: Request, res: Response) {\n", this.methodName);
@@ -73,7 +72,7 @@ export class Service {
 
         // Apply triggers
         this._triggers.forEach(trigger => {
-            code += trigger.generate(this.mockName, tab + "\t");
+            code += trigger.generate(this.mockName, this.methodName, tab + "\t");
         });        
 
         // Apply a default trigger if there are no trigger to apply
