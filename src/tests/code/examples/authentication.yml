@@ -8,10 +8,12 @@ services:
     userName: myUserName
     password: myPassword
   response:
-    actions:
-    - type: message
-      status: 200
-      body: OK
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK
 - name: ApiKeyAuthentictionService
   method: POST
   path: /api/v1/apiKeyAuthentication
@@ -21,7 +23,9 @@ services:
     keyName: api-key
     keyValue: 123456
   response:
-    actions:
-    - type: message
-      status: 200
-      body: OK
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK

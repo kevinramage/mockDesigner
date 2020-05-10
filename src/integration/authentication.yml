@@ -1,0 +1,39 @@
+name: Authentication
+testcases:
+- name: Build mock service
+  steps:
+  - type: exec
+    script: npm run start -- --input .\tests\code\examples\authentication.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated\docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 10
+- name: Test basic authentication
+  steps:
+  - type: http
+    method: POST
+    url: http://localhost:7001/api/v1/basicAuthentication
+    assertions:
+    - result.body ShouldEqual "Authentication required"
+    - result.statuscode ShouldEqual 401
+    - result.timeseconds ShouldBeLessThan 1
+  - type: http
+    method: POST
+    url: http://localhost:7001/api/v1/basicAuthentication
+    basic_auth_user: test
+    basic_auth_password: testtest
+    assertions:
+    - result.body ShouldEqual "Authentication failed"
+    - result.statuscode ShouldEqual 403
+    - result.timeseconds ShouldBeLessThan 1
+  - type: http
+    method: POST
+    url: http://localhost:7001/api/v1/basicAuthentication
+    basic_auth_user: myUserName
+    basic_auth_password: myPassword
+    assertions:
+    - result.body ShouldEqual OK
+    - result.statuscode ShouldEqual 200
+    - result.timeseconds ShouldBeLessThan 1

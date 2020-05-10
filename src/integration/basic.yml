@@ -1,0 +1,21 @@
+name: Basic
+testcases:
+- name: Build mock service
+  steps:
+  - type: exec
+    script: npm run start -- --input .\tests\code\examples\basic.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated\docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 10
+- name: Test mock service
+  steps:
+  - type: http
+    method: GET
+    url: http://localhost:7001/api/v1/myService
+    assertions:
+    - result.body ShouldEqual OK
+    - result.statuscode ShouldEqual 200
+    - result.timeseconds ShouldBeLessThan 1
