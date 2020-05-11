@@ -15,21 +15,22 @@ jobs:
       with:
         node-version: '10.x'
 
+    # Clone repo
+    - uses: actions/checkout@v2
+
+    # Install project
+    - name: Install application
+      run: npm install
+
     # Download venom executable
     - name: Download venom executable
       run: |
         ls -l
         pwd
-        cd ../
-        ls -l
-        cd ../
-        ls -l
+        ls -l ../
+        ls -l ../../
         cd src/integration
         ./downloadVenom
-
-    # Install project
-    - name: Install application
-      run: npm install
 
     # Execute integration tests
     - name: Execute integration tests
