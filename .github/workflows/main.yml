@@ -18,8 +18,14 @@ jobs:
     # Download venom executable
     - name: Download venom executable
       run: |
+        ls -l
+        pwd
         cd src/integration
         ./downloadVenom
+
+    # Install project
+    - name: Install application
+      run: npm install
 
     # Execute integration tests
     - name: Execute integration tests
