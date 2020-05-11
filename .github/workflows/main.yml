@@ -20,6 +20,10 @@ jobs:
       run: |
         ls -l
         pwd
+        cd ../
+        ls -l
+        cd ../
+        ls -l
         cd src/integration
         ./downloadVenom
 
