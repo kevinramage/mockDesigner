@@ -20,17 +20,19 @@ jobs:
 
     # Install project
     - name: Install application
-      run: npm install
+      run: |
+        cd src
+        npm install
 
     # Download venom executable
     - name: Download venom executable
       run: |
         ls -l
-        pwd
-        ls -l ../
-        ls -l ../../
+        ls -l src
+        ls -l src/integration
         cd src/integration
-        ./downloadVenom
+        chmod +x downloadVenom.sh
+        ./downloadVenom.sh
 
     # Execute integration tests
     - name: Execute integration tests
