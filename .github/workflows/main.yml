@@ -27,9 +27,6 @@ jobs:
     # Download venom executable
     - name: Download venom executable
       run: |
-        ls -l
-        ls -l src
-        ls -l src/integration
         cd src/integration
         chmod +x downloadVenom.sh
         ./downloadVenom.sh
@@ -37,5 +34,5 @@ jobs:
     # Execute integration tests
     - name: Execute integration tests
       run: |
-        cd ../
-        npm start
+        cd src
+        npm run test
