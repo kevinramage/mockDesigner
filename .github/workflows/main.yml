@@ -39,3 +39,5 @@ jobs:
         chmod +x integration/venom.linux-amd64
         ls -l
         npm run test
+        ls -l .
+        cat test_results.xml
