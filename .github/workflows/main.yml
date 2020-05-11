@@ -30,9 +30,12 @@ jobs:
         cd src/integration
         chmod +x downloadVenom.sh
         ./downloadVenom.sh
+        ls -l
 
     # Execute integration tests
     - name: Execute integration tests
       run: |
         cd src
+        chmod +x integration/venom
+        ls -l
         npm run test
