@@ -7,7 +7,7 @@
     "start": "npm run build && npm run copy:tests && node dist/mockGeneration.js",
     "build": "tsc",
     "copy:tests": "cpx tests/** dist/tests",
-    "test": "./integration/venom run --output-dir . ./integration/*.yml"
+    "test": "./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml"
   },
   "author": "",
   "license": "ISC",
