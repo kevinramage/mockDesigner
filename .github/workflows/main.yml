@@ -18,11 +18,11 @@ jobs:
     # Download venom executable
     - name: Download venom executable
       run: |
-      cd src/integration
-      ./downloadVenom
+        cd src/integration
+        ./downloadVenom
 
     # Execute integration tests
     - name: Execute integration tests
       run: |
-      cd ../
-      npm start
+        cd ../
+        npm start
