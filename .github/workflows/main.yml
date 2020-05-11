@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+    # Setup node JS
+    - name: Setup Node
+      uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+
+    # Download venom executable
+    - name: Download venom executable
+      run: |
+      cd src/integration
+      ./downloadVenom
+
+    # Execute integration tests
+    - name: Execute integration tests
+      run: |
+      cd ../
+      npm start
