@@ -36,6 +36,6 @@ jobs:
     - name: Execute integration tests
       run: |
         cd src
-        chmod +x integration/venom
+        chmod +x integration/venom.linux-amd64
         ls -l
         npm run test
