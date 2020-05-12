@@ -30,14 +30,13 @@ jobs:
         cd src/integration
         chmod +x downloadVenom.sh
         ./downloadVenom.sh
-        ls -l
 
     # Execute integration tests
     - name: Execute integration tests
       run: |
         cd src
         chmod +x integration/venom.linux-amd64
-        ls -l
+        ifconfig -a
+        grep `hostname` /etc/hosts
         npm run test
-        ls -l .
         cat test_results.xml
