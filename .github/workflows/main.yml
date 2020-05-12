@@ -36,6 +36,7 @@ jobs:
       run: |
         cd src
         chmod +x integration/venom.linux-amd64
-        npm run test
-        cat test_results.xml
-        ifconfig -a
+        npm run start -- --input .\tests\code\examples\basic.yml
+        docker-compose -f generated\docker-compose.yml up -d --build
+        docker images
+        docker ps -a
