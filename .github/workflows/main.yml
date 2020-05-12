@@ -36,7 +36,6 @@ jobs:
       run: |
         cd src
         chmod +x integration/venom.linux-amd64
-        ifconfig -a
-        grep `hostname` /etc/hosts
         npm run test
         cat test_results.xml
+        ifconfig -a

@@ -1,6 +1,8 @@
 name: Authentication
+vars:
+  host: "10.1.0.4"
 testcases:
-- name: Build mock service
+- name: BuildMockService
   steps:
   - type: exec
     script: npm run start -- --input tests/code/examples/authentication.yml
@@ -14,14 +16,14 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: http://localhost:7001/api/v1/basicAuthentication
+    url: "http://{{.host}}:7001/api/v1/basicAuthentication"
     assertions:
     - result.body ShouldEqual "Authentication required"
     - result.statuscode ShouldEqual 401
     - result.timeseconds ShouldBeLessThan 1
   - type: http
     method: POST
-    url: http://localhost:7001/api/v1/basicAuthentication
+    url: "http://{{.host}}:7001/api/v1/basicAuthentication"
     basic_auth_user: test
     basic_auth_password: testtest
     assertions:
@@ -30,7 +32,7 @@ testcases:
     - result.timeseconds ShouldBeLessThan 1
   - type: http
     method: POST
-    url: http://localhost:7001/api/v1/basicAuthentication
+    url: "http://{{.host}}:7001/api/v1/basicAuthentication
     basic_auth_user: myUserName
     basic_auth_password: myPassword
     assertions:

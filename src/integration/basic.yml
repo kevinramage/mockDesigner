@@ -1,4 +1,6 @@
 name: Basic
+vars:
+  host: "10.1.0.4"
 testcases:
 - name: Build mock service
   steps:
@@ -14,7 +16,7 @@ testcases:
   steps:
   - type: http
     method: GET
-    url: http://localhost:7001/api/v1/myService
+    url: http://{{.host}}:7001/api/v1/myService
     assertions:
     - result.body ShouldEqual OK
     - result.statuscode ShouldEqual 200
