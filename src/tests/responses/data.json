@@ -2,7 +2,7 @@
     "id": 1,
     "username": "test",
     "password": "****",
-    "fisrtName": "{{.data.firstname}}",
+    "firstName": "{{.data.firstname}}",
     "lastName": "{{.data.lastname}}",
     "cityname": "{{.data.cityname}}",
     "postalcode": "{{.data.postalcode_fr}}",
