@@ -11,7 +11,6 @@ export class BehaviourManager {
     public static async getBehaviour(key: string, name: string) {
         winston.debug("BehaviourManager.getBehaviour");
         const finalKey = "__behaviour__" + key;
-        RedisManager.instance.init();
         const textValue = await RedisManager.instance.getValue(finalKey);
         const data = textValue ? JSON.parse(textValue) as IBehaviourData[] : [];
         return data.find(elt => { return elt.name == name; });
@@ -28,18 +27,22 @@ export class BehaviourManager {
     public static async createBehaviour(key: string, name: string) {
         winston.debug("BehaviourManager.createBehaviour");
         const finalKey = "__behaviour__" + key;
-        var eltPresent = false, data: IBehaviourData[] = [];
-        var elt = { name: name };
-        const textValue = await RedisManager.instance.getValue(finalKey);
-        if ( textValue ) {
-            data = JSON.parse(textValue) as IBehaviourData[];
-            eltPresent = data.find((elt : IBehaviourData) => { return elt.name == name}) != undefined;
+        if ( name ) {
+            var eltPresent = false, data: IBehaviourData[] = [];
+            var elt = { name: name };
+            const textValue = await RedisManager.instance.getValue(finalKey);
+            if ( textValue ) {
+                data = JSON.parse(textValue) as IBehaviourData[];
+                eltPresent = data.find((elt : IBehaviourData) => { return elt.name == name}) != undefined;
+            }
+            if ( !eltPresent ) {
+                data.push(elt);
+                await RedisManager.instance.setValue(finalKey, JSON.stringify(data));
+            }
+            return elt;
+        } else {
+            return null;
         }
-        if ( !eltPresent ) {
-            data.push(elt);
-            await RedisManager.instance.setValue(finalKey, JSON.stringify(data));
-        }
-        return elt;
     }
 
     public static async deleteBehaviour(key: string, name: string) {
@@ -55,6 +58,13 @@ export class BehaviourManager {
         } else {
             return null;
         }
+    }
+
+    public static async deleteAllBehaviours(key: string) {
+        winston.debug("BehaviourManager.deleteAllBehaviours");
+        const finalKey = "__behaviour__" + key;
+        await RedisManager.instance.setValue(finalKey, "[]");
+        return null;
     }
 
     public static async updateBehaviour(key: string, name: string, repeat: number) {
