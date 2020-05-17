@@ -19,6 +19,7 @@ export class Route {
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").get(%s._%s_getAllBehaviours);\n", this.path, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").post(%s._%s_createBehaviour);\n", this.path, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/:name\").delete(%s._%s_deleteBehaviour);\n", this.path, service.mockName, service.methodName);
+        code += util.format("\t\tthis.router.route(\"%s/_behaviour\").delete(%s._%s_deleteAllBehaviours);\n", this.path, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s\").%s(%s.%s);\n", this.path, this.method.toLowerCase(), mockName, service.methodName);
         return code;
     }

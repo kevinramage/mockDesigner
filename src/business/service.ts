@@ -38,6 +38,7 @@ export class Service {
 
         // Generate response handler
         code += tab + util.format("public static async %s(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s.%s\");\n", this.mockName, this.methodName);
 
         // Define context
         code += tab + "\tconst context = new Context(req);\n";
@@ -63,6 +64,7 @@ export class Service {
 
         // Generate business method
         code += tab + util.format("public static async _%s(context: Context, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s\");\n", this.mockName, this.methodName);
 
         // Apply behaviours
         code += tab + "\tvar triggerApplied = false, expression, evaluation, key, behaviour;\n\n"
@@ -92,8 +94,10 @@ export class Service {
 
         // Get a behaviour
         code += tab + util.format("public static async _%s_getBehaviour(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_getBehaviour\");\n", this.mockName, this.methodName);
         code += tab + util.format("\tconst key = \"%s__%s\";\n", this.mockName, this.methodName);
         code += tab + "\tconst behaviour = await BehaviourManager.getBehaviour(key, req.params.name);\n";
+        code += tab + "\tres.setHeader('Content-Type', 'application/json');\n";
         code += tab + "\tres.status(behaviour ? 200 : 404);\n";
         code += tab + "\tif ( behaviour ) {\n"
         code += tab + "\t\tres.write(JSON.stringify(behaviour));\n";
@@ -103,8 +107,10 @@ export class Service {
 
         // Get all behaviours
         code += tab + util.format("public static async _%s_getAllBehaviours(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_getAllBehaviours\");\n", this.mockName, this.methodName);
         code += tab + util.format("\tconst key = \"%s__%s\";\n", this.mockName, this.methodName);
         code += tab + "\tconst behaviours = await BehaviourManager.getAllBehaviours(key);\n";
+        code += tab + "\tres.setHeader('Content-Type', 'application/json');\n";
         code += tab + "\tres.status(200);\n";
         code += tab + "\tres.write(JSON.stringify(behaviours));\n";
         code += tab + "\tres.end();\n";
@@ -112,6 +118,7 @@ export class Service {
         
         // Create behaviour
         code += tab + util.format("public static async _%s_createBehaviour(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_createBehaviour - Name: \" + req.body.name);\n", this.mockName, this.methodName);
         code += tab + util.format("\tconst key = \"%s__%s\";\n", this.mockName, this.methodName);
         code += tab + "\tconst created = await BehaviourManager.createBehaviour(key, req.body.name);\n";
         code += tab + "\tres.status(201);\n";
@@ -121,9 +128,19 @@ export class Service {
 
         // Delete behaviour
         code += tab + util.format("public static async _%s_deleteBehaviour(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_deleteBehaviour\");\n", this.mockName, this.methodName);
         code += tab + util.format("\tconst key = \"%s__%s\";\n", this.mockName, this.methodName);
         code += tab + "\tconst deleted = await BehaviourManager.deleteBehaviour(key, req.params.name);\n";
         code += tab + "\tres.status(deleted ? 204 : 404);\n"
+        code += tab + "\tres.end();\n";
+        code += tab + "}\n\n";
+
+        // Delete all behaviours
+        code += tab + util.format("public static async _%s_deleteAllBehaviours(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_deleteAllBehaviours\");\n", this.mockName, this.methodName);
+        code += tab + util.format("\tconst key = \"%s__%s\";\n", this.mockName, this.methodName);
+        code += tab + "\tawait BehaviourManager.deleteAllBehaviours(key);\n";
+        code += tab + "\tres.status(204);\n"
         code += tab + "\tres.end();\n";
         code += tab + "}\n\n";
 
