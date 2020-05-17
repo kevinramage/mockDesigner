@@ -1,6 +1,6 @@
 name: Authentication
 vars:
-  host: "10.1.0.4"
+  host: "localhost"
 testcases:
 - name: BuildMockService
   steps:
