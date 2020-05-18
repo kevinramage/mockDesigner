@@ -38,6 +38,12 @@ jobs:
         chmod +x integration/venom.linux-amd64
         ./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml
 
+    # Artifact result
+    - uses: actions/upload-artifact@v2
+      with:
+        name: test_results
+        path: src/test_results.xml
+
     # Proceed report
     - uses: check-run-reporter/action@master
       env:
