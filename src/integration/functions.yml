@@ -1,0 +1,40 @@
+name: Functions
+vars:
+  host: "localhost"
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/functions.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated/docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 30
+
+# Nominal case
+- name: NominalCase
+  steps:
+  - type: http
+    method: POST
+    headers:
+      Content-Type: "application/json"
+    body: "{ \"username\": \"Kevin\" }"
+    url: "http://{{.host}}:7001/api/v1/myService"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.increment ShouldNotBeNil
+    - result.bodyjson.uniquestring ShouldNotBeNil
+    - result.bodyjson.uniquevalue ShouldNotBeNil
+    - result.bodyjson.currentdate ShouldNotBeNil
+    - result.bodyjson.randominteger ShouldNotBeNil
+    - result.bodyjson.randomstring ShouldNotBeNil
+    - result.bodyjson.uppercaseconstant ShouldEqual TEST
+    - result.bodyjson.uppercaserequest ShouldEqual KEVIN
+    - result.bodyjson.lowercaseconstant ShouldEqual test
+    - result.bodyjson.lowercaserequest ShouldEqual kevin
+    - result.bodyjson.helloworld ShouldEqual "Hello Kevin"

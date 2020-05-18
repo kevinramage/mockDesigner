@@ -1,0 +1,36 @@
+name: Request
+vars:
+  host: "localhost"
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/request.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated/docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 10
+
+# Nominal case
+- name: NominalCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:7001/api/v1/myService/2/subItem/25?search=test&strict=true"
+    headers:
+      Content-Type: "application/json"
+    body: "{ \"userName\": \"coucou\", \"password\":\"1234\" }"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.searchquery ShouldEqual test
+    - result.bodyjson.strictquery ShouldEqual true
+    - result.bodyjson.idparam ShouldEqual 2
+    - result.bodyjson.subidparam ShouldEqual 25
+    - result.bodyjson.contenttypeheader ShouldEqual "application/json"
+    - result.bodyjson.username ShouldEqual coucou
+    - result.bodyjson.password ShouldEqual 1234

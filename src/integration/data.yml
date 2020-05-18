@@ -1,0 +1,34 @@
+name: Data
+vars:
+  host: "localhost"
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/data.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated/docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 10
+
+# Nominal case
+- name: NominalCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:7001/api/v1/myService"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.username ShouldEqual test
+    - result.bodyjson.password ShouldEqual "****"
+    - result.bodyjson.firstname ShouldNotBeNil
+    - result.bodyjson.lastname ShouldNotBeNil
+    - result.bodyjson.cityname ShouldNotBeNil
+    - result.bodyjson.postalcode ShouldNotBeNil
+    - result.bodyjson.city.postalcode ShouldNotBeNil
+    - result.bodyjson.city.name ShouldNotBeNil
