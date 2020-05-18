@@ -27,7 +27,7 @@ export class ServiceSave implements IServiceAction {
         code += "\n";
 
         // Compute storage key
-        code += tab + util.format("var key = \"%s$$\";\n", this.storage);
+        code += tab + util.format("key = \"%s$$\";\n", this.storage);
         this.keys.forEach(k => {
             code += tab + util.format("key += await TemplateManager.instance.evaluate(\"%s\", context) + \"$$\";\n", k);
         });
