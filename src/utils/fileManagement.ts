@@ -2,14 +2,12 @@ import * as fs from "fs";
 import * as path from "path";
 import * as rimraf from "rimraf";
 import * as winston from "winston";
-const { exec } = require("child_process");
 
 export class FileManagement {
 
     public static createDirectory(directory: string) {
         winston.debug("FileManagement.createDirectory: " + directory);
         const directoryPath = path.join(process.cwd(), directory);
-        console.info("--- CREATE DIRECTORY: " + directoryPath);
         if ( fs.existsSync(directoryPath) ) {
             rimraf.sync(directoryPath)
         }
@@ -24,9 +22,6 @@ export class FileManagement {
 
     public static _copyDirectory (source: string, target: string) {
 
-        console.info("--- COPY DIRECTORY: " + source + " => " + target);
-        console.info("Username: " + process.env.USER);
-
         // Security
         if ( !fs.existsSync(source) ) {
             return;
@@ -34,7 +29,6 @@ export class FileManagement {
         
         // Create target directory if not exists
         if ( !fs.existsSync(target) ) {
-            console.info("--- COPY - CREATE DIRECTORY: " +  target);
             fs.mkdirSync(target);
         }
 
@@ -57,7 +51,7 @@ export class FileManagement {
 
     public static readDirectoryReccursively(source: string) {
         const sourcePath = path.join(process.cwd(), source);
-        return FileManagement._readDirectoryReccursively(source);
+        return FileManagement._readDirectoryReccursively(sourcePath);
     }
 
     public static _readDirectoryReccursively(source: string) {
