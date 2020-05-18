@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as rimraf from "rimraf";
 import * as winston from "winston";
+const { exec } = require("child_process");
 
 export class FileManagement {
 
@@ -24,6 +25,11 @@ export class FileManagement {
     public static _copyDirectory (source: string, target: string) {
 
         console.info("--- COPY DIRECTORY: " + source + " => " + target);
+        console.info("Username: " + process.env.USER);
+        exec("ls -la " + target, (error: any, stdout: string) => {
+            console.info("ls -la " + target)
+            console.info(stdout);
+        });
 
         // Security
         if ( !fs.existsSync(source) ) {
