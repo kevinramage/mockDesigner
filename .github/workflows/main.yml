@@ -35,10 +35,8 @@ jobs:
     - name: Execute integration tests
       run: |
         cd src
-        pwd
-        ls -la
         chmod +x integration/venom.linux-amd64
-        npm run start -- --input ./tests/code/examples/basic.yml
-        docker-compose -f generated/docker-compose.yml up -d --build
-        docker images
+        ./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml
+        ls -la
         docker ps -a
+        cat test_results.xml
