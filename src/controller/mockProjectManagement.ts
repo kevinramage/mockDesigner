@@ -29,9 +29,6 @@ export class MockProjectManagement {
     public addTemplate(templateName: string, ...values : IKeyValue[]) {
         winston.debug(util.format("MockProjectManagement.addTemplate: %s", templateName));
         const templatePath = path.join(process.cwd(), "templates", templateName);
-        console.info("Current dir: " + process.cwd());
-        console.info("TemplateName: " + templateName);
-        console.info("TemplatePath: " + templatePath);
         const body = fs.readFileSync(templatePath);
         this._files[templateName] = body.toString();
         const instance = this;
@@ -46,18 +43,13 @@ export class MockProjectManagement {
         // Write all files
         const instance = this;
         Object.keys(this._files).forEach(key => {
-            console.info("Current: " + process.cwd());
-            console.info("Pathname: " + outputPathname);
-            console.info("Key: " + key);
             const pathname = path.join(process.cwd(), outputPathname, key);
-            console.info("Pathname: " + pathname);
             instance.writeFile(pathname, instance._files[key]);
         });
     }
 
     private writeFile(pathname: string, body: string) {
         winston.debug(util.format("MockProjectManagement.writeFile: %s", pathname));
-        console.info("WriteFile: " + pathname);
 
         // Create directory
         const directoryPath = path.dirname(pathname);
