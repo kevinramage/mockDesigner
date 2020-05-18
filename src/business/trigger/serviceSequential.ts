@@ -23,11 +23,11 @@ export class ServiceSequential implements IServiceTrigger {
         this.generateThreshold();
 
         // Display counter
-        code += tab + util.format("winston.info(\"Counter: \" + %s._counter);\n", mockName);
+        code += tab + util.format("winston.debug(\"Counter: \" + %s.%s_counter);\n", mockName, serviceName);
 
         // Generate messages
         this._messages.forEach(msg => {
-            code += msg.generate(mockName, tab);
+            code += msg.generate(mockName, serviceName, tab);
         });
 
         // Increment counter

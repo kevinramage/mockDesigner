@@ -14,10 +14,10 @@ export class ServiceSequentialMessage {
         this._actions = [];
     }
 
-    public generate(mockName: string, tab: string) {
+    public generate(mockName: string, serviceName: string, tab: string) {
         var code = "";
 
-        code += tab + util.format("if ( !triggerApplied && %s._counter >= %d && %s._counter < %d ) {\n", mockName, this._minThreshold, mockName, this._maxThreshold);
+        code += tab + util.format("if ( !triggerApplied && %s.%s_counter >= %d && %s.%s_counter < %d ) {\n", mockName, serviceName, this._minThreshold, mockName, serviceName, this._maxThreshold);
         code += tab + "\ttriggerApplied = true;\n\n";
         this._actions.forEach(action => {
             code += action.generate(tab + "\t");
