@@ -34,11 +34,12 @@ jobs:
     # Execute integration tests
     - name: Execute integration tests
       run: |
-        echo $USERNAME
+        mkdir generated
+        mkdir generated/code
         ls -la .
         cd src
         chmod +x integration/venom.linux-amd64
-        npm run start -- --input .\tests\code\examples\basic.yml
-        docker-compose -f generated\docker-compose.yml up -d --build
+        npm run start -- --input ./tests/code/examples/basic.yml
+        docker-compose -f generated/docker-compose.yml up -d --build
         docker images
         docker ps -a
