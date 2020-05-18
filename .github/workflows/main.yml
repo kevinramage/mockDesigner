@@ -37,6 +37,8 @@ jobs:
         cd src
         chmod +x integration/venom.linux-amd64
         ./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml
+        RETURNCODE=$?
         ls -la
         docker ps -a
         cat test_results.xml
+        exit ${RETURNCODE}
