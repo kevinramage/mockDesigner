@@ -38,13 +38,7 @@ export class MockProjectManagement {
     }
 
     public writeFiles(outputPathname: string) {
-        winston.debug(util.format("MockProjectManagement.writeFiles: %s", outputPathname));
-
-        // Remove previous generation
-        if ( fs.existsSync(outputPathname) ) {
-            rimraf.sync(outputPathname)
-        }
-        fs.mkdirSync(outputPathname, { mode: 777 });
+        winston.debug(util.format("MockProjectManagement.writeFiles: %s", outputPathname));        
 
         // Write all files
         const instance = this;

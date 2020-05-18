@@ -4,11 +4,10 @@
   "description": "",
   "main": "mockGeneration.js",
   "scripts": {
-    "start": "npm run build && npm run copy:tests && node dist/mockGeneration.js",
+    "start": "npm run build && node dist/mockGeneration.js",
     "build": "tsc",
-    "copy:tests": "cpx tests/** dist/tests",
     "test": "./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml",
-    "winTest": ".\\integration\\venom.exe run --output-dir . .\\integration\\*.yml" 
+    "winTest": ".\\venom.exe run --output-dir . .\\integration\\*.yml" 
   },
   "author": "",
   "license": "ISC",
@@ -36,7 +35,6 @@
     "@types/yaml": "^1.9.7",
     "body-parser": "^1.19.0",
     "body-parser-xml": "^2.0.0",
-    "cpx": "^1.5.0",
     "dotenv": "^8.2.0",
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",

@@ -1,7 +1,15 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as rimraf from "rimraf";
 
 export class FileManagement {
+
+    public static createDirectory(directory: string) {
+        if ( fs.existsSync(directory) ) {
+            rimraf.sync(directory)
+        }
+        fs.mkdirSync(directory, { mode: 777 });
+    } 
 
     public static copyDirectory (source: string, target: string) {
 
