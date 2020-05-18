@@ -47,6 +47,6 @@ jobs:
     # Proceed report
     - name: AnalyzeReport
       run: |
-        RETURN_CODE=$(cat test_results.xml | grep "<failure>" | wc -l)
+        RETURN_CODE=$(cat src/test_results.xml | grep "<failure>" | wc -l)
         echo $RETURN_CODE
         exit $RETURN_CODE
