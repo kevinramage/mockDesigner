@@ -11,7 +11,7 @@ testcases:
     assertions:
     - result.code ShouldEqual 0
   - type: exec
-    script: docker-compose -f generated\docker-compose.yml up -d --build
+    script: docker-compose -f generated/docker-compose.yml up -d --build
   - type: exec
     script: sleep 10
   - type: http
