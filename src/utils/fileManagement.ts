@@ -29,7 +29,7 @@ export class FileManagement {
         
         // Create target directory if not exists
         if ( !fs.existsSync(target) ) {
-            fs.mkdirSync(target);
+            fs.mkdirSync(target, { mode: 777});
         }
 
         // Copy files and subdirectory
