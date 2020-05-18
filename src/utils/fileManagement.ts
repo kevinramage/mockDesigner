@@ -50,7 +50,7 @@ export class FileManagement {
 
     public static readDirectoryReccursively(source: string) {
         const sourcePath = path.join(process.cwd(), source);
-        return FileManagement._readDirectoryReccursively(sourcePath);
+        return FileManagement._readDirectoryReccursively(source);
     }
 
     public static _readDirectoryReccursively(source: string) {
