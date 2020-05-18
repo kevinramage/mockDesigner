@@ -35,8 +35,7 @@ jobs:
     - name: Execute integration tests
       run: |
         chmod +777 src
-        df -kh
-        tree src
+        ls -l src
         cd src
         chmod +x integration/venom.linux-amd64
         npm run start -- --input .\tests\code\examples\basic.yml
