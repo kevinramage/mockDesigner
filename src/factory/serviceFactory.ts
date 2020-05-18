@@ -43,6 +43,11 @@ export class ServiceFactory {
         } else {
             service.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
         }
+        if ( serviceInterface.pingPath ) {
+            service.route.pingPath = serviceInterface.pingPath;
+        } else {
+            service.route.pingPath = serviceInterface.path;
+        }
 
         // Triggers
         const instance = this;

@@ -26,6 +26,7 @@ export class Service {
     public generate() {
         winston.debug("Service.generate");
         var code = this.generateService("\t");
+        code += this.generatePingService("\t");
         code += this.generateBehaviourServices("\t");
         return code;
     }
@@ -83,6 +84,20 @@ export class Service {
         code += tab + "\t\tResponseHandler.sendError(res, \"No trigger to apply\", \"\");\n";
         code += tab + "\t}\n";
 
+        code += tab + "}\n\n";
+
+        return code;
+    }
+
+    private generatePingService(tab: string) {
+        winston.debug("Service.generatePingService");
+        var code = "";
+
+        // Generate ping service code
+        code += tab + util.format("public static async _%s_ping(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_ping\");\n", this.mockName, this.methodName);
+        code += tab + "\tres.status(204);\n";
+        code += tab + "\tres.end();\n";
         code += tab + "}\n\n";
 
         return code;

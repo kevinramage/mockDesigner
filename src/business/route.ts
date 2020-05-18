@@ -5,16 +5,19 @@ import { Service } from "./service";
 export class Route {
 
     private _path : string;
+    private _pingPath : string;
     private _method : string;
 
     constructor() {
         this._path = "";
+        this._pingPath = "";
         this._method = "";
     }
 
     public generate(mockName: string, service: Service) {
         winston.debug("Route.generate");
         var code = "";
+        code += util.format("\t\tthis.router.route(\"%s/_ping\").get(%s._%s_ping);\n", this.pingPath, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/:name\").get(%s._%s_getBehaviour);\n", this.path, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").get(%s._%s_getAllBehaviours);\n", this.path, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").post(%s._%s_createBehaviour);\n", this.path, service.mockName, service.methodName);
@@ -36,6 +39,13 @@ export class Route {
     }
     public set method(value) {
         this._method = value;
+    }
+
+    public get pingPath() {
+        return this._pingPath;
+    }
+    public set pingPath(value) {
+        this._pingPath = value;
     }
 
     public get paths() {
