@@ -7,7 +7,7 @@ testcases:
 - name: Build mock service
   steps:
   - type: exec
-    script: npm run start -- --input .\tests\code\examples\basic.yml
+    script: npm run start -- --input ./tests/code/examples/basic.yml
     assertions:
     - result.code ShouldEqual 0
   - type: exec
