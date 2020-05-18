@@ -8,6 +8,7 @@ export class FileManagement {
     public static createDirectory(directory: string) {
         winston.debug("FileManagement.createDirectory: " + directory);
         const directoryPath = path.join(process.cwd(), directory);
+        console.info("--- CREATE DIRECTORY: " + directoryPath);
         if ( fs.existsSync(directoryPath) ) {
             rimraf.sync(directoryPath)
         }
@@ -21,6 +22,8 @@ export class FileManagement {
     }
 
     public static _copyDirectory (source: string, target: string) {
+
+        console.info("--- COPY DIRECTORY: " + source + " => " + target);
 
         // Security
         if ( !fs.existsSync(source) ) {
