@@ -1,0 +1,16 @@
+name: Random
+vars:
+  host: "localhost"
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/random.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated/docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 10
