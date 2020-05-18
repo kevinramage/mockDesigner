@@ -32,6 +32,7 @@ export class FileManagement {
         
         // Create target directory if not exists
         if ( !fs.existsSync(target) ) {
+            console.info("--- COPY - CREATE DIRECTORY: " +  target);
             fs.mkdirSync(target, { mode: 777});
         }
 
@@ -46,6 +47,7 @@ export class FileManagement {
 
             // File
             } else {
+                console.info("--- COPY FILE: " + sourceFile + " => " + targetFile);
                 fs.copyFileSync(sourceFile, targetFile);
             }
         });
