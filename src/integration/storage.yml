@@ -1,0 +1,31 @@
+name: Storage
+vars:
+  host: "localhost"
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/storage.yml
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f generated/docker-compose.yml up -d --build
+  - type: exec
+    script: sleep 10
+
+# Nominal case
+- name: NominalCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:7001/api/v1/myService"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"myCommand\", \"description\": \"A command description\" }"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldNotBeNil
+    - result.bodyjson.name ShouldEqual "myCommand"
+    - result.bodyjson.description ShouldEqual "A command description"

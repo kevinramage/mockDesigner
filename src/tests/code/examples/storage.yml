@@ -20,4 +20,4 @@ services:
           status: 200
           headers:
             Content-Type: application/json
-          bodyFile: storage.json
+          bodyFile: ../responses/storage.json
