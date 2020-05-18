@@ -29,6 +29,9 @@ export class MockProjectManagement {
     public addTemplate(templateName: string, ...values : IKeyValue[]) {
         winston.debug(util.format("MockProjectManagement.addTemplate: %s", templateName));
         const templatePath = path.join(process.cwd(), "templates", templateName);
+        console.info("Current dir: " + process.cwd());
+        console.info("TemplateName: " + templateName);
+        console.info("TemplatePath: " + templatePath);
         const body = fs.readFileSync(templatePath);
         this._files[templateName] = body.toString();
         const instance = this;
