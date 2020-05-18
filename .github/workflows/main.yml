@@ -36,8 +36,6 @@ jobs:
       run: |
         cd src
         pwd
-        mkdir generated
-        mkdir generated/code
         ls -la
         chmod +x integration/venom.linux-amd64
         npm run start -- --input ./tests/code/examples/basic.yml

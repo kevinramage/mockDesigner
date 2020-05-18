@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as winston from "winston";
 import * as util from "util";
-import * as rimraf from "rimraf";
 import { ERRORS } from "../constantes";
 import { IKeyValue } from "interface/keyValue";
 

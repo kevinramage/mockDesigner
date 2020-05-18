@@ -13,7 +13,7 @@ export class FileManagement {
         if ( fs.existsSync(directoryPath) ) {
             rimraf.sync(directoryPath)
         }
-        fs.mkdirSync(directoryPath, { mode: 777 });
+        fs.mkdirSync(directoryPath);
     } 
 
     public static copyDirectory (source: string, target: string) {
@@ -26,10 +26,6 @@ export class FileManagement {
 
         console.info("--- COPY DIRECTORY: " + source + " => " + target);
         console.info("Username: " + process.env.USER);
-        exec("ls -la " + target, (error: any, stdout: string) => {
-            console.info("ls -la " + target)
-            console.info(stdout);
-        });
 
         // Security
         if ( !fs.existsSync(source) ) {
@@ -39,7 +35,7 @@ export class FileManagement {
         // Create target directory if not exists
         if ( !fs.existsSync(target) ) {
             console.info("--- COPY - CREATE DIRECTORY: " +  target);
-            fs.mkdirSync(target, { mode: 777});
+            fs.mkdirSync(target);
         }
 
         // Copy files and subdirectory
