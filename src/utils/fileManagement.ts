@@ -43,7 +43,6 @@ export class FileManagement {
 
             // File
             } else {
-                console.info("--- COPY FILE: " + sourceFile + " => " + targetFile);
                 fs.copyFileSync(sourceFile, targetFile);
             }
         });

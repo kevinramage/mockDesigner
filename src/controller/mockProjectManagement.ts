@@ -42,6 +42,9 @@ export class MockProjectManagement {
         // Write all files
         const instance = this;
         Object.keys(this._files).forEach(key => {
+            console.info("Current: " + process.cwd());
+            console.info("Pathname: " + outputPathname);
+            console.info("Key: " + key);
             const pathname = path.join(process.cwd(), outputPathname, key);
             console.info("Pathname: " + pathname);
             instance.writeFile(pathname, instance._files[key]);
