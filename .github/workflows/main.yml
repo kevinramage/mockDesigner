@@ -37,3 +37,9 @@ jobs:
         cd src
         chmod +x integration/venom.linux-amd64
         ./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml
+
+    # Proceed report
+    - uses: check-run-reporter/action@master
+        env:
+          CHECK_RUN_REPORTER_LABEL: 'Integration Tests'
+          CHECK_RUN_REPORTER_REPORT: 'src/test_results.xml'
