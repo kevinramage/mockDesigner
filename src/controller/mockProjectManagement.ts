@@ -57,11 +57,12 @@ export class MockProjectManagement {
 
     private writeFile(pathname: string, body: string) {
         winston.debug(util.format("MockProjectManagement.writeFile: %s", pathname));
+        console.info("WriteFile: " + pathname);
 
         // Create directory
         const directoryPath = path.dirname(pathname);
         if ( !fs.existsSync(directoryPath)) {
-            fs.mkdirSync(directoryPath, { mode: 777, recursive: true });
+            fs.mkdirSync(directoryPath, { recursive: true });
         }
 
         // Create file
