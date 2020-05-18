@@ -45,8 +45,8 @@ jobs:
         path: src/test_results.xml
 
     # Proceed report
-    - uses: check-run-reporter/action@master
-      env:
-        CHECK_RUN_REPORTER_LABEL: 'Integration Tests'
-        CHECK_RUN_REPORTER_REPORT: 'src/test_results.xml'
-        CHECK_RUN_REPORTER_TOKEN: ${{ secrets.CHECK_RUN_REPORTER_TOKEN }}
+    - name: AnalyzeReport
+      run: |
+        RETURN_CODE=$(cat test_results.xml | grep "<failure>" | wc -l)
+        echo $RETURN_CODE
+        exit $RETURN_CODE
