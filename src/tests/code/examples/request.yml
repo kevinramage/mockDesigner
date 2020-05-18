@@ -2,6 +2,7 @@ name: MyMock
 services:
   - name: "myService"
     method: POST
+    pingPath: /api/v1/myService
     path: /api/v1/myService/:id/subItem/:subId
     response:
       triggers:

@@ -14,3 +14,8 @@ testcases:
     script: docker-compose -f generated/docker-compose.yml up -d --build
   - type: exec
     script: sleep 10
+  - type: http
+    method: GET
+    url: "http://{{.host}}:7001/api/v1/myService/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204

@@ -2,6 +2,7 @@ name: MyMock
 services:
   - name: "myService"
     method: POST
+    pingPath: /api/v1/myService
     path: /api/v1/myService/:id/subItem/:subId
     response:
       triggers:
@@ -11,4 +12,4 @@ services:
           status: 200
           headers:
             content-type: application/xml
-          bodyFile: ../response/request.xml
+          bodyFile: ../responses/request.xml

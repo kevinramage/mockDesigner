@@ -14,3 +14,32 @@ testcases:
     script: docker-compose -f generated/docker-compose.yml up -d --build
   - type: exec
     script: sleep 10
+  - type: http
+    method: GET
+    url: "http://{{.host}}:7001/api/v1/myService/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Nominal case
+- name: NominalCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:7001/api/v1/myService/2/subItem/25?search=test&strict=true"
+    headers:
+      Content-Type: "text/xml;charset=UTF-8"
+      SOAPAction: "Request"
+    body: "<soapenv:Envelope> <soapenv:Header> <doc:MyHeader>MyFirstHeader</doc:MyHeader> <doc:SecondHeader>MySecondHeader</doc:SecondHeader> </soapenv:Header> <soapenv:Body> <doc:Account> <username att=\"MyAttributeValue\">MyUsername</username> <password>Mypassword</password> </doc:Account> </soapenv:Body> </soapenv:Envelope>"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldContainSubstring "<id>1</id>"
+    - result.body ShouldContainSubstring "<searchQuery>test</searchQuery>"
+    - result.body ShouldContainSubstring "<strictQuery>true</strictQuery>"
+    - result.body ShouldContainSubstring "<idParam>2</idParam>"
+    - result.body ShouldContainSubstring "<subIdParam>25</subIdParam>"
+    - result.body ShouldContainSubstring "<contentTypeHeader>text/xml;charset=UTF-8</contentTypeHeader>"
+    - result.body ShouldContainSubstring "<header>MyFirstHeader</header>"
+    - result.body ShouldContainSubstring "<secondHeader>MySecondHeader</secondHeader>"
+    - result.body ShouldContainSubstring "<userName>MyUsername</userName>"
+    - result.body ShouldContainSubstring "<userNameAtt>MyAttributeValue</userNameAtt>"
+    - result.body ShouldContainSubstring "<password>Mypassword</password>"

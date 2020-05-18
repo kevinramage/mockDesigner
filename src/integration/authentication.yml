@@ -2,6 +2,8 @@ name: Authentication
 vars:
   host: "localhost"
 testcases:
+
+# Build mock
 - name: BuildMockService
   steps:
   - type: exec
@@ -12,6 +14,13 @@ testcases:
     script: docker-compose -f generated/docker-compose.yml up -d --build
   - type: exec
     script: sleep 10
+  - type: http
+    method: GET
+    url: "http://{{.host}}:7001/api/v1/basicAuthentication/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Basic authentication case
 - name: Test basic authentication
   steps:
   - type: http
@@ -32,7 +41,7 @@ testcases:
     - result.timeseconds ShouldBeLessThan 1
   - type: http
     method: POST
-    url: "http://{{.host}}:7001/api/v1/basicAuthentication
+    url: "http://{{.host}}:7001/api/v1/basicAuthentication"
     basic_auth_user: myUserName
     basic_auth_password: myPassword
     assertions:
