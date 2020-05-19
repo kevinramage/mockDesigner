@@ -37,6 +37,7 @@ jobs:
         cd src
         chmod +x integration/venom.linux-amd64
         ./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml
+        docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 
     # Artifact result
     - uses: actions/upload-artifact@v2
