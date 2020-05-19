@@ -11,6 +11,19 @@ Inside this tests directory:
 
 Inside each these directories, you can add subdirectories to organize your different services.
 
+## Include
+
+Mock Designer propose an include statement.
+This statement can be used to divide big file in small files or can be used to facilitate some reuse.
+
+An example of include statement:
+```yml
+name: MyMock
+services:
+  ##INCLUDE include.yml.part1##
+##INCLUDE include.yml.part2##
+```
+
 ## Next feature
 
 - [x] Avoid the folder restriction 

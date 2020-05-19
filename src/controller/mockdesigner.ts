@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as yaml from "yaml";
 import * as util from "util";
 import * as winston from "winston";
@@ -31,7 +32,7 @@ export class MockDesigner {
                 }
 
                 // Parse the file
-                const body = buffer.toString();
+                const body = this.proceedIncludes(path, buffer.toString());
                 yamlObject = yaml.parse(body);
                 this._mockInterface = yamlObject as IMock;
 
@@ -50,6 +51,40 @@ export class MockDesigner {
             throw new Error(ERRORS.INVALID_INPUTDIR_FILENOTEXISTS);
         }
     }
+
+    private proceedIncludes(path: string, content: string) : string {
+        const regexInclude = /(\s*)##INCLUDE\s*([a-zA-Z0-9|\.|_|\-]+)\s*##/g;
+        var result = content;
+        var match = regexInclude.exec(content);
+        if ( match && match.length > 1 ) {
+
+            // Extract variables
+            var space = "", includePath = "";
+            const fullMatch = match[0];
+            if (  match.length > 2 ) {
+                space = match[1];
+                includePath = match[2];
+            } else {
+                includePath = match[1];
+            }
+
+            // Proceed inclusion
+            const includeCode = this.proceedInclude(path, space, includePath);
+            result = result.replace(fullMatch, includeCode);
+            return this.proceedIncludes(path, result);
+        }
+        return result;
+    }
+
+    private proceedInclude(pathName: string, space: string, includePath: string) {
+        const dirname = path.dirname(pathName);
+        const buffer = fs.readFileSync(path.join(dirname, includePath));
+        var result = buffer.toString();
+        return result.replace(/\r/g, "").split("\n").map(line => {
+            return space + line;
+        }).join("\n");
+    }
+
 
     private validate(mock: IMock) : string[] {
         winston.debug("MockDesigner.validate");

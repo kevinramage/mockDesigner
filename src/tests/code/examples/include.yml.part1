@@ -1,0 +1,10 @@
+- name: "Get"
+  method: GET
+  path: /api/v1/myService/:id
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: "OK"
