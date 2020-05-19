@@ -147,9 +147,11 @@ export class MockDesigners {
         winston.debug("MockDesigners.importExternalsFunctions");
         const codes : string[] = [];
         const imports : string[] = [];
-        fs.readdirSync("tests/functions").forEach(file => {
+        FileManagement.readDirectoryReccursively("tests/functions").forEach(file => {
+            var pathname = file.replace(/\\/g, "/").substring(("tests/functions/").length);
+            pathname = pathname.substring(0, pathname.length - 3);
             const className = path.basename(file, ".ts");
-            const anImport = util.format("import { %s } from \"../functions/%s\";", className, className);
+            const anImport = util.format("import { %s } from \"../functions/%s\";", className, pathname);
             imports.push(anImport);
             const code = util.format("%s.functions.forEach(f => { instance._functions[f.name] = f.func });", className);
             codes.push(code);
