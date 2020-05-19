@@ -3,8 +3,8 @@ To use easily Mock Designer, you must know some basic notions.
 
 ## Organization
 There are some rules to organize your project, you can manage all mock services of your application / domain in the same project.
-You can create one file for each services to implement but you can divide your service in several files with the include system or you can regroup some services in the same file.
-[More informations]()
+You can create one big with lot's of services or you can organize your services in several files.
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/organization.md)
 
 ## Actions
 Mock designer can manage several actions on the reception of a request. You can just send a response or apply more complex actions like save data ...
