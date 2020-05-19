@@ -11,10 +11,7 @@ You can find bellow a command to execute the tool.
 `npm run start -- --input tests/basic.yml`
 Now, you can find a directory named "generated" that contains the source code of the mock system.
 You can run the mock system with the following command:
-```
-cd generated
-./run.bat
-```
+`docker-compose -f generated/docker-compose.yml up -d --build`
 Now, you just have to do a GET request `http://localhost:7001/api/v1/myService` to test the service
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/commandLine.md)
 
@@ -46,5 +43,10 @@ Mock designer have some notions notions: trigger, action, behaviour...
 ### Monitor the request and response
 
 ## Use cases
+
+## Integration
+
+Mockd Designer use venom as integration technology. You can run the integration tests with the following command:
+`.\venom.exe run --output-dir . .\integration\*.yml`
 
 ## Contribution
