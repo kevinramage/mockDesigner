@@ -1,21 +1,23 @@
 name: Random
 vars:
   host: "localhost"
+  port: 7006
+  output: generated_random
 testcases:
 
 # Build mock
 - name: BuildMockService
   steps:
   - type: exec
-    script: npm run start -- --input tests/code/examples/random.yml
+    script: npm run start -- --input tests/code/examples/random.yml --port {{.port}} --output {{.output}}
     assertions:
     - result.code ShouldEqual 0
   - type: exec
-    script: docker-compose -f generated/docker-compose.yml up -d --build
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --build
   - type: exec
     script: sleep 10
   - type: http
     method: GET
-    url: "http://{{.host}}:7001/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204

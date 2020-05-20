@@ -32,7 +32,6 @@ export class Main {
 
         // Run mock designers
         var error = "";
-        var argIndex = 0;
         const mockDesigners = new MockDesigners();
 
         // Project name
@@ -51,7 +50,6 @@ export class Main {
             if ( !isNaN(port) && port > 0 ) {
                 mockDesigners.port = port;
             } else {
-                console.error("Port: " + program.port);
                 error = ERRORS.INVALID_PORT;
             }
         }

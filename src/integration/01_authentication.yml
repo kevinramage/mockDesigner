@@ -1,22 +1,24 @@
 name: Authentication
 vars:
   host: "localhost"
+  port: 7001
+  output: generated_authentication
 testcases:
 
 # Build mock
 - name: BuildMockService
   steps:
   - type: exec
-    script: npm run start -- --input tests/code/examples/authentication.yml
+    script: npm run start -- --input tests/code/examples/authentication.yml --port {{.port}} --output {{.output}}
     assertions:
     - result.code ShouldEqual 0
   - type: exec
-    script: docker-compose -f generated/docker-compose.yml up -d --build
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --build
   - type: exec
     script: sleep 10
   - type: http
     method: GET
-    url: "http://{{.host}}:7001/api/v1/basicAuthentication/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/basicAuthentication/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -25,14 +27,14 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: "http://{{.host}}:7001/api/v1/basicAuthentication"
+    url: "http://{{.host}}:{{.port}}/api/v1/basicAuthentication"
     assertions:
     - result.body ShouldEqual "Authentication required"
     - result.statuscode ShouldEqual 401
     - result.timeseconds ShouldBeLessThan 1
   - type: http
     method: POST
-    url: "http://{{.host}}:7001/api/v1/basicAuthentication"
+    url: "http://{{.host}}:{{.port}}/api/v1/basicAuthentication"
     basic_auth_user: test
     basic_auth_password: testtest
     assertions:
@@ -41,7 +43,7 @@ testcases:
     - result.timeseconds ShouldBeLessThan 1
   - type: http
     method: POST
-    url: "http://{{.host}}:7001/api/v1/basicAuthentication"
+    url: "http://{{.host}}:{{.port}}/api/v1/basicAuthentication"
     basic_auth_user: myUserName
     basic_auth_password: myPassword
     assertions:

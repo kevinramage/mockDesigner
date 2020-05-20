@@ -1,22 +1,24 @@
 name: Functions
 vars:
   host: "localhost"
+  port: 7005
+  output: generated_functions
 testcases:
 
 # Build mock
 - name: BuildMockService
   steps:
   - type: exec
-    script: npm run start -- --input tests/code/examples/functions.yml
+    script: npm run start -- --input tests/code/examples/functions.yml --port {{.port}} --output {{.output}}
     assertions:
     - result.code ShouldEqual 0
   - type: exec
-    script: docker-compose -f generated/docker-compose.yml up -d --build
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --build
   - type: exec
-    script: sleep 30
+    script: sleep 10
   - type: http
     method: GET
-    url: "http://{{.host}}:7001/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -28,7 +30,7 @@ testcases:
     headers:
       Content-Type: "application/json"
     body: "{ \"username\": \"Kevin\" }"
-    url: "http://{{.host}}:7001/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/myService"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.id ShouldEqual 1
