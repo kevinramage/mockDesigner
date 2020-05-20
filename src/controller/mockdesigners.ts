@@ -80,12 +80,12 @@ export class MockDesigners {
         winston.debug("MockDesigners.run");
 
         // Copy data
-        FileManagement.createDirectory("generated");
-        FileManagement.copyDirectory("tests/code", "generated/code");
-        FileManagement.copyDirectory("tests/data", "generated/data");
-        FileManagement.copyDirectory("tests/functions", "generated/functions");
-        FileManagement.copyDirectory("tests/responses", "generated/responses");
-        FileManagement.copyDirectory("tests/scripts", "generated/scripts");
+        FileManagement.createDirectory(this.outputDir);
+        FileManagement.copyDirectory("tests/code", this.outputDir + "/code");
+        FileManagement.copyDirectory("tests/data", this.outputDir +  "/data");
+        FileManagement.copyDirectory("tests/functions", this.outputDir + "/functions");
+        FileManagement.copyDirectory("tests/responses", this.outputDir + "/responses");
+        FileManagement.copyDirectory("tests/scripts", this.outputDir + "/scripts");
 
         // Read files
         const files = this.readFiles(this.inputDir);
@@ -98,7 +98,7 @@ export class MockDesigners {
         this.generateFiles();
 
         // Write files
-        this._mockProjectManagement.writeFiles("generated");
+        this._mockProjectManagement.writeFiles(this.outputDir);
     }
 
     private generateFiles() {

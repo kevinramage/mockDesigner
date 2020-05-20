@@ -15,10 +15,10 @@ export class Main {
 
         // Configure program
         program
-            .option('-n, --projectName', 'project name')
-            .option('-i, --input', 'input directory')
-            .option('-o, --output', 'output directory')
-            .option('-p, --port', 'mock port')
+            .option('-n, --projectName <name>', 'project name')
+            .option('-i, --input <directory>', 'input directory')
+            .option('-o, --output <directory>', 'output directory')
+            .option('-p, --port <portNumber>', 'mock port')
         
         program.description("Tool to generate mocks from descriptions");
         program.version("1.0.0");
@@ -38,10 +38,8 @@ export class Main {
         // Project name
         if ( program.projetName ) {
             const regex = /^[a-zA-Z0-9_\s]+$/g;
-            const projetName = program.args[argIndex++];
-            if ( regex.exec(projetName)) {
-                console.info(projetName);
-                mockDesigners.name = projetName;
+            if ( regex.exec(program.projectName)) {
+                mockDesigners.name = program.projectName;
             } else {
                 error = ERRORS.INVALID_PROJECTNAME;
             }
@@ -49,22 +47,23 @@ export class Main {
 
         // Port
         if ( program.port ) {
-            const port = Number.parseInt(program.args[argIndex++]);
-            if ( isNaN(port) && port > 0 ) {
+            const port = Number.parseInt(program.port);
+            if ( !isNaN(port) && port > 0 ) {
                 mockDesigners.port = port;
             } else {
+                console.error("Port: " + program.port);
                 error = ERRORS.INVALID_PORT;
             }
         }
 
         // InputDir
         if ( program.input ) {
-            mockDesigners.inputDir = program.args[argIndex++];
+            mockDesigners.inputDir = program.input;
         }
 
         // Output
         if ( program.output ) {
-            mockDesigners.outputDir = program.args[argIndex++];
+            mockDesigners.outputDir = program.output;
         }
 
         console.info("INFO  - MockDesigner - Start");

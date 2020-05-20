@@ -66,6 +66,7 @@
   },
   "exclude": [
     "templates/**",
-    "generated/**"
+    "generated/**",
+    "generated*/**"
   ]
 }
