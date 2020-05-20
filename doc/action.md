@@ -2,7 +2,7 @@
 Mock Designer propose actions to react to different requests. 
 With Mock Designer actions, a mock can send a response, save request data.
 
-## Send response
+## Message action
 This action provide a way to send a response from a text or a file.
 This action provide the possibility to send custom status, headers, body.
 [More informations]()

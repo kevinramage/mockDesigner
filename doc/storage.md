@@ -2,7 +2,7 @@
 
 ## Save data
 
-Mock designer propose a solution to save request data. You can save the complete request data, save an object or just save a value.
+Mock designer propose a solution to save request data. Mock Designer propose a solution to save the complete request data, save an object or just save a value.
 To save the request data, you can apply a save action to collect request data and store it in redis database.
 Mock designer save data in storage space with a name and keys.
 Name represents a logic storage domain
