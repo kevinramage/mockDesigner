@@ -14,11 +14,13 @@ Example:
 actions:
 - type: message
   status: 200
-  body: OK
+  headers:
+    Content-Type: application/json
+  bodyFile: ../responses/examples/data.json
 ```
 
 ## Tools
-Tools propose help to add some dynamism in your response. These tools can be used with lot's of action or trigger but often used with the message action, so the documentation linked to these tool is present in message action section.
+Tools propose help to add some dynamism in your response. These tools can be used with lot's of action or trigger but often used with the message action, so the documentation linked to these tools is present in message action section.
 
 ### Functions 
 A tool propose to add some dynamism in a response: functions.
