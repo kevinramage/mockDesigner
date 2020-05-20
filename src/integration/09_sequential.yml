@@ -15,7 +15,7 @@ testcases:
   - type: exec
     script: docker-compose -f {{.output}}/docker-compose.yml up -d --build
   - type: exec
-    script: sleep 10
+    script: sleep 15
   - type: http
     method: GET
     url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
