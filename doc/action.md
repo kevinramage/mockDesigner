@@ -5,7 +5,7 @@ With Mock Designer actions, a mock can send a response, save request data.
 ## Message action
 This action provide a way to send a response from a text or a file.
 This action provide the possibility to send custom status, headers, body.
-[More informations]()
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/message.md)
 
 ## Validate the request
 This action provide a way to check the request validity before the response processing.
