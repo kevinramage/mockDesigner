@@ -115,9 +115,11 @@ export class MockDesigners {
         winston.debug("MockDesigners.addProjectFiles");
 
         // Variables
+        const dockerPort = "- \"" + this._port + ":" + this._port + "\"";
         const variables : {[key: string] : IKeyValue[]} = {};
         variables["package.json"] = [{key: KEYS.APPNAME, value: this._name.toLowerCase()}];
         variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}];
+        variables["docker-compose.yml"] = [ {key: KEYS.DOCKERPORT, value: dockerPort}]
         
         // Update template code
         const data = this.importExternalsFunctions();
