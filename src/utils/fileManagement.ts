@@ -7,11 +7,24 @@ export class FileManagement {
 
     public static createDirectory(directory: string) {
         winston.debug("FileManagement.createDirectory: " + directory);
-        const directoryPath = path.join(process.cwd(), directory);
-        if ( fs.existsSync(directoryPath) ) {
-            rimraf.sync(directoryPath)
-        }
-        fs.mkdirSync(directoryPath);
+        return new Promise<void>((resolve) => {
+            const directoryPath = path.join(process.cwd(), directory);
+            if ( fs.existsSync(directoryPath) ) {
+                rimraf.sync(directoryPath);
+
+                // Delay the creation of new directory (500ms)
+                // Else you encountered a permission denied error
+                const callable = () => {
+                    FileManagement.createDirectory(directory).finally(() => {
+                        resolve();
+                    });
+                }
+                setTimeout(callable, 500);
+            } else {
+                fs.mkdirSync(directoryPath);
+                resolve();
+            }
+        });
     } 
 
     public static copyDirectory (source: string, target: string) {

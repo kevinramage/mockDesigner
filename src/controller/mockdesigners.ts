@@ -76,11 +76,11 @@ export class MockDesigners {
         });
     }
     
-    public run() : void {
+    public async run() {
         winston.debug("MockDesigners.run");
 
         // Copy data
-        FileManagement.createDirectory(this.outputDir);
+        await FileManagement.createDirectory(this.outputDir);
         FileManagement.copyDirectory("tests/code", this.outputDir + "/code");
         FileManagement.copyDirectory("tests/data", this.outputDir +  "/data");
         FileManagement.copyDirectory("tests/functions", this.outputDir + "/functions");
