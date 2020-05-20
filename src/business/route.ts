@@ -17,6 +17,7 @@ export class Route {
     public generate(mockName: string, service: Service) {
         winston.debug("Route.generate");
         var code = "";
+        code += util.format("\t\tthis.router.route(\"%s/_resetCounter\").post(%s._%s_resetCounter);\n", this.pingPath, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_ping\").get(%s._%s_ping);\n", this.pingPath, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/:name\").get(%s._%s_getBehaviour);\n", this.path, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"%s/_behaviour/\").get(%s._%s_getAllBehaviours);\n", this.path, service.mockName, service.methodName);

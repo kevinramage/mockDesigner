@@ -6,7 +6,7 @@ import * as winston from "winston";
 import { IMock } from "../interface/mock";
 import { Mock } from "../business/mock";
 import { MockFactory } from "../factory/mockFactory";
-import { ERRORS, IDGENERATION_TYPE } from "../constantes";
+import { ERRORS } from "../constantes";
 import { IMockService } from "../interface/mockService";
 import { IMockResponse } from "../interface/mockResponse";
 import { IMockAction } from "../interface/mockAction";

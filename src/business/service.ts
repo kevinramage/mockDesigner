@@ -28,6 +28,7 @@ export class Service {
         var code = this.generateService("\t");
         code += this.generatePingService("\t");
         code += this.generateBehaviourServices("\t");
+        code += this.generateResetCounterService("\t");
         return code;
     }
 
@@ -97,6 +98,21 @@ export class Service {
         code += tab + util.format("public static async _%s_ping(req: Request, res: Response) {\n", this.methodName);
         code += tab + util.format("\twinston.debug(\"%s._%s_ping\");\n", this.mockName, this.methodName);
         code += tab + "\tres.status(204);\n";
+        code += tab + "\tres.end();\n";
+        code += tab + "}\n\n";
+
+        return code;
+    }
+
+    private generateResetCounterService(tab: string) {
+        winston.debug("Service.generatePingService");
+        var code = "";
+
+        // Generate ping service code
+        code += tab + util.format("public static async _%s_resetCounter(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_resetCounter\");\n", this.mockName, this.methodName);
+        code += tab + util.format("\t%s.%s_counter = 0;\n", this.mockName, this.methodName);
+        code += tab + "\tres.status(200);\n";
         code += tab + "\tres.end();\n";
         code += tab + "}\n\n";
 

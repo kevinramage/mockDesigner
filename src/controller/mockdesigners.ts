@@ -119,7 +119,7 @@ export class MockDesigners {
         const variables : {[key: string] : IKeyValue[]} = {};
         variables["package.json"] = [{key: KEYS.APPNAME, value: this._name.toLowerCase()}];
         variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}];
-        variables["docker-compose.yml"] = [ {key: KEYS.DOCKERPORT, value: dockerPort}]
+        variables["docker-compose.yml"] = [ {key: KEYS.DOCKERPORT, value: dockerPort}];
         
         // Update template code
         const data = this.importExternalsFunctions();
@@ -131,7 +131,7 @@ export class MockDesigners {
         // Read all files present in templates directory
         const instance = this;
         FileManagement.readDirectoryReccursively("templates").forEach(file => {
-            var fileName = file.substring(("generated/").length);
+            var fileName = file.substring(("templates/").length);
             fileName = fileName.replace("\\", "/");
             if ( variables[fileName] ) {
                 var args : [string, ...IKeyValue[]] = [fileName];
@@ -159,30 +159,6 @@ export class MockDesigners {
             codes.push(code);
         });
         return { codes: codes, imports: imports };
-    }
-
-    private compileExternalFunctions() {
-        const fileNames : string[]= [];
-        fs.readdirSync("functions").forEach(file => {
-            // Add file
-            const fileName = path.join("functions", file);
-            fileNames.push(fileName);
-
-            // Change imports
-        });
-
-        // Compile
-        /*
-        const instance = this;
-        const tscCmdLine = "tsc -t es6 -m commonjs --esModuleInterop";
-        const cmdLine = fileNames.map(file => { return util.format("%s %s",tscCmdLine ,file); }).join(";");
-        console.info(cmdLine);
-        exec(cmdLine, (err, stdout, stderr) => {
-            console.info(err);
-            console.info(stderr);
-            //instance.includeExternalFunctions(fileNames);
-        });
-        */
     }
 
     public get name() {
