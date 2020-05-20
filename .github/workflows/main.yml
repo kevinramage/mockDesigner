@@ -36,7 +36,7 @@ jobs:
       run: |
         cd src
         chmod +x integration/venom.linux-amd64
-        ./integration/venom.linux-amd64 run --parallel 5 --output-dir . ./integration/*.yml
+        ./integration/venom.linux-amd64 run --log debug --output-dir . ./integration/*.yml
         docker rmi $(docker images --filter "dangling=true" -q --no-trunc)
 
     # Artifact result
