@@ -11,10 +11,6 @@ Mock Designer propose actions to react to different requests.
 With Mock Designer actions, a mock can send a response, save request data.
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/action.md)
 
-## Response
-On the reception of a request, the mock service will answer response. You can send static responses based on text or file or send dynamic content. You can use functions, data stored, data sources, request data...
-[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/response.md)
-
 ## Trigger
 You can add some conditions in your actions to add more dynamism in your service.
 You can based your conditions on data, request, expression..
@@ -30,9 +26,11 @@ To simulate authentication system, Mock Designer propose a solution that simulat
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/authentication.md)
 
 # Protocol
+**Functionnality not ready**
 Https, websocket...
 Proxy
 TODO
 
 ## Extends the system
+**Functionnality not ready**
 TODO

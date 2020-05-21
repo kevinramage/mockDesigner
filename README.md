@@ -3,6 +3,9 @@ Mock designer tool help you to easily manage your mocks. You can describe the mo
 
 ## Installation
 
+To install it, you just have to clone this repository.
+Docker and npm tools required to use MockDesigner.
+
 ## Usage
 
 To use it describe your mock behaviour in yaml file and execute the tool to generate the code link.
@@ -46,7 +49,7 @@ Mock designer have some notions notions: trigger, action, behaviour...
 
 ## Integration
 
-Mockd Designer use venom as integration technology. You can run the integration tests with the following command:
+Mock Designer use venom as integration technology. You can run the integration tests with the following command:
 `.\venom.exe run --output-dir . .\integration\*.yml`
 
 ## Contribution

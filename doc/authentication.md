@@ -1,5 +1,6 @@
 # Authentication
-Mock Designer propose a solution to simuate the service authentication easily.
+Mock Designer propose a solution to simulate the service authentication easily.
+**Documentation not ready**
 
 ## Basic authentication
 

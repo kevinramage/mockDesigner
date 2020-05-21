@@ -14,7 +14,6 @@ Validation action propose several checks:
 * The presence of mandatory fields
 * The consistency of fields
 * The array length validity
-[More informations]()
 
 ## Save data
 This action provide a way to save the request received.
@@ -25,4 +24,3 @@ Data stored with this process will expired after 10 hours (This expiration can b
 
 ## Compute context
 **Functionnality not available now**
-[More informations]()
