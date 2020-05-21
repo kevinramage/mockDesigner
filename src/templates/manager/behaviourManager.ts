@@ -24,7 +24,7 @@ export class BehaviourManager {
         return data;
     }
 
-    public static async createBehaviour(key: string, name: string) {
+    public static async createBehaviour(key: string, name: string, expired: number | undefined) {
         winston.debug("BehaviourManager.createBehaviour");
         const finalKey = "__behaviour__" + key;
         if ( name ) {
@@ -37,7 +37,8 @@ export class BehaviourManager {
             }
             if ( !eltPresent ) {
                 data.push(elt);
-                await RedisManager.instance.setValue(finalKey, JSON.stringify(data));
+                const DEFAULT_EXPIRATION = 60 * 60 * 10;
+                await RedisManager.instance.setExValue(finalKey, expired || DEFAULT_EXPIRATION, JSON.stringify(data));
             }
             return elt;
         } else {
@@ -67,7 +68,7 @@ export class BehaviourManager {
         return null;
     }
 
-    public static async updateBehaviour(key: string, name: string, repeat: number) {
+    public static async updateBehaviour(key: string, name: string, repeat: number, expired: number | undefined) {
         winston.debug("BehaviourManager.updateBehaviour");
         const finalKey = "__behaviour__" + key;
         const textValue = await RedisManager.instance.getValue(finalKey);
@@ -75,7 +76,8 @@ export class BehaviourManager {
         const index = data.findIndex((elt : IBehaviourData) => { return elt.name == name});
         if ( index != -1 ) {
             data[index].repeat = repeat;
-            await RedisManager.instance.setValue(finalKey, JSON.stringify(data));
+            const DEFAULT_EXPIRATION = 60 * 60 * 10;
+            await RedisManager.instance.setExValue(finalKey, expired || DEFAULT_EXPIRATION, JSON.stringify(data));
             return data[index];
         } else {
             return null;
@@ -92,17 +94,19 @@ export class BehaviourManager {
             
             // Not defined
             if ( !data[index].repeat) {
+                const DEFAULT_EXPIRATION = 60 * 60 * 10;
                 if ( repeat != -1 && repeat > 1 ) {
-                    await BehaviourManager.updateBehaviour(key, name, repeat - 1);
+                    await BehaviourManager.updateBehaviour(key, name, repeat - 1, DEFAULT_EXPIRATION);
                 } else if ( repeat != -1 ) {
                     await BehaviourManager.deleteBehaviour(key, name);
                 }
 
             // Defined
             } else if ( data[index].repeat != -1) {
+                const DEFAULT_EXPIRATION = 60 * 60 * 10;
                 if ( data[index].repeat as number > 1 ) {
                     const repeat = data[index].repeat as number - 1;
-                    await BehaviourManager.updateBehaviour(key, name, repeat);
+                    await BehaviourManager.updateBehaviour(key, name, repeat, DEFAULT_EXPIRATION);
                 } else {
                     await BehaviourManager.deleteBehaviour(key, name);
                 }

@@ -23,6 +23,7 @@ In specific situation, you need to break down the service not for the next call 
 For each service, Mock Designer create automatically a path dedicated to the behaviour management.
 You can get, create, update, delete behaviour for your service.
 Mock designer propose an option to define behaviours for your service.
+> By default, a behaviour expired after 10 hour. You can change the expiration delay with the expired property in mock creation.
 
 ## Usage
 

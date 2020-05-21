@@ -8,6 +8,7 @@ This action provide the possibility to send custom status, headers, body.
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/message.md)
 
 ## Validate the request
+**Functionnality not available now**
 This action provide a way to check the request validity before the response processing.
 Validation action propose several checks:
 * The presence of mandatory fields
@@ -23,5 +24,5 @@ Data stored with this process will expired after 10 hours (This expiration can b
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/storage.md)
 
 ## Compute context
-You can compute some properties to reuse it after
+**Functionnality not available now**
 [More informations]()

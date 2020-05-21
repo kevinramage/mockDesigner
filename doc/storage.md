@@ -7,7 +7,7 @@ To save the request data, you can apply a save action to collect request data an
 Mock designer save data in storage space with a name and keys.
 Name represents a logic storage domain
 Keys represents an identifier or a set of identifiers to identify a particular line
-All data stored expires after X hours.
+All data stored expires after 10 hours.
 
 **Usage**:
 To save some data in redis, you just have to provide:
@@ -51,5 +51,5 @@ You can use the storage keyword to retrieve informations saved.
 
 ## Next features
 
-- [ ] Manage data expiration
+- [x] Manage data expiration
 - [ ] Support the usage of object directly in the body response

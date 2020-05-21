@@ -35,7 +35,8 @@ export class ServiceSave implements IServiceAction {
         code += "\n";
 
         // Add code to save the object in redis
-        code += tab + "RedisManager.instance.setValue(key, JSON.stringify(obj));\n";
+        code += tab + "const DEFAULT_EXPIRATION = 60 * 60 * 10;\n"
+        code += tab + "RedisManager.instance.setExValue(key, JSON.stringify(obj), DEFAULT_EXPIRATION);\n";
         code += "\n";
 
         return code;

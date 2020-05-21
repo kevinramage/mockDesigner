@@ -49,6 +49,25 @@ export class RedisManager {
         });
     }
 
+    public setExValue(key: string, seconds: number, value: string) {
+        winston.debug("RedisManager.setExValue");
+        return new Promise<void>((resolve, reject) => {
+            if ( this._client ) {
+                this._client.setex(key, seconds, value, (err, reply) => {
+                    if ( !err ) {
+                        resolve();
+                    } else {
+                        winston.error("RedisManager.setExValue: Internal error: ", err);
+                        reject(err);
+                    }
+                });
+            } else {
+                winston.error("RedisManager.setExValue: Redis client null or undefined");
+                reject("Redis client null or undefined");
+            }
+        });
+    }
+
     public saveObject(key: string, fieldIdName: string, fieldIdValue: string, body: object) {
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {

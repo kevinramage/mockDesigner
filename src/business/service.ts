@@ -151,7 +151,7 @@ export class Service {
         code += tab + util.format("public static async _%s_createBehaviour(req: Request, res: Response) {\n", this.methodName);
         code += tab + util.format("\twinston.debug(\"%s._%s_createBehaviour - Name: \" + req.body.name);\n", this.mockName, this.methodName);
         code += tab + util.format("\tconst key = \"%s__%s\";\n", this.mockName, this.methodName);
-        code += tab + "\tconst created = await BehaviourManager.createBehaviour(key, req.body.name);\n";
+        code += tab + "\tconst created = await BehaviourManager.createBehaviour(key, req.body.name, req.body.expired);\n";
         code += tab + "\tres.status(201);\n";
         code += tab + "\tres.write(JSON.stringify(created));\n";
         code += tab + "\tres.end();\n";
