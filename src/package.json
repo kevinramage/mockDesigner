@@ -7,7 +7,8 @@
     "start": "npm run build && node dist/mockGeneration.js",
     "build": "tsc",
     "test": "./integration/venom.linux-amd64 run --output-dir . ./integration/*.yml",
-    "winTest": ".\\venom.exe run --output-dir . .\\integration\\*.yml" 
+    "winTest": ".\\venom.exe run --output-dir . .\\integration\\*.yml",
+    "runSwaggerTool": "tsc tools/swaggerToMockDesigner.ts && node tools/swaggerToMockDesigner.js"
   },
   "author": "",
   "license": "ISC",
