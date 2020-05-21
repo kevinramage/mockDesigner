@@ -9,9 +9,13 @@ export class Main {
     public async run() {
 
         // Configure logs
+        const myFormat = winston.format.printf(({ level, message, timestamp }) => {
+            return `${timestamp} - ${level.toUpperCase()}: ${message}`;
+        });
         winston.add(new DailyRotateFile({ filename: "logs/WASP_%DATE%.log", datePattern: 'YYYY-MM-DD', 
-            level: 'debug', zippedArchive: true, maxSize: '20m', maxFiles: '14d'}));
-        winston.add(new winston.transports.Console({ level: "info",  }));
+            level: 'debug', zippedArchive: true, maxSize: '20m', maxFiles: '14d', format: winston.format.combine(winston.format.timestamp(), myFormat)}));
+        winston.remove(winston.transports.Console);
+        winston.add(new winston.transports.Console({level: "info", format: winston.format.combine(winston.format.timestamp(), myFormat) }));
 
         // Configure program
         program
@@ -64,14 +68,14 @@ export class Main {
             mockDesigners.outputDir = program.output;
         }
 
-        console.info("INFO  - MockDesigner - Start");
+        winston.info("MockDesigner - Start");
         if ( error == "" ) {
             try {
 
                 // Run the generation
                 mockDesigners.run();
 
-                console.info("INFO  - MockDesigner - Complete");
+                winston.info("MockDesigner - Complete");
             } catch ( ex ) {
                 //winston.error("An error occured during the process: ", ex);
                 const errorMessage = ex.message as string;
