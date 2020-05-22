@@ -1,0 +1,48 @@
+name: Include
+vars:
+  host: "localhost"
+  port: 7011
+  output: generated_include
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/include.yml --port {{.port}} --output {{.output}}
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --force-recreate 
+  - type: exec
+    script: ./wait {{.output}}_was_1
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/includeServiceGet/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/includeServiceGetAll/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Test service 1
+- name: ServiceGet
+  steps:
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/myService/1"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual OK
+
+# Test service 2
+- name: ServiceGetAll
+  steps:
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual OK2
