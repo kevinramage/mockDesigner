@@ -29,6 +29,8 @@ content-Type: application/json
     "expired": 3600
 }
 ```
+Expired property is optionnal property. By default a behaviour defined for 10 hours.
+
 **Update behaviour**
 ```
 PUT /api/v1/myServiceName/_behaviour/ERROR_500
