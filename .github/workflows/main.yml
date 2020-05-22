@@ -37,7 +37,7 @@ jobs:
         cd src
         chmod +x integration/venom.linux-amd64
         chmod +x wait
-        ./integration/venom.linux-amd64 run --log debug --parallel 2 --output-dir . ./integration/*.yml
+        ./integration/venom.linux-amd64 run --parallel 2 --output-dir . ./integration/*.yml
 
     # Artifact result
     - uses: actions/upload-artifact@v2
