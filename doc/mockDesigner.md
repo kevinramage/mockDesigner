@@ -21,6 +21,10 @@ You can use some rotation mechanism: sequential, random
 To manage mock technical error, Mock Designer propose a new system name behaviour. You can setup a behaviour to define how the mock will answer. With this system you can change dynamically the mock response.
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/behaviour.md)
 
+## Internal services
+Mock designer propose differents internal services to help the administration.
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/internalServices.md)
+
 ## Authentication
 To simulate authentication system, Mock Designer propose a solution that simulate the main authentication system: basic ...
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/authentication.md)
