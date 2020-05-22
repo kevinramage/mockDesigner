@@ -1,8 +1,8 @@
-name: MyMock
+name: MyBehaviourMock
 services:
-  - name: "myService"
+  - name: "behaviourService"
     method: POST
-    path: /api/v1/myService
+    path: /api/v1/behaviourService
     response:
       behaviours:
       - name: ERROR_500

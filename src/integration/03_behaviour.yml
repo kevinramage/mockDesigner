@@ -18,7 +18,7 @@ testcases:
     script: ./wait {{.output}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -27,7 +27,7 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
     assertions:
     - result.body ShouldEqual "Operation completed successfully"
@@ -37,28 +37,28 @@ testcases:
 - name: TestBehaviourNominalCase
   steps:
 
-  # Clean behaviours
+  # Clean all behaviours
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour"
     assertions:
     - result.statuscode ShouldEqual 204
 
   # Create behaviour instance
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour"
     assertions:
     - result.bodyjson.__len__ ShouldEqual 0 
     - result.statuscode ShouldEqual 200
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour/ERROR_500"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour/ERROR_500"
     assertions:
     - result.statuscode ShouldEqual 404
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour"
     headers:
       Content-Type: application/json
     body: "{ \"name\": \"ERROR_500\" }"
@@ -66,14 +66,14 @@ testcases:
     - result.statuscode ShouldEqual 201
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour"
     assertions:
     - result.bodyjson.__len__ ShouldEqual 1 
     - result.statuscode ShouldEqual 200
     - result.bodyjson.bodyjson0.name ShouldEqual ERROR_500
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour/ERROR_500"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour/ERROR_500"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.name ShouldEqual ERROR_500
@@ -81,7 +81,7 @@ testcases:
   # Test behaviour
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
@@ -94,12 +94,12 @@ testcases:
   steps:
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour/ERROR_500"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour/ERROR_500"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
     assertions:
     - result.body ShouldEqual "Operation completed successfully"
@@ -112,7 +112,7 @@ testcases:
   # Create behaviour
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour"
     headers:
       Content-Type: application/json
     body: "{ \"name\": \"ERROR_500\" }"
@@ -122,7 +122,7 @@ testcases:
   # Call 3 times the service
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
@@ -131,7 +131,7 @@ testcases:
     - result.statuscode ShouldEqual 500
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
@@ -140,7 +140,7 @@ testcases:
     - result.statuscode ShouldEqual 500
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
@@ -151,7 +151,7 @@ testcases:
   # Call 1 more time the service
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
@@ -166,7 +166,7 @@ testcases:
   # Create behaviour
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_behaviour"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService/_behaviour"
     headers:
       Content-Type: application/json
     body: "{ \"name\": \"ERROR_500\" }"
@@ -176,7 +176,7 @@ testcases:
   # Test conditions
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\" }"
@@ -185,7 +185,7 @@ testcases:
     - result.statuscode ShouldEqual 200
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"description\": \"myDescription\" }"
@@ -194,7 +194,7 @@ testcases:
     - result.statuscode ShouldEqual 200
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/behaviourService"
     headers:
       Content-Type: "application/json"
     body: "{ \"name\": \"MyName\", \"description\": \"myDescription\" }"
