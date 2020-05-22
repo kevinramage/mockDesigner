@@ -1,0 +1,71 @@
+name: MicroServices
+services:
+
+# Get a command
+- name: GetCommand
+  method: GET
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage: command
+        identifier:
+          value: "{{.request.params.cmdId}}"
+
+# Get commands
+- name: GetAllCommands
+  method: GET
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage: command
+
+# Create a command
+- name: CreateCommand
+  method: POST
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage: command
+        identifier: 
+          name: id
+          value: "{{Increment(commandCounter)}}"
+
+# Update a command
+- name: UpdateCommand
+  method: PUT
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage: command
+        identifier: 
+          value: "{{.request.params.cmdId}}"
+
+# Delete a command
+- name: DeleteCommand
+  method: DELETE
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: delete
+        storage: command
+        identifier: 
+          value: "{{.request.params.cmdId}}"

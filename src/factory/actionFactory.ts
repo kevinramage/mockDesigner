@@ -4,6 +4,8 @@ import { ServiceMessage } from "../business/action/serviceMessage";
 import { ServiceMessageHeader } from "../business/action/serviceMessageHeader";
 import { IMockSaveAction } from "../interface/mockSaveAction";
 import { ServiceSave } from "../business/action/serviceSave";
+import { IMockMicroServiceAction } from "../interface/mockMicroServiceAction";
+import { ServiceMicroService } from "../business/action/serviceMicroService";
 
 export class ActionFactory {
 
@@ -13,6 +15,8 @@ export class ActionFactory {
                 return ActionFactory.buildMessageAction(actionInterface as IMockMessageAction);
             case "save":
                 return ActionFactory.buildSaveAction(actionInterface as IMockSaveAction);
+            case "microservice":
+                return ActionFactory.buildMicroServiceAction(actionInterface as IMockMicroServiceAction);
             default:
                 return null;
         }
@@ -33,6 +37,7 @@ export class ActionFactory {
         serviceMessage.body = actionInterface.body;
         return serviceMessage;
     }
+
     private static buildSaveAction(actionInterface: IMockSaveAction) {
         const serviceSave : ServiceSave = new ServiceSave();
         
@@ -50,5 +55,23 @@ export class ActionFactory {
         });
 
         return serviceSave;
+    }
+
+    private static buildMicroServiceAction(actionInterface: IMockMicroServiceAction) {
+        const serviceMicroService = new ServiceMicroService();
+
+        // Action
+        serviceMicroService.action = actionInterface.action;
+
+        // Storage
+        serviceMicroService.storage = actionInterface.storage;
+
+        // Id
+        if ( actionInterface.identifier ) {
+            serviceMicroService.identifierName = actionInterface.identifier.name;
+            serviceMicroService.identifierValue = actionInterface.identifier.value;
+        }
+
+        return serviceMicroService;
     }
 }

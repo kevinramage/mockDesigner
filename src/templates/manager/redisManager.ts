@@ -68,6 +68,83 @@ export class RedisManager {
         });
     }
 
+    public deleteValue(key: string) {
+        winston.debug("RedisManager.deleteValue");
+        return new Promise<void>((resolve, reject) => {
+            if ( this._client ) {
+                this._client.del(key, (err, reply) => {
+                    if ( !err ) {
+                        resolve();
+                    } else {
+                        winston.error("RedisManager.deleteValue: Internal error: ", err);
+                        reject(err);
+                    }
+                });
+            } else {
+                winston.error("RedisManager.deleteValue: Redis client null or undefined");
+                reject("Redis client null or undefined");
+            }
+        });
+    }
+
+    public async addIndex(key: string, value: string) {
+        var data : string[];
+
+        // Get indexes
+        try {
+            data = JSON.parse(await RedisManager.instance.getValue(key));
+            if ( !data ) {
+                data = [];
+            }
+        } catch (ex) {
+            data = [];
+        }
+
+        // Add value
+        data.push(value);
+
+        // Save value
+        await RedisManager.instance.setValue(key, JSON.stringify(data));
+    }
+
+    public async removeIndex(key: string, value: string) {
+        var data : string[];
+
+        // Get indexes
+        try {
+            data = JSON.parse(await RedisManager.instance.getValue(key));
+            if ( !data ) {
+                data = [];
+            }
+        } catch (ex) {
+            data = [];
+        }
+
+        // Add value
+        data = data.filter((valueToAnalyze) => { return valueToAnalyze != value; })
+
+        // Save value
+        await RedisManager.instance.setValue(key, JSON.stringify(data));
+    }
+
+    public async getAllObject(key: string) {
+
+        // Get indexes
+        try {
+            const data : string[] = JSON.parse(await RedisManager.instance.getValue(key + "_list"));
+            const promises = data.map(index => {
+                return RedisManager.instance.getValue(key + "$$" + index);
+            });
+            const objectsText = await Promise.all(promises);
+            return objectsText.map(text => {
+                return JSON.parse(text);
+            }).splice(0, 50);
+
+        } catch ( ex ) {
+            return [];
+        }
+    }
+
     public saveObject(key: string, fieldIdName: string, fieldIdValue: string, body: object) {
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
