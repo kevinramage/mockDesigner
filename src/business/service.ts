@@ -28,7 +28,7 @@ export class Service {
         var code = this.generateService("\t");
         code += this.generatePingService("\t");
         code += this.generateBehaviourServices("\t");
-        code += this.generateResetCounterService("\t");
+        code += this.generateCounterService("\t");
         return code;
     }
 
@@ -104,16 +104,38 @@ export class Service {
         return code;
     }
 
-    private generateResetCounterService(tab: string) {
+    private generateCounterService(tab: string) {
         winston.debug("Service.generatePingService");
         var code = "";
 
-        // Generate ping service code
-        code += tab + util.format("public static async _%s_resetCounter(req: Request, res: Response) {\n", this.methodName);
-        code += tab + util.format("\twinston.debug(\"%s._%s_resetCounter\");\n", this.mockName, this.methodName);
+        // Generate get service counter
+        code += tab + util.format("public static async _%s_getServiceCounter(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_getServiceCounter\");\n", this.mockName, this.methodName);
+        code += tab + "\tres.status(200);\n";
+        code += tab + util.format("\tres.write(%s.%s_counter + \"\");\n", this.mockName, this.methodName);
+        code += tab + "\tres.end();\n";
+        code += tab + "}\n\n";
+
+        // Generate reset service counter
+        code += tab + util.format("public static async _%s_resetServiceCounter(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_resetServiceCounter\");\n", this.mockName, this.methodName);
         code += tab + util.format("\t%s.%s_counter = 0;\n", this.mockName, this.methodName);
         code += tab + "\tres.status(200);\n";
         code += tab + "\tres.end();\n";
+        code += tab + "}\n\n";
+
+        // Generate update service counter
+        code += tab + util.format("public static async _%s_updateServiceCounter(req: Request, res: Response) {\n", this.methodName);
+        code += tab + util.format("\twinston.debug(\"%s._%s_updateServiceCounter\");\n", this.mockName, this.methodName);
+        code += tab + "\tif ( req.body.value && !Number.isNaN(Number.parseInt(req.body.value)) ) {\n"
+        code += tab + util.format("\t\t%s.%s_counter = Number.parseInt(req.body.value);\n", this.mockName, this.methodName);
+        code += tab + "\t\tres.status(200);\n";
+        code += tab + "\t\tres.end();\n";
+        code += tab + "\t} else {\n"
+        code += tab + "\t\tres.status(400);\n";
+        code += tab + "\t\tres.write(\"Invalid value sent\");\n";
+        code += tab + "\t\tres.end();\n";
+        code += tab + "\t}\n";
         code += tab + "}\n\n";
 
         return code;

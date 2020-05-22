@@ -27,7 +27,7 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService/_resetCounter"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService/_resetServiceCounter"
     assertions:
     - result.statuscode ShouldEqual 200
   - type: http
