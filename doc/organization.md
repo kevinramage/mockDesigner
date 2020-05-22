@@ -1,7 +1,7 @@
 # Organization
 In Mock Designer, the test organization is an important rule to follow in order to add your own custom files or organize your tests with directory.
 
-## Structure
+## Project Structure
 Mock designer propose you the following organization, include all your code in tests directory.
 Inside this tests directory:
 * data directory: Add data sources in this directory (json, ~~xml~~, ~~csv~~)
@@ -10,6 +10,20 @@ Inside this tests directory:
 * code directory: Add service code in this directory (yml)
 
 Inside each these directories, you can add subdirectories to organize your different services.
+
+## Code structure
+
+A mock defined with a specific structure:
+Mock
+|_ Services
+|___Behaviours
+|_____Actions
+|___Trigger
+|_____Actions
+
+* Behaviour: Behaviour executed in first. Behaviour allow to execute alternative use cases.
+* Trigger: Trigger executed in second.
+Trigger allow to execute conditionnal use cases.
 
 ## Include
 
