@@ -18,11 +18,19 @@ testcases:
     script: ./wait {{.output}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/basicAuthentication/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/basicAuthenticationService/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/apiKeyAuthenticationService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
 # Basic authentication case
+# - Authentication required
+# - Authentication failed
+# - Authentication succeed
 - name: Test basic authentication
   steps:
   - type: http
@@ -46,6 +54,38 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/basicAuthentication"
     basic_auth_user: myUserName
     basic_auth_password: myPassword
+    assertions:
+    - result.body ShouldEqual OK
+    - result.statuscode ShouldEqual 200
+    - result.timeseconds ShouldBeLessThan 1
+
+# Api key authentication with header
+# - Authentication required
+# - Authentication failed
+# - Authentication succeed
+- name: Test Api key authentication with header
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/apiKeyAuthentication"
+    assertions:
+    - result.body ShouldEqual "Authentication required"
+    - result.statuscode ShouldEqual 401
+    - result.timeseconds ShouldBeLessThan 1
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/apiKeyAuthentication"
+    headers:
+      api-key: aBadKey
+    assertions:
+    - result.body ShouldEqual "Authentication failed"
+    - result.statuscode ShouldEqual 403
+    - result.timeseconds ShouldBeLessThan 1
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/apiKeyAuthentication"
+    headers:
+      api-key: "123456"
     assertions:
     - result.body ShouldEqual OK
     - result.statuscode ShouldEqual 200

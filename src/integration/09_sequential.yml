@@ -18,7 +18,7 @@ testcases:
     script: ./wait {{.output}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -27,48 +27,48 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_resetCounter"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService/_resetCounter"
     assertions:
     - result.statuscode ShouldEqual 200
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
-    assertions:
-    - result.statuscode ShouldEqual 200
-    - result.body ShouldEqual "Operation completed successfully"
-  - type: http
-    method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.body ShouldEqual "Operation completed successfully"
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.body ShouldEqual "Operation completed successfully"
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual "Operation completed successfully"
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
     assertions:
     - result.statuscode ShouldEqual 400
     - result.body ShouldEqual "Request sent invalid"
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
     assertions:
     - result.statuscode ShouldEqual 400
     - result.body ShouldEqual "Request sent invalid"
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
     assertions:
     - result.statuscode ShouldEqual 500
     - result.body ShouldEqual "An internal error occured"
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/sequentialService"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.body ShouldEqual "Operation completed successfully"

@@ -1,8 +1,8 @@
-name: MyMock
+name: sequentialMock
 services:
-  - name: "myService"
+  - name: sequentialService
     method: POST
-    path: /api/v1/myService
+    path: /api/v1/sequentialService
     response:
       triggers:
       - type: sequential

@@ -18,6 +18,6 @@ testcases:
     script: ./wait {{.output}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/randomService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204

@@ -1,9 +1,8 @@
-name: MyMock
+name: requestXMLMock
 services:
-  - name: "myService"
+  - name: requestXMLService
     method: POST
-    pingPath: /api/v1/myService
-    path: /api/v1/myService/:id/subItem/:subId
+    path: /api/v1/requestXMLService/:id/subItem/:subId
     response:
       triggers:
       - type: none

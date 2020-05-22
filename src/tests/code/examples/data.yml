@@ -1,8 +1,8 @@
-name: MyMock
+name: dataMock
 services:
-  - name: myService
+  - name: dataService
     method: POST
-    path: /api/v1/myService
+    path: /api/v1/dataService
     response:
       triggers:
       - type: none

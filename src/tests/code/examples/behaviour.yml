@@ -1,6 +1,6 @@
-name: MyBehaviourMock
+name: behaviourMock
 services:
-  - name: "behaviourService"
+  - name: behaviourService
     method: POST
     path: /api/v1/behaviourService
     response:

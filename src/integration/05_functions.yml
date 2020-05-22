@@ -18,7 +18,7 @@ testcases:
     script: ./wait {{.output}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/functionService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -30,7 +30,7 @@ testcases:
     headers:
       Content-Type: "application/json"
     body: "{ \"username\": \"Kevin\" }"
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/functionService"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.id ShouldEqual 1

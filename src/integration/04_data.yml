@@ -18,7 +18,7 @@ testcases:
     script: ./wait {{.output}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/dataService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -27,7 +27,7 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService"
+    url: "http://{{.host}}:{{.port}}/api/v1/dataService"
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.id ShouldEqual 1

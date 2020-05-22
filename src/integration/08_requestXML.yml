@@ -19,7 +19,7 @@ testcases:
     script: ./wait {{.output_lowercase}}_was_1
   - type: http
     method: GET
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/_ping"
+    url: "http://{{.host}}:{{.port}}/api/v1/requestXMLService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -28,7 +28,7 @@ testcases:
   steps:
   - type: http
     method: POST
-    url: "http://{{.host}}:{{.port}}/api/v1/myService/2/subItem/25?search=test&strict=true"
+    url: "http://{{.host}}:{{.port}}/api/v1/requestXMLService/2/subItem/25?search=test&strict=true"
     headers:
       Content-Type: "text/xml;charset=UTF-8"
       SOAPAction: "Request"

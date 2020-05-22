@@ -1,6 +1,6 @@
-name: authenticationService
+name: authenticationMock
 services: 
-- name: BasicAuthenticationService
+- name: basicAuthenticationService
   method: POST
   path: /api/v1/basicAuthentication
   authentication:
@@ -14,7 +14,7 @@ services:
       - type: message
         status: 200
         body: OK
-- name: ApiKeyAuthentictionService
+- name: apiKeyAuthenticationService
   method: POST
   path: /api/v1/apiKeyAuthentication
   authentication:

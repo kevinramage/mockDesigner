@@ -1,8 +1,8 @@
-name: MyMock
+name: functionMock
 services:
-  - name: "myService"
+  - name: functionService
     method: POST
-    path: /api/v1/myService
+    path: /api/v1/functionService
     response:
       triggers:
       - type: none

@@ -1,8 +1,8 @@
-name: MyMock
+name: storageMock
 services:
-  - name: myService
+  - name: storageService
     method: POST
-    path: /api/v1/myService
+    path: /api/v1/storageService
     response:
       triggers:
       - type: none

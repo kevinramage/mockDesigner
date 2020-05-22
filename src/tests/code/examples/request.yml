@@ -1,9 +1,8 @@
-name: MyMock
+name: requestMock
 services:
-  - name: "myService"
+  - name: requestService
     method: POST
-    pingPath: /api/v1/myService
-    path: /api/v1/myService/:id/subItem/:subId
+    path: /api/v1/requestService/:id/subItem/:subId
     response:
       triggers:
       - type: none

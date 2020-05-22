@@ -1,8 +1,8 @@
-name: MyMock
+name: randomMock
 services:
-  - name: "myService"
+  - name: randomService
     method: POST
-    path: /api/v1/myService
+    path: /api/v1/randomService
     response:
       triggers:
       - type: random
