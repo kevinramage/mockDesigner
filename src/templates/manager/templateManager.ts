@@ -192,6 +192,8 @@ export class TemplateManager {
             return this.evaluateJSONRequest(path, context);
         } else if ( context.isXMLRequest ) {
             return this.evaluateXMLRequest(path, context);
+        } else if ( path.startsWith("query") || path.startsWith("headers") || path.startsWith("params")) {
+            return this.evaluateJSONRequest(path, context);
         } else {
             winston.warn("TemplateManager.evaluateRequest - Content Type not defined or not supported");
             return "undefined";
