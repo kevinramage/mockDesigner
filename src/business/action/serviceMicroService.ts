@@ -6,12 +6,14 @@ export class ServiceMicroService implements IServiceAction {
 
     private _action : string;
     private _storage : string;
+    private _keys: string[];
     private _identifierName : string | undefined;
     private _identifierValue : string | undefined;
 
     constructor() {
         this._action = "";
         this._storage = "";
+        this._keys = [];
     }
 
     generate(tab: string): string {
@@ -56,8 +58,12 @@ export class ServiceMicroService implements IServiceAction {
 
         // Generate code to get data
         code += tab + util.format("// Get data & send response\n");
-        code += tab + util.format("const id = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.identifierValue);
-        code += tab + util.format("key = \"%s$$\" + id;\n", this.storage);     
+        code += tab + util.format("var id;\n");
+        code += tab + util.format("key = \"%s\";\n", this.storage);
+        this.keys.forEach(key => {
+            code += tab + util.format("id = await TemplateManager.instance.evaluate(\"%s\", context);\n", key);
+            code += tab + util.format("key += \"$$\" + id;\n");
+        });   
         code += tab + util.format("var data = await RedisManager.instance.getValue(key);\n"); 
 
         // Generate code to send response
@@ -90,18 +96,24 @@ export class ServiceMicroService implements IServiceAction {
         // Generate code to build object
         code += tab + util.format("// Build object\n");
         code += tab + util.format("const obj = context?.request?.body || {};\n");
-        code += tab + util.format("const id = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.identifierValue);
-        code += tab + util.format("obj.%s = id;\n\n", this.identifierName);
+        code += tab + util.format("const newId = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.identifierValue);
+        code += tab + util.format("obj.%s = newId;\n\n", this.identifierName);
 
         // Generate code to save object
         code += tab + util.format("// Save object\n");
-        code += tab + util.format("key = \"%s$$\" + id;\n", this.storage);
+        code += tab + util.format("var id;\n");
+        code += tab + util.format("key = \"%s\";\n", this.storage);
+        this.keys.forEach(key => {
+            code += tab + util.format("id = await TemplateManager.instance.evaluate(\"%s\", context);\n", key);
+            code += tab + util.format("key += \"$$\" + id;\n");
+        });   
+        code += tab + util.format("key += \"$$\" + newId;\n"); 
         code += tab + util.format("const DEFAULT_EXPIRATION = 60 * 60 * 10;\n");
         code += tab + util.format("await RedisManager.instance.setExValue(key, DEFAULT_EXPIRATION, JSON.stringify(obj));\n\n");
 
         // Generate code to add index
         code += tab + util.format("// Add index\n");
-        code += tab + util.format("await RedisManager.instance.addIndex(\"%s_list\", id);\n\n",this.storage);
+        code += tab + util.format("await RedisManager.instance.addIndex(\"%s_list\", newId);\n\n",this.storage);
 
         // Generated code to send response
         code += tab + util.format("// Send reponse\n");
@@ -119,11 +131,15 @@ export class ServiceMicroService implements IServiceAction {
         // Generate code to build object
         code += tab + util.format("// Build object\n");
         code += tab + util.format("const obj = context?.request?.body || {};\n");
-        code += tab + util.format("const id = await TemplateManager.instance.evaluate(\"%s\", context);\n\n", this.identifierValue);
 
         // Generate code to save object
         code += tab + util.format("// Save object\n");
-        code += tab + util.format("key = \"%s$$\" + id;\n", this.storage);
+        code += tab + util.format("var id;\n");
+        code += tab + util.format("key = \"%s\";\n", this.storage);
+        this.keys.forEach(key => {
+            code += tab + util.format("id = await TemplateManager.instance.evaluate(\"%s\", context);\n", key);
+            code += tab + util.format("key += \"$$\" + id;\n");
+        });
         code += tab + util.format("const DEFAULT_EXPIRATION = 60 * 60 * 10;\n");
         code += tab + util.format("await RedisManager.instance.setExValue(key, DEFAULT_EXPIRATION, JSON.stringify(obj));\n\n");
 
@@ -142,8 +158,12 @@ export class ServiceMicroService implements IServiceAction {
 
         // Generate code to delete data
         code += tab + util.format("// Delete data\n");
-        code += tab + util.format("const id = await TemplateManager.instance.evaluate(\"%s\", context);\n", this.identifierValue);
-        code += tab + util.format("key = \"%s$$\" + id;\n", this.storage);
+        code += tab + util.format("var id;\n");
+        code += tab + util.format("key = \"%s\";\n", this.storage);
+        this.keys.forEach(key => {
+            code += tab + util.format("id = await TemplateManager.instance.evaluate(\"%s\", context);\n", key);
+            code += tab + util.format("key += \"$$\" + id;\n");
+        });
         code += tab + util.format("await RedisManager.instance.deleteValue(key);\n");
         code += tab + util.format("await RedisManager.instance.removeIndex(\"%s_list\", id);\n\n",this.storage);
 
@@ -153,6 +173,10 @@ export class ServiceMicroService implements IServiceAction {
         code += tab + util.format("await ResponseHandler.sendContent(context, res, 204, \"\", headers);\n\n");
 
         return code;
+    }
+
+    public addKey(key: string) {
+        this._keys.push(key);
     }
 
     public get action() {
@@ -181,5 +205,9 @@ export class ServiceMicroService implements IServiceAction {
     }
     public set identifierValue(value) {
         this._identifierValue = value;
+    }
+
+    public get keys() {
+        return this._keys;
     }
 }

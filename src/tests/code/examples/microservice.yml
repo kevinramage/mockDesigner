@@ -12,8 +12,8 @@ services:
       - type: microservice
         action: get
         storage: command
-        identifier:
-          value: "{{.request.params.cmdId}}"
+        keys:
+        - "{{.request.params.cmdId}}"
 
 # Get commands
 - name: GetAllCommands
@@ -53,8 +53,8 @@ services:
       - type: microservice
         action: update
         storage: command
-        identifier: 
-          value: "{{.request.params.cmdId}}"
+        keys: 
+        - "{{.request.params.cmdId}}"
 
 # Delete a command
 - name: DeleteCommand
@@ -67,5 +67,22 @@ services:
       - type: microservice
         action: delete
         storage: command
+        keys: 
+        - "{{.request.params.cmdId}}"
+
+# Create a product
+- name: CreateProduct
+  method: POST
+  path: /api/v1/command/:cmdId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage: product
         identifier: 
-          value: "{{.request.params.cmdId}}"
+          name: id
+          value: "{{Increment(productCounter)}}"
+        keys: 
+        - "{{.request.params.cmdId}}"

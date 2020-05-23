@@ -72,6 +72,13 @@ export class ActionFactory {
             serviceMicroService.identifierValue = actionInterface.identifier.value;
         }
 
+        // Keys
+        if ( actionInterface.keys ) {
+            actionInterface.keys.forEach(key => {
+                serviceMicroService.addKey(key);
+            });
+        }
+
         return serviceMicroService;
     }
 }

@@ -7,5 +7,6 @@ export interface IMockMicroServiceAction extends IMockAction {
     identifier: {
         name: string,
         value: string
-    }
+    },
+    keys: string[]
 }
