@@ -130,9 +130,9 @@ export class TemplateManager {
         if ( match && match.length > 1 ) {
 
             // Evaluate argument
-            const argument = await this.evaluate(match[1], context)
+            const argument = await this.evaluate(match[1], context);
             args.push(argument);
-            const remaining = content.substring(argument.length);
+            const remaining = content.replace(match[1], "");
             const remainingArguments = await this.evaluateFunctionArguments(remaining, context);
             if ( remainingArguments && remainingArguments.length > 0 ) {
                 args = args.concat(remainingArguments);
@@ -475,17 +475,15 @@ export class TemplateManager {
         return Number.parseInt(id);
     }
 
-    public static async increment(context: Context, key: string) {
-        winston.debug("TemplateManager.increment");
-        var value = await RedisManager.instance.getValue(key);
-        if ( !value ) { value = "1"; }
-        const currentValue = Number.parseInt(value);
-        if ( !Number.isNaN(currentValue)) {
-            await RedisManager.instance.setValue(key, (currentValue+1) + "");
-            if ( context ) {
-                Object.defineProperty(context.data, "lastIncrement", { value: value });
-                Object.defineProperty(context.data, "increment" + key, { value: value });
-            }
+    public static async increment(...args: any[]) {
+        winston.debug("TemplateManager.increment: ", args);
+        const context = args[0];
+        const keys = args.slice(1);
+        const key = args[args.length-1];
+        const value = RedisManager.instance.incrementCounter(keys);
+        if ( context ) {
+            Object.defineProperty(context.data, "lastIncrement", { value: value });
+            Object.defineProperty(context.data, "increment" + key, { value: value });
         }
         return value;
     }

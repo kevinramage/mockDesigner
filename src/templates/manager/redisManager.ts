@@ -163,6 +163,32 @@ export class RedisManager {
         });
     }
 
+    public async incrementCounter(keys: string[]) {
+        if ( keys.length == 1 ) {
+            return await RedisManager.instance.incrementCounterValue(keys[0]);
+        } else {
+            return await RedisManager.instance.incrementComposedCounterValue(keys);
+        }
+    }
+
+    public async incrementCounterValue(counterKey: string) {
+        const value = await this.getValue(counterKey);
+        const increment = (value != null) ? Number.parseInt(value) : 1;
+        await this.setValue(counterKey, (increment + 1) + "");
+        return increment;
+    }
+
+    public async incrementComposedCounterValue(keys: string[]) {
+        var key = "composed";
+        keys.forEach(k => {
+            key += "$$" + k;
+        });
+        const value = await this.getValue(key);
+        const increment = (value != null) ? Number.parseInt(value) : 1;
+        await this.setValue(key, (increment + 1) + "");
+        return increment;
+    }
+
     public static get instance() {
         if ( !RedisManager._instance ) {
             RedisManager._instance = new RedisManager();
