@@ -67,3 +67,36 @@ content-Type: application/json
     "value": 10
 }
 ```
+
+### Database service
+
+**Get database value**
+```
+GET /api/v1/myServiceName/_getDatabaseValue?name=myKey
+```
+
+**Reset database counter**
+```
+POST /api/v1/myServiceName/_resetDatabaseCounter
+content-Type: application/json
+
+{
+    "name": "myCounter"
+}
+```
+
+**Update database value**
+```
+PUT /api/v1/myServiceName/_updateDatabaseValue
+content-Type: application/json
+
+{
+    "name": "myCounter",
+    "value": 10
+}
+```
+
+**Delete database value**
+```
+DELETE /api/v1/myServiceName/_deleteDatabaseCounter?name=myKey
+```
