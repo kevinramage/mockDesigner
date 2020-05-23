@@ -1,0 +1,159 @@
+name: Microservice
+vars:
+  host: "localhost"
+  port: 7012
+  output: generated_microservice
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/microservice.yml --port {{.port}} --output {{.output}}
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --force-recreate 
+  - type: exec
+    script: ./wait {{.output}}_was_1
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Clean database values
+- name: CleanDatabaseValues
+  steps:
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=command$$1"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=command$$2"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=command_list"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=commandCounter"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Test command creation
+- name: TestCommandCreation
+  steps:
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual []
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/1"
+    assertions:
+    - result.statuscode ShouldEqual 404
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/command"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"MyCommand\", \"description\": \"MyDescription\" }"
+    assertions:
+    - result.statuscode ShouldEqual 201
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.name ShouldEqual MyCommand
+    - result.bodyjson.description ShouldEqual MyDescription
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/1"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.name ShouldEqual MyCommand
+    - result.bodyjson.description ShouldEqual MyDescription
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.__len__ ShouldEqual 1
+    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.name ShouldEqual MyCommand
+    - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/command"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"MyCommand2\", \"description\": \"MyDescription2\" }"
+    assertions:
+    - result.statuscode ShouldEqual 201
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyCommand2
+    - result.bodyjson.description ShouldEqual MyDescription2
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.__len__ ShouldEqual 2
+    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.name ShouldEqual MyCommand
+    - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
+    - result.bodyjson.bodyjson1.id ShouldEqual 2
+    - result.bodyjson.bodyjson1.name ShouldEqual MyCommand2
+    - result.bodyjson.bodyjson1.description ShouldEqual MyDescription2
+
+# Test command update
+- name: TestCommandUpdate
+  steps:
+  - type: http
+    method: PUT
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2"
+    headers:
+      Content-Type: application/json
+    body: "{ \"id\": 2, \"name\": \"MyCommand2Updated\", \"description\": \"MyDescription2Updated\" }"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyCommand2Updated
+    - result.bodyjson.description ShouldEqual MyDescription2Updated
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyCommand2Updated
+    - result.bodyjson.description ShouldEqual MyDescription2Updated
+
+# Test command deletion
+- name: TestCommandDeletion
+  steps:
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/command/1"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/1"
+    assertions:
+    - result.statuscode ShouldEqual 404
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.__len__ ShouldEqual 1
+    - result.bodyjson.bodyjson0.id ShouldEqual 2
+    - result.bodyjson.bodyjson0.name ShouldEqual MyCommand2Updated
+    - result.bodyjson.bodyjson0.description ShouldEqual MyDescription2Updated
