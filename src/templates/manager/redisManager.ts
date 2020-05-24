@@ -7,6 +7,7 @@ export class RedisManager {
     private _client : redis.RedisClient | undefined;
 
     public init() {
+        winston.debug("RedisManager.init");
         const options : redis.ClientOpts = {};
         if ( process.env.REDIS_URL ) {
             options.host = process.env.REDIS_URL;
@@ -15,12 +16,14 @@ export class RedisManager {
     }
 
     public getValue(key: string) {
+        winston.debug("RedisManager.getValue: " + key);
         return new Promise<string>((resolve, reject) => {
             if ( this._client ) {
                 this._client.get(key, (err, value) => {
                     if ( !err ) {
                         resolve(value);
                     } else {
+                        winston.error("RedisManager.getValue -Internal error: " + err);
                         reject(err);
                     }
                 });
@@ -31,7 +34,7 @@ export class RedisManager {
     }
 
     public setValue(key: string, value: string) {
-        winston.debug("RedisManager.setValue");
+        winston.debug(util.format("RedisManager.setValue: %s = %s", key, value));
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
                 this._client.set(key, value, (err, reply) => {
@@ -50,7 +53,7 @@ export class RedisManager {
     }
 
     public setExValue(key: string, seconds: number, value: string) {
-        winston.debug("RedisManager.setExValue");
+        winston.debug(util.format("RedisManager.setExValue: %s (%d) = %s", key, seconds, value));
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
                 this._client.setex(key, seconds, value, (err, reply) => {
@@ -69,7 +72,7 @@ export class RedisManager {
     }
 
     public deleteValue(key: string) {
-        winston.debug("RedisManager.deleteValue");
+        winston.debug("RedisManager.deleteValue: " + key);
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
                 this._client.del(key, (err, reply) => {
@@ -88,6 +91,7 @@ export class RedisManager {
     }
 
     public async addIndex(key: string, value: string) {
+        winston.debug(util.format("RedisManager.addIndex: %s = %s", key, value));
         var data : string[];
 
         // Get indexes
@@ -108,6 +112,7 @@ export class RedisManager {
     }
 
     public async removeIndex(key: string, value: string) {
+        winston.debug(util.format("RedisManager.removeIndex: %s[%s]", key, value));
         var data : string[];
 
         // Get indexes
@@ -128,6 +133,7 @@ export class RedisManager {
     }
 
     public async getAllObject(key: string) {
+        winston.debug("RedisManager.getAllObject: " + key);
 
         // Get indexes
         try {
@@ -155,6 +161,7 @@ export class RedisManager {
     }
 
     public saveObject(key: string, fieldIdName: string, fieldIdValue: string, body: object) {
+        winston.debug("RedisManager.saveObject: " + key);
         return new Promise<void>((resolve, reject) => {
             if ( this._client ) {
                 const saveKey = util.format("_obj_%s_%s", key, fieldIdValue);
@@ -172,38 +179,47 @@ export class RedisManager {
         });
     }
 
-    public async incrementCounter(keys: string[]) {
-        if ( keys.length == 1 ) {
-            return await RedisManager.instance.incrementCounterValue(keys[0]);
-        } else {
-            return await RedisManager.instance.incrementComposedCounterValue(keys);
-        }
-    }
-
-    public async incrementCounterValue(counterKey: string) {
-        const value = await this.getValue(counterKey);
-        const increment = (value != null) ? Number.parseInt(value) : 1;
-        await this.setValue(counterKey, (increment + 1) + "");
-        return increment;
-    }
-
-    public async incrementComposedCounterValue(keys: string[]) {
-        var key = "composed";
-        keys.forEach(k => {
-            key += "$$" + k;
+    public incrementCounter(keys: string[]) {
+        winston.debug("RedisManager.incrementCounter: " + keys ? keys.join(",") : "undefined");
+        return new Promise<Number>(async resolve => {
+            if ( keys.length == 1 ) {
+                resolve(await RedisManager.instance.incrementCounterValue(keys[0]));
+            } else {
+                resolve(await RedisManager.instance.incrementComposedCounterValue(keys));
+            }
         });
-        const value = await this.getValue(key);
-        const increment = (value != null) ? Number.parseInt(value) : 1;
-        await this.setValue(key, (increment + 1) + "");
-        return increment;
+    }
+
+    private incrementCounterValue(counterKey: string) {
+        winston.debug("RedisManager.incrementCounterValue: " + counterKey);
+        return new Promise<number>(async resolve => {
+            const value = await RedisManager.instance.getValue(counterKey);
+            const increment = (value != null) ? Number.parseInt(value) : 1;
+            await RedisManager.instance.setValue(counterKey, (increment + 1) + "");
+            resolve(increment);
+        });
+    }
+
+    private incrementComposedCounterValue(keys: string[]) {
+        winston.debug("RedisManager.incrementComposedCounterValue: " + keys ? keys.join(",") : "undefined");
+        return new Promise<number>(async resolve => {
+            var key = "composed";
+            keys.forEach(k => {
+                key += "$$" + k;
+            });
+            const value = await RedisManager.instance.getValue(key);
+            const increment = (value != null) ? Number.parseInt(value) : 1;
+            await RedisManager.instance.setValue(key, (increment + 1) + "");
+            resolve(increment);
+        });
     }
 
     public async checkValues(values: string[]) {
+        winston.debug("RedisManager.checkValues: " + values ? values.join(",") : "undefined")
         return new Promise<boolean>((resolve) => {
             if ( values.length > 0 ) {
                 const promises = values.map(v => { return RedisManager.instance.getValue(v); });
                 Promise.all(promises).then(valuesComputed => {
-                    console.info(valuesComputed);
                     resolve(valuesComputed.every(v => { return v != null }));
                 }).catch(() => {
                     resolve(false);

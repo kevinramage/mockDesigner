@@ -21,6 +21,15 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/storageService/_ping"
     assertions:
     - result.statuscode ShouldEqual 204
+  
+# Clean counter
+- name: CleanCounter
+  steps:
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/storageService/_deleteDatabaseValue?name=commandCounter"
+    assertions:
+    - result.statuscode ShouldEqual 204
 
 # Nominal case
 - name: NominalCase

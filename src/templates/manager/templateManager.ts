@@ -480,7 +480,7 @@ export class TemplateManager {
         const context = args[0];
         const keys = args.slice(1);
         const key = args[args.length-1];
-        const value = RedisManager.instance.incrementCounter(keys);
+        const value = await RedisManager.instance.incrementCounter(keys);
         if ( context ) {
             Object.defineProperty(context.data, "lastIncrement", { value: value });
             Object.defineProperty(context.data, "increment" + key, { value: value });

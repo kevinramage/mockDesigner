@@ -4,7 +4,6 @@ Mock Designer propose an action to simulate a microservice behaviour
 ## Get all service
 Return all data of a business object.
 This action will
-* Check the presence of parent object
 * Compute the key to retrieve data (with storage and keys)
 * Retrieve data
 * Send data

@@ -1,23 +1,23 @@
 name: storageMock
 services:
-  - name: storageService
-    method: POST
-    path: /api/v1/storageService
-    response:
-      triggers:
-      - type: none
-        actions:
-        - type: save
-          expressions:
-          - key: name
-            value: "{{.request.body.name}}"
-          - key: description
-            value: "{{.request.body.description}}"
-          storage: command
-          keys:
-          - "{{Increment(commandCounter)}}"
-        - type: message
-          status: 200
-          headers:
-            Content-Type: application/json
-          bodyFile: ../responses/examples/storage.json
+- name: storageService
+  method: POST
+  path: /api/v1/storageService
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: save
+        expressions:
+        - key: name
+          value: "{{.request.body.name}}"
+        - key: description
+          value: "{{.request.body.description}}"
+        storage: command
+        keys:
+        - "{{Increment(commandCounter)}}"
+      - type: message
+        status: 200
+        headers:
+          Content-Type: application/json
+        bodyFile: ../responses/examples/storage.json
