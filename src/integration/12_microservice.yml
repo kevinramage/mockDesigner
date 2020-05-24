@@ -45,6 +45,26 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=commandCounter"
     assertions:
     - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=product$$2-1"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=product$$2-2"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=product_list$$2"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=composed$$command2$$productCounter"
+    assertions:
+    - result.statuscode ShouldEqual 204
 
 # Test command creation
 - name: TestCommandCreation
@@ -156,4 +176,124 @@ testcases:
     - result.bodyjson.__len__ ShouldEqual 1
     - result.bodyjson.bodyjson0.id ShouldEqual 2
     - result.bodyjson.bodyjson0.name ShouldEqual MyCommand2Updated
+    - result.bodyjson.bodyjson0.description ShouldEqual MyDescription2Updated
+
+  # Test product creation
+- name: TestProductCreation
+  steps:
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual []
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/1"
+    assertions:
+    - result.statuscode ShouldEqual 404
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"MyProduct\", \"description\": \"MyDescription\" }"
+    assertions:
+    - result.statuscode ShouldEqual 201
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.name ShouldEqual MyProduct
+    - result.bodyjson.description ShouldEqual MyDescription
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.__len__ ShouldEqual 1
+    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.name ShouldEqual MyProduct
+    - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/1"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.name ShouldEqual MyProduct
+    - result.bodyjson.description ShouldEqual MyDescription
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"MyProduct2\", \"description\": \"MyDescription2\" }"
+    assertions:
+    - result.statuscode ShouldEqual 201
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyProduct2
+    - result.bodyjson.description ShouldEqual MyDescription2
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.__len__ ShouldEqual 2
+    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.name ShouldEqual MyProduct
+    - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
+    - result.bodyjson.bodyjson1.id ShouldEqual 2
+    - result.bodyjson.bodyjson1.name ShouldEqual MyProduct2
+    - result.bodyjson.bodyjson1.description ShouldEqual MyDescription2
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/2"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyProduct2
+    - result.bodyjson.description ShouldEqual MyDescription2
+
+# Test product update
+- name: TestProductUpdate
+  steps:
+  - type: http
+    method: PUT
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/2"
+    headers:
+      Content-Type: application/json
+    body: "{ \"id\": 2, \"name\": \"MyProduct2Updated\", \"description\": \"MyDescription2Updated\" }"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyProduct2Updated
+    - result.bodyjson.description ShouldEqual MyDescription2Updated
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/2"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.name ShouldEqual MyProduct2Updated
+    - result.bodyjson.description ShouldEqual MyDescription2Updated
+
+# Test product deletion
+- name: TestProductDeletion
+  steps:
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/1"
+    assertions:
+    - result.statuscode ShouldEqual 204
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/1"
+    assertions:
+    - result.statuscode ShouldEqual 404
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/command/2/product"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.bodyjson.__len__ ShouldEqual 1
+    - result.bodyjson.bodyjson0.id ShouldEqual 2
+    - result.bodyjson.bodyjson0.name ShouldEqual MyProduct2Updated
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription2Updated

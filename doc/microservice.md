@@ -2,7 +2,12 @@
 Mock Designer propose an action to simulate a microservice behaviour
 
 ## Get all service
-Return all data of a business object
+Return all data of a business object.
+This action will
+* Check the presence of parent object
+* Compute the key to retrieve data (with storage and keys)
+* Retrieve data
+* Send data
 
 **Usage:**
 * action: Must equals to getall to use this action
@@ -24,6 +29,10 @@ Return all data of a business object
 
 ## Get service
 Return data of a specific business object
+This action will
+* Compute the key to retrieve data (with storage and keys)
+* Retrieve data
+* Send data
 
 **Usage:**
 * action: Must equals to get to use this action
@@ -50,6 +59,11 @@ Return data of a specific business object
 
 ## Create service
 Generate the unique identifier of the business object and save business object in redis database.
+This action will
+* Generate identifier
+* Save data
+* Updade indexes
+* Send data
 
 **Usage:**
 * action: Must equals to create to use this action
@@ -76,6 +90,10 @@ Generate the unique identifier of the business object and save business object i
 
 ## Update service
 Update an existing business object.
+This action will
+* Compute the key to retrieve data (with storage and keys)
+* Save data
+* Send data
 
 **Usage:**
 * action: Must equals to update to use this action
@@ -100,6 +118,10 @@ Update an existing business object.
 
 ## Delete service
 Delete an existing business object.
+This action will
+* Delete data
+* Updade indexes
+* Send empty response
 
 **Usage:**
 * action: Must equals to delete to use this action
@@ -121,3 +143,10 @@ Delete an existing business object.
         identifier: 
           value: "{{.request.params.cmdId}}"
 ```
+
+## Storage of business object
+
+Store a command: command$$1
+Store command list: command_list
+Store a product: product$$1-1
+Store a product list: product_list$$1

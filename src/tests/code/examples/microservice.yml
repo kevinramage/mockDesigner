@@ -1,6 +1,85 @@
 name: MicroServices
 services:
 
+
+# Get a product
+- name: GetProduct
+  method: GET
+  path: /api/v1/command/:cmdId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage: product
+        keys:
+        - "{{.request.params.cmdId}}"
+        - "{{.request.params.prdId}}"
+
+# Get products
+- name: GetAllProducts
+  method: GET
+  path: /api/v1/command/:cmdId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage: product
+        keys:
+        - "{{.request.params.cmdId}}"
+
+# Create a product
+- name: CreateProduct
+  method: POST
+  path: /api/v1/command/:cmdId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage: product
+        identifier: 
+          name: id
+          value: "{{Increment(command{{.request.params.cmdId}}, productCounter)}}"
+        keys: 
+        - "{{.request.params.cmdId}}"
+
+# Update a product
+- name: UpdateProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage: product
+        identifier: 
+          name: id
+          value: "{{Increment({{.request.params.cmdId}}, productCounter)}}"
+        keys: 
+        - "{{.request.params.cmdId}}"
+        - "{{.request.params.prdId}}"
+
+- name: DeleteProduct
+  method: DELETE
+  path: /api/v1/command/:cmdId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: delete
+        storage: product
+        keys: 
+        - "{{.request.params.cmdId}}"
+        - "{{.request.params.prdId}}"
+
 # Get a command
 - name: GetCommand
   method: GET
@@ -67,22 +146,5 @@ services:
       - type: microservice
         action: delete
         storage: command
-        keys: 
-        - "{{.request.params.cmdId}}"
-
-# Create a product
-- name: CreateProduct
-  method: POST
-  path: /api/v1/command/:cmdId/product
-  response:
-    triggers:
-    - type: none
-      actions:
-      - type: microservice
-        action: create
-        storage: product
-        identifier: 
-          name: id
-          value: "{{Increment(productCounter)}}"
         keys: 
         - "{{.request.params.cmdId}}"

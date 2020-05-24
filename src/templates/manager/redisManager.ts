@@ -131,14 +131,23 @@ export class RedisManager {
 
         // Get indexes
         try {
-            const data : string[] = JSON.parse(await RedisManager.instance.getValue(key + "_list"));
+
+            // Read index
+            const data : string[] = JSON.parse(await RedisManager.instance.getValue(key));
+
+            // Read each element present in index
+            const objects : any[] = [];
             const promises = data.map(index => {
-                return RedisManager.instance.getValue(key + "$$" + index);
+                return new Promise(async(resolve) => {
+                    const text = await RedisManager.instance.getValue(index);
+                    if ( text ) {
+                        objects.push(JSON.parse(text));
+                    }
+                    resolve();
+                })
             });
-            const objectsText = await Promise.all(promises);
-            return objectsText.map(text => {
-                return JSON.parse(text);
-            }).splice(0, 50);
+            await Promise.all(promises);
+            return objects.slice(0, 50);
 
         } catch ( ex ) {
             return [];
@@ -187,6 +196,22 @@ export class RedisManager {
         const increment = (value != null) ? Number.parseInt(value) : 1;
         await this.setValue(key, (increment + 1) + "");
         return increment;
+    }
+
+    public async checkValues(values: string[]) {
+        return new Promise<boolean>((resolve) => {
+            if ( values.length > 0 ) {
+                const promises = values.map(v => { return RedisManager.instance.getValue(v); });
+                Promise.all(promises).then(valuesComputed => {
+                    console.info(valuesComputed);
+                    resolve(valuesComputed.every(v => { return v != null }));
+                }).catch(() => {
+                    resolve(false);
+                });
+            } else {
+                resolve(true);
+            }
+        });
     }
 
     public static get instance() {
