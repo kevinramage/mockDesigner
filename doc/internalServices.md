@@ -72,12 +72,12 @@ content-Type: application/json
 
 **Get database value**
 ```
-GET /api/v1/myServiceName/_getDatabaseValue?name=myKey
+GET /api/v1/_getDatabaseValue?name=myKey
 ```
 
 **Reset database counter**
 ```
-POST /api/v1/myServiceName/_resetDatabaseCounter
+POST /api/v1/_resetDatabaseCounter
 content-Type: application/json
 
 {
@@ -87,7 +87,7 @@ content-Type: application/json
 
 **Update database value**
 ```
-PUT /api/v1/myServiceName/_updateDatabaseValue
+PUT /api/v1/_updateDatabaseValue
 content-Type: application/json
 
 {
@@ -98,5 +98,5 @@ content-Type: application/json
 
 **Delete database value**
 ```
-DELETE /api/v1/myServiceName/_deleteDatabaseCounter?name=myKey
+DELETE /api/v1/_deleteDatabaseCounter?name=myKey
 ```

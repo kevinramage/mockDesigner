@@ -20,10 +20,10 @@ export class Route {
         code += util.format("\t\tthis.router.route(\"/api/v1/%s/_getServiceCounter\").get(%s._%s_getServiceCounter);\n", service.methodName, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"/api/v1/%s/_resetServiceCounter\").post(%s._%s_resetServiceCounter);\n", service.methodName, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"/api/v1/%s/_updateServiceCounter\").put(%s._%s_updateServiceCounter);\n", service.methodName, service.mockName, service.methodName);
-        code += util.format("\t\tthis.router.route(\"/api/v1/%s/_getDatabaseValue\").get(%s._%s_getDatabaseValue);\n", service.methodName, service.mockName, service.methodName);
-        code += util.format("\t\tthis.router.route(\"/api/v1/%s/_resetDatabaseCounter\").post(%s._%s_resetDatabaseCounter);\n", service.methodName, service.mockName, service.methodName);
-        code += util.format("\t\tthis.router.route(\"/api/v1/%s/_updateDatabaseValue\").put(%s._%s_updateDatabaseValue);\n", service.methodName, service.mockName, service.methodName);
-        code += util.format("\t\tthis.router.route(\"/api/v1/%s/_deleteDatabaseValue\").delete(%s._%s_deleteDatabaseValue);\n", service.methodName, service.mockName, service.methodName);
+        code += util.format("\t\tthis.router.route(\"/api/v1/_getDatabaseValue\").get(%s._getDatabaseValue);\n", service.mockName);
+        code += util.format("\t\tthis.router.route(\"/api/v1/_resetDatabaseCounter\").post(%s._resetDatabaseCounter);\n", service.mockName);
+        code += util.format("\t\tthis.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", service.mockName);
+        code += util.format("\t\tthis.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n", service.mockName);
         code += util.format("\t\tthis.router.route(\"/api/v1/%s/_ping\").get(%s._%s_ping);\n", service.methodName, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"/api/v1/%s/_behaviour/:name\").get(%s._%s_getBehaviour);\n", service.methodName, service.mockName, service.methodName);
         code += util.format("\t\tthis.router.route(\"/api/v1/%s/_behaviour/\").get(%s._%s_getAllBehaviours);\n", service.methodName, service.mockName, service.methodName);

@@ -27,42 +27,42 @@ testcases:
   steps:
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=command$$1"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command$$1"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=command$$2"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command$$2"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=command_list"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command_list"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=commandCounter"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=commandCounter"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=product$$2-1"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product$$2-1"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=product$$2-2"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product$$2-2"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=product_list$$2"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product_list$$2"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/GetCommand/_deleteDatabaseValue?name=composed$$command2$$productCounter"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=composed$$command2$$productCounter"
     assertions:
     - result.statuscode ShouldEqual 204
 

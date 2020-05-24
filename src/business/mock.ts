@@ -27,6 +27,7 @@ export class Mock {
         this._services.forEach(service => {
             code += service.generate();
         });
+        code += this.generateDatabaseService("\t");
         code += "}\n";
         return code;
     }
@@ -44,6 +45,51 @@ export class Mock {
         this._services.forEach(service => {
             code += service.generateRoute();
         });
+        return code;
+    }
+
+    private generateDatabaseService(tab: string) {
+        winston.debug("Service.generateDatabaseCounter");
+        var code = "";
+
+        // Generate get database counter
+        code += tab + util.format("public static async _getDatabaseValue(req: Request, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s._getDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\tconst value = await RedisManager.instance.getValue(req.query['name'] as string);\n");
+        code += tab + util.format("\tif ( value != null ) {\n");
+        code += tab + util.format("\t\tres.status(200);\n");
+        code += tab + util.format("\t\tres.write(value + \"\");\n");
+        code += tab + util.format("\t} else {\n");
+        code += tab + util.format("\t\tres.status(404);\n");
+        code += tab + util.format("\t\tres.write(\"Ressource not found\");\n");
+        code += tab + util.format("\t}\n");
+        code += tab + util.format("\tres.end();\n");
+        code += tab + util.format("}\n\n");
+
+        // Generate reset database counter
+        code += tab + util.format("public static async _resetDatabaseCounter(req: Request, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s._resetDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\tawait RedisManager.instance.setValue(req.body.name, \"0\");\n");
+        code += tab + util.format("\tres.status(204);\n");
+        code += tab + util.format("\tres.end();\n");
+        code += tab + util.format("}\n\n");
+
+        // Generate update database value code
+        code += tab + util.format("public static async _updateDatabaseValue(req: Request, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s._updateDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\tawait RedisManager.instance.setValue(req.body.name, req.body.value);\n");
+        code += tab + util.format("\tres.status(204);\n");
+        code += tab + util.format("\tres.end();\n");
+        code += tab + util.format("}\n\n");
+
+        // Generate delete database value code
+        code += tab + util.format("public static async _deleteDatabaseValue(req: Request, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s._updateDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\tawait RedisManager.instance.deleteValue(req.query['name'] as string);\n");
+        code += tab + util.format("\tres.status(204);\n");
+        code += tab + util.format("\tres.end();\n");
+        code += tab + util.format("}\n\n");
+
         return code;
     }
 
