@@ -7,8 +7,8 @@ You can have some conditions based on:
 * script
 
 ## Data trigger
-**Functionnality not available now**
-Mock Designer propose to trigger specifics actions when some expressions mactch
+Mock Designer propose to trigger specifics actions when some expressions matches.
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/dataTrigger.md)
 
 ## Sequential trigger
 Mock Designer propose to add some rotation in a response. You can add some sequential rotation in the mock response provided.

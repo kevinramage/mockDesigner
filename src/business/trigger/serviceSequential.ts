@@ -13,10 +13,12 @@ export class ServiceSequential implements IServiceTrigger {
     }
 
     public addMessage(message: ServiceSequentialMessage) {
+        winston.debug("ServiceSequential.addMessage");
         this._messages.push(message);
     }
 
     public generate(mockName: string, serviceName: string, tab: string) {
+        winston.debug("ServiceSequential.generate");
         var code = "";
 
         // Generate threshold

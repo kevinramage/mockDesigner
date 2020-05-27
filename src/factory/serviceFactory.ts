@@ -118,7 +118,9 @@ export class ServiceFactory {
         const serviceDataTrigger = new ServiceData();
 
         // Expression
-        serviceDataTrigger.expression = dataTrigger.expression;
+        dataTrigger.conditions.forEach(condition => {
+            serviceDataTrigger.addCondition(condition);
+        });
 
         // Actions
         dataTrigger.actions.forEach(action => {

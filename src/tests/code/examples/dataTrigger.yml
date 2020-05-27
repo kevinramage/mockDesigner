@@ -1,0 +1,28 @@
+name: dataTrigger
+services:
+- name: dataTriggerService
+  method: POST
+  path: /api/v1/dataTrigger/:id
+  response:
+    triggers:
+    - type: data
+      conditions: 
+      - "'{{.request.params.id}}' == '99999'"
+      - "'{{.request.body.name}}' == 'ERROR_500'"
+      actions:
+      - type: message
+        status: 500
+        body: "Internal error"
+    - type: data
+      conditions:
+      - "'{{.request.params.id}}' == '99999'"
+      - "'{{.request.body.name}}' == 'ERROR_400'"
+      actions:
+      - type: message
+        status: 400
+        body: "Invalid request"
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK

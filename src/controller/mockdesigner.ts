@@ -163,12 +163,10 @@ export class MockDesigner {
 
     private validationDataTrigger(mockDataTrigger: IMockDataTriger, validationErrors: string[]) {
 
-        // Expression
-        if ( !mockDataTrigger.expression) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_EXPRESSION); }
-        else if ( typeof mockDataTrigger.expression != "string" ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_EXPRESSION); }
-
+        // Conditions
+        
         // Actions
-        else if ( !mockDataTrigger.actions ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_ACTIONS); }
+        if ( !mockDataTrigger.actions ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_ACTIONS); }
         else if ( !mockDataTrigger.actions.length ) { validationErrors.push(ERRORS.VALIDATION_TRIGGERDATA_ACTIONS); }
         if ( mockDataTrigger.actions ) {
             const instance = this;

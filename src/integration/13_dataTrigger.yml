@@ -1,0 +1,59 @@
+name: DataTrigger
+vars:
+  host: "localhost"
+  port: 7013
+  output: generated_datatrigger_1
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input tests/code/examples/dataTrigger.yml --port {{.port}} --output {{.output}}
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --force-recreate 
+  - type: exec
+    script: ./wait {{.output}}_was
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTriggerService/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Test 500 error trigger
+- name: Test500ErrorTrigger
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTrigger/99999"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"ERROR_500\" }"
+    assertions:
+    - result.statuscode ShouldEqual 500
+    - result.body ShouldEqual "Internal error"
+
+# Test 400 error trigger
+- name: Test400ErrorTrigger
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTrigger/99999"
+    headers:
+      Content-Type: application/json
+    body: "{ \"name\": \"ERROR_400\" }"
+    assertions:
+    - result.statuscode ShouldEqual 400
+    - result.body ShouldEqual "Invalid request"
+
+# Test 200 nominal case
+- name: Test200NominalCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTrigger/99999"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual OK
