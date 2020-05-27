@@ -2,7 +2,7 @@ name: DataTrigger
 vars:
   host: "localhost"
   port: 7013
-  output: generated_datatrigger_1
+  output: generated_datatrigger
 testcases:
 
 # Build mock
@@ -15,7 +15,7 @@ testcases:
   - type: exec
     script: docker-compose -f {{.output}}/docker-compose.yml up -d --force-recreate 
   - type: exec
-    script: ./wait {{.output}}_was
+    script: ./wait {{.output}}_was_1
   - type: http
     method: GET
     url: "http://{{.host}}:{{.port}}/api/v1/dataTriggerService/_ping"

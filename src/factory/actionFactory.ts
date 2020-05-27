@@ -6,6 +6,8 @@ import { IMockSaveAction } from "../interface/mockSaveAction";
 import { ServiceSave } from "../business/action/serviceSave";
 import { IMockMicroServiceAction } from "../interface/mockMicroServiceAction";
 import { ServiceMicroService } from "../business/action/serviceMicroService";
+import { ServiceWait } from "../business/action/serviceWait";
+import { IMockWaitAction } from "../interface/mockWaitAction";
 
 export class ActionFactory {
 
@@ -17,6 +19,8 @@ export class ActionFactory {
                 return ActionFactory.buildSaveAction(actionInterface as IMockSaveAction);
             case "microservice":
                 return ActionFactory.buildMicroServiceAction(actionInterface as IMockMicroServiceAction);
+            case "wait":
+                return ActionFactory.buildWaitAction(actionInterface as IMockWaitAction);
             default:
                 return null;
         }
@@ -80,5 +84,14 @@ export class ActionFactory {
         }
 
         return serviceMicroService;
+    }
+
+    private static buildWaitAction(actionInterface: IMockWaitAction) {
+        const serviceWait = new ServiceWait();
+
+        // Time
+        serviceWait.time = actionInterface.time;
+
+        return serviceWait;
     }
 }

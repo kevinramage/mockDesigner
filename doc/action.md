@@ -22,5 +22,9 @@ The save action provide a possibility to customize data stored and organize data
 Data stored with this process will expired after 10 hours (This expiration can be configured).
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/storage.md)
 
+## Wait
+This action provide a way to test application timeout handling.
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/timeout.md)
+
 ## Compute context
 **Functionnality not available now**

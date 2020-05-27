@@ -189,6 +189,8 @@ export class MockDesigner {
                 case "save":
                     this.validateSaveAction(mockAction as IMockSaveAction, validationErrors);
                 break;
+                case "wait":
+                    break;
                 default:
                     validationErrors.push(ERRORS.VALIDATION_ACTION_TYPE);
             }
