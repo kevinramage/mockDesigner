@@ -57,10 +57,10 @@ export class Mock {
         winston.debug("Mock.generateDatabaseServiceRoutes");
         var code = "";
 
-        code += tab + util.format("this.router.route(\"/api/v1/_getDatabaseValue\").get(%s._getDatabaseValue);\n", this.name);
-        code += tab + util.format("this.router.route(\"/api/v1/_resetDatabaseCounter\").post(%s._resetDatabaseCounter);\n", this.name);
-        code += tab + util.format("this.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", this.name);
-        code += tab + util.format("this.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n\n", this.name);
+        code += tab + util.format("this.router.route(\"/api/v1/_getDatabaseValue\").get(%s._getDatabaseValue);\n", this.controllerName);
+        code += tab + util.format("this.router.route(\"/api/v1/_resetDatabaseCounter\").post(%s._resetDatabaseCounter);\n", this.controllerName);
+        code += tab + util.format("this.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", this.controllerName);
+        code += tab + util.format("this.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n\n", this.controllerName);
 
         return code;
     }
