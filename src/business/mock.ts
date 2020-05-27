@@ -1,6 +1,7 @@
 import * as winston from "winston";
 import * as util from "util";
 import { Service } from "./service";
+import { RouteSolver } from "./routeSolver";
 
 export class Mock {
     private _name : string;
@@ -42,14 +43,30 @@ export class Mock {
     public generateRoutes() {
         winston.debug("Mock.generateRoutes");
         var code = "";
+
+        code += this.generateDatabaseServiceRoutes("\t\t");
         this._services.forEach(service => {
             code += service.generateRoute();
         });
+        code += this.generateServicesRoutes("\t\t");
+        
+        return code;
+    }
+
+    private generateDatabaseServiceRoutes(tab: string) {
+        winston.debug("Mock.generateDatabaseServiceRoutes");
+        var code = "";
+
+        code += tab + util.format("this.router.route(\"/api/v1/_getDatabaseValue\").get(%s._getDatabaseValue);\n", this.name);
+        code += tab + util.format("this.router.route(\"/api/v1/_resetDatabaseCounter\").post(%s._resetDatabaseCounter);\n", this.name);
+        code += tab + util.format("this.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", this.name);
+        code += tab + util.format("this.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n\n", this.name);
+
         return code;
     }
 
     private generateDatabaseService(tab: string) {
-        winston.debug("Service.generateDatabaseCounter");
+        winston.debug("Mock.generateDatabaseCounter");
         var code = "";
 
         // Generate get database counter
@@ -89,6 +106,25 @@ export class Mock {
         code += tab + util.format("\tres.status(204);\n");
         code += tab + util.format("\tres.end();\n");
         code += tab + util.format("}\n\n");
+
+        return code;
+    }
+
+    private generateServicesRoutes(tab: string) {
+        winston.debug("Mock.generateServicesRoutes");
+        var code = "";
+
+        // Use resolver to sort routes
+        this._services.forEach(s => {
+            const functionName = util.format("%s.%s", s.mockName, s.methodName);
+            RouteSolver.instance.addRoute(s.route.method, s.route.path, functionName);
+        });
+        const routes = RouteSolver.instance.resolve();
+
+        // Add route
+        routes.forEach(r => {
+            code += tab + util.format("%s\n", r.code );
+        });
 
         return code;
     }

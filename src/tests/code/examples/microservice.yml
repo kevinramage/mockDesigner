@@ -2,20 +2,74 @@ name: MicroServices
 services:
 
 
-# Get a product
-- name: GetProduct
+# Get commands
+- name: GetAllCommands
   method: GET
-  path: /api/v1/command/:cmdId/product/:prdId
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage: command
+
+# Get a command
+- name: GetCommand
+  method: GET
+  path: /api/v1/command/:cmdId
   response:
     triggers:
     - type: none
       actions:
       - type: microservice
         action: get
-        storage: product
+        storage: command
         keys:
         - "{{.request.params.cmdId}}"
-        - "{{.request.params.prdId}}"
+
+# Create a command
+- name: CreateCommand
+  method: POST
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage: command
+        identifier: 
+          name: id
+          value: "{{Increment(commandCounter)}}"
+
+# Update a command
+- name: UpdateCommand
+  method: PUT
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage: command
+        keys: 
+        - "{{.request.params.cmdId}}"
+
+# Delete a command
+- name: DeleteCommand
+  method: DELETE
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: delete
+        storage: command
+        keys: 
+        - "{{.request.params.cmdId}}"
 
 # Get products
 - name: GetAllProducts
@@ -30,6 +84,21 @@ services:
         storage: product
         keys:
         - "{{.request.params.cmdId}}"
+
+# Get a product
+- name: GetProduct
+  method: GET
+  path: /api/v1/command/:cmdId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage: product
+        keys:
+        - "{{.request.params.cmdId}}"
+        - "{{.request.params.prdId}}"
 
 # Create a product
 - name: CreateProduct
@@ -79,72 +148,3 @@ services:
         keys: 
         - "{{.request.params.cmdId}}"
         - "{{.request.params.prdId}}"
-
-# Get a command
-- name: GetCommand
-  method: GET
-  path: /api/v1/command/:cmdId
-  response:
-    triggers:
-    - type: none
-      actions:
-      - type: microservice
-        action: get
-        storage: command
-        keys:
-        - "{{.request.params.cmdId}}"
-
-# Get commands
-- name: GetAllCommands
-  method: GET
-  path: /api/v1/command
-  response:
-    triggers:
-    - type: none
-      actions:
-      - type: microservice
-        action: getall
-        storage: command
-
-# Create a command
-- name: CreateCommand
-  method: POST
-  path: /api/v1/command
-  response:
-    triggers:
-    - type: none
-      actions:
-      - type: microservice
-        action: create
-        storage: command
-        identifier: 
-          name: id
-          value: "{{Increment(commandCounter)}}"
-
-# Update a command
-- name: UpdateCommand
-  method: PUT
-  path: /api/v1/command/:cmdId
-  response:
-    triggers:
-    - type: none
-      actions:
-      - type: microservice
-        action: update
-        storage: command
-        keys: 
-        - "{{.request.params.cmdId}}"
-
-# Delete a command
-- name: DeleteCommand
-  method: DELETE
-  path: /api/v1/command/:cmdId
-  response:
-    triggers:
-    - type: none
-      actions:
-      - type: microservice
-        action: delete
-        storage: command
-        keys: 
-        - "{{.request.params.cmdId}}"
