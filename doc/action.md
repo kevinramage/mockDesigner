@@ -13,7 +13,6 @@ This action provide a way to check the request validity before the response proc
 Validation action propose several checks:
 * The presence of mandatory fields
 * The consistency of fields
-* The array length validity
 
 ## Save data
 This action provide a way to save the request received.
@@ -25,6 +24,3 @@ Data stored with this process will expired after 10 hours (This expiration can b
 ## Wait
 This action provide a way to test application timeout handling.
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/timeout.md)
-
-## Compute context
-**Functionnality not available now**
