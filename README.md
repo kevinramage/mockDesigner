@@ -1,10 +1,10 @@
 # Mock Designer
-Mock designer tool help you to easily manage your mocks. You can describe the mock behaviour expected and the system will generate code for you.
+Mock designer tool help you to easily manage your mocks. You can describe the mock behaviour expected and the system will generate the mock source code for you.
 
 ## Installation
 
 To install it, you just have to clone this repository.
-Docker and npm tools required to use MockDesigner.
+Docker and npm tools required to use Mock Designer.
 
 ## Usage
 
@@ -15,41 +15,57 @@ You can find bellow a command to execute the tool.
 Now, you can find a directory named "generated" that contains the source code of the mock system.
 You can run the mock system with the following command:
 `docker-compose -f generated/docker-compose.yml up -d --build`
-Now, you just have to do a GET request `http://localhost:7001/api/v1/myService` to test the service
+Now, you just have to do a GET request `http://localhost:7001/api/v1/myService` to test the service.
+
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/commandLine.md)
 
 ## Create a simple mock
 
-We will a simple GET service. This service will return a basic 200 HTTP response.
+We will create a simple GET service:
+This service will return a basic 200 HTTP response.
+
 *basic.yml*
 ```yaml
 name: MyMock
 services:
-  - name: "myService"
-    method: GET
-    path: /api/v1/myService
-    response:
-      actions:
-      - type: message
-        status: 200
-        body: OK
+- name: "myService"
+  method: GET
+  path: /api/v1/myService
+  response:
+    actions:
+    - type: message
+      status: 200
+      body: OK
 ```
 
 ## Documentation
-Mock designer have some notions notions: trigger, action, behaviour...
+
+To use all features of Mock Designer, you must know some basics notions: trigger, action, behaviour...
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/mockDesigner.md)
 
 ## Tools
 
 ### Generate definition from Swagger
+
+This feature will come in future version
+
 ### Generate definition from WSDL
+
+This feature will come in future version
+
 ### Monitor the request and response
+
+This feature will come in future version
 
 ## Use cases
 
+Some classical use cases will be added in future version to help you to understand the interest of the tool.
+
 ## Integration
 
-Mock Designer use venom as integration technology. You can run the integration tests with the following command:
+Mock Designer use venom as integration test technology. You can run the integration tests with the following command:
 `.\venom.exe run --output-dir . .\integration\*.yml`
 
 ## Contribution
+
+This topic not ready now.
