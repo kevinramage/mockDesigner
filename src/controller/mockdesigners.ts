@@ -81,11 +81,11 @@ export class MockDesigners {
 
         // Copy data
         await FileManagement.createDirectory(this.outputDir);
-        FileManagement.copyDirectory("tests/code", this.outputDir + "/code");
-        FileManagement.copyDirectory("tests/data", this.outputDir +  "/data");
-        FileManagement.copyDirectory("tests/functions", this.outputDir + "/functions");
-        FileManagement.copyDirectory("tests/responses", this.outputDir + "/responses");
-        FileManagement.copyDirectory("tests/scripts", this.outputDir + "/scripts");
+        FileManagement.copyDirectory(this.mockDirectory + "/code", this.outputDir + "/code");
+        FileManagement.copyDirectory(this.mockDirectory + "/data", this.outputDir +  "/data");
+        FileManagement.copyDirectory(this.mockDirectory + "/functions", this.outputDir + "/functions");
+        FileManagement.copyDirectory(this.mockDirectory + "/responses", this.outputDir + "/responses");
+        FileManagement.copyDirectory(this.mockDirectory + "/scripts", this.outputDir + "/scripts");
 
         // Read files
         const files = this.readFiles(this.inputDir);
@@ -149,8 +149,9 @@ export class MockDesigners {
         winston.debug("MockDesigners.importExternalsFunctions");
         const codes : string[] = [];
         const imports : string[] = [];
-        FileManagement.readDirectoryReccursively("tests/functions").forEach(file => {
-            var pathname = file.replace(/\\/g, "/").substring(("tests/functions/").length);
+        const instance = this;
+        FileManagement.readDirectoryReccursively(instance.mockDirectory + "/functions").forEach(file => {
+            var pathname = file.replace(/\\/g, "/").substring((instance.mockDirectory + "/functions/").length);
             pathname = pathname.substring(0, pathname.length - 3);
             const className = path.basename(file, ".ts");
             const anImport = util.format("import { %s } from \"../functions/%s\";", className, pathname);
@@ -187,5 +188,10 @@ export class MockDesigners {
     }
     public set outputDir(value) {
         this._outputDir = value;
+    }
+
+    public get mockDirectory() {
+        const inputDir = this.inputDir.replace(/\\/g, "/").replace("./", "");
+        return inputDir.substring(0, inputDir.indexOf("/"));
     }
 }
