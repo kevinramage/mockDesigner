@@ -4,13 +4,19 @@ export class Context {
     private _request : Request | undefined;
     private _dataSources : {[key: string] : object};
     private _data : object;
+    private _messages : string[];
 
     constructor(request ?: Request) {
         this._request = request;
         this._dataSources = {};
         this._data = {
             increment: {}
-        }
+        };
+        this._messages = [];
+    }
+
+    public addMessage(message: string) {
+        this._messages.push(message);
     }
 
     public get request() {
@@ -45,5 +51,9 @@ export class Context {
         } else {
             return false;
         }
+    }
+
+    public get messages() {
+        return this._messages;
     }
 }

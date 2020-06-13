@@ -41,7 +41,11 @@ export class ResponseHandler {
 
         // Body
         if ( body ) {
-            const bodyEvaluated = await TemplateManager.instance.evaluate(body, context);
+            var bodyEvaluated = body;
+            if ( bodyEvaluated.includes("%s") && context.messages.length > 0 ) {
+                bodyEvaluated = bodyEvaluated.replace("%s", context.messages[0]);
+            }
+            bodyEvaluated = await TemplateManager.instance.evaluate(bodyEvaluated, context);
             res.write(bodyEvaluated); 
         }
         res.end();

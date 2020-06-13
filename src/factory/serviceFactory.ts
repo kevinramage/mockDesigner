@@ -19,6 +19,8 @@ import { IMockSequentialTriggerMessage } from "../interface/mockSequentialTrigge
 import { ServiceSequentialMessage } from "../business/trigger/serviceSequentialTriggerMessage";
 import { ServiceSequential } from "../business/trigger/serviceSequential";
 import { BehaviourFactory } from "./behaviourFactory";
+import { IMockValidationTrigger } from "../interface/mockValidationTrigger";
+import { ServiceValidation } from "../business/trigger/serviceValidation";
 
 export class ServiceFactory {
 
@@ -66,7 +68,10 @@ export class ServiceFactory {
                     service.addTrigger(instance.buildRandomTrigger(trigger as IMockRandomTrigger));
                 break;
                 case "sequential":
-                    service.addTrigger(instance.buildSequentialTrigger(trigger as IMockSequentialTrigger ));
+                    service.addTrigger(instance.buildSequentialTrigger(trigger as IMockSequentialTrigger));
+                break;
+                case "validate":
+                    service.addTrigger(instance.buildValidationTrigger(trigger as IMockValidationTrigger));
                 break;
             }
         });
@@ -213,5 +218,26 @@ export class ServiceFactory {
         });
 
         return serviceSequentialMessage;
+    }
+
+    private static buildValidationTrigger(dataValidation: IMockValidationTrigger) {
+        const serviceValidationTrigger = new ServiceValidation();
+
+        // Mandatories fields
+        if ( dataValidation.mandatoriesFields ) {
+            dataValidation.mandatoriesFields.forEach(f => {
+                serviceValidationTrigger.addMandoryField(f);
+            });
+        }
+
+        // Actions
+        dataValidation.actions.forEach(action => {
+            const actionBuilt = ActionFactory.build(action);
+            if ( actionBuilt != null ) {
+                serviceValidationTrigger.addAction(actionBuilt);
+            }
+        });
+
+        return serviceValidationTrigger;
     }
 }
