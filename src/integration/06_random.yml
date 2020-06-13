@@ -9,7 +9,7 @@ testcases:
 - name: BuildMockService
   steps:
   - type: exec
-    script: npm run start -- --input tests/code/examples/random.yml --port {{.port}} --output {{.output}}
+    script: npm run start -- --input mocks/code/examples/random.yml --port {{.port}} --output {{.output}}
     assertions:
     - result.code ShouldEqual 0
   - type: exec

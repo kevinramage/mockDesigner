@@ -17,3 +17,7 @@ Data stored with this process will expired after 10 hours (This expiration can b
 ## Wait
 This action provide a way to test application timeout handling.
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/timeout.md)
+
+## MicroService
+This action provide a way to simulate a microservice action
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/microservice.md)
