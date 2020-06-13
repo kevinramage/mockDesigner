@@ -7,13 +7,6 @@ This action provide a way to send a response from a text or a file.
 This action provide the possibility to send custom status, headers, body.
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/message.md)
 
-## Validate the request
-**Functionnality not available now**
-This action provide a way to check the request validity before the response processing.
-Validation action propose several checks:
-* The presence of mandatory fields
-* The consistency of fields
-
 ## Save data
 This action provide a way to save the request received.
 The save action will store the request in specific storage space with a unique key. 
