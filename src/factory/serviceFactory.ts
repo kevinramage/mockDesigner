@@ -21,6 +21,8 @@ import { ServiceSequential } from "../business/trigger/serviceSequential";
 import { BehaviourFactory } from "./behaviourFactory";
 import { IMockValidationTrigger } from "../interface/mockValidationTrigger";
 import { ServiceValidation } from "../business/trigger/serviceValidation";
+import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
+import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
 
 export class ServiceFactory {
 
@@ -80,16 +82,18 @@ export class ServiceFactory {
         if ( serviceInterface.authentication ) {
             switch ( serviceInterface.authentication.type ) {
                 case AUTHENTICATION_TYPE.BASIC_AUTHENTICATION:
+                    const mockBasicAuthentication = serviceInterface.authentication as IMockBasicAuthentication;
                     const basicAuthentication = new BasicAuthentication();
-                    basicAuthentication.username = serviceInterface.authentication.userName;
-                    basicAuthentication.password = serviceInterface.authentication.password;
+                    basicAuthentication.username = mockBasicAuthentication.userName;
+                    basicAuthentication.password = mockBasicAuthentication.password;
                     service.authentication = basicAuthentication;
                 break;
                 case AUTHENTICATION_TYPE.APIKEY_AUTHENTICATION:
+                    const mockApiKeyAuthentication = serviceInterface.authentication as IMockApiKeyAuthentication;
                     const apiKeyAuthentication = new ApiKeyAuthentication();
-                    apiKeyAuthentication.source = serviceInterface.authentication.source;
-                    apiKeyAuthentication.keyName = serviceInterface.authentication.keyName;
-                    apiKeyAuthentication.keyValue = serviceInterface.authentication.keyValue;
+                    apiKeyAuthentication.source = mockApiKeyAuthentication.source;
+                    apiKeyAuthentication.keyName = mockApiKeyAuthentication.keyName;
+                    apiKeyAuthentication.keyValue = mockApiKeyAuthentication.keyValue;
                     service.authentication = apiKeyAuthentication;
                 break;
             }

@@ -1,8 +1,11 @@
-import { MockDesigners } from "./controller/mockdesigners";
 import * as winston from "winston";
-import DailyRotateFile = require("winston-daily-rotate-file");
+import * as colors from "colors";
+import { MockDesigners } from "./controller/mockdesigners";
 import { program } from "commander";
 import { ERRORS } from "./constantes";
+import { ValidationError } from "./controller/mockdesigner";
+
+import DailyRotateFile = require("winston-daily-rotate-file");
 
 export class Main {
 
@@ -73,20 +76,21 @@ export class Main {
             try {
 
                 // Run the generation
-                mockDesigners.run();
+                await mockDesigners.run();
 
                 winston.info("MockDesigner - Complete");
             } catch ( ex ) {
-                //winston.error("An error occured during the process: ", ex);
-                const errorMessage = ex.message as string;
-                if ( errorMessage && errorMessage.includes('\n')) {
-                    errorMessage.split('\n').forEach(message => {
-                        console.error("ERROR - " + message);
+                const validationError = ex as ValidationError;
+                if ( validationError ) {
+                    console.error(colors.red("ERROR: " + validationError.message));
+                    validationError.errors.forEach(err => {
+                        console.error(colors.red("ERROR: " + err));
                     });
                 } else {
                     console.error("ERROR - " + ex.message);
                     console.error(ex);
                 }
+                console.info("");
             }
         } else {
             console.error("ERROR - " + error);

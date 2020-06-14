@@ -8,7 +8,7 @@ In numerous situation, we must master data required for your tests but for non r
 ## Usage
 
 To use this trigger, you just have to add a repeat and the actions linked to this repeat.
-* Repeat: an integer positive value, the action will be repeat
+* Repeat: an integer positive value, the action will be repeat (Optionnal, default value is 1)
 * Actions: actions to proceed
 
 ## Example
