@@ -90,6 +90,24 @@ export class RedisManager {
         });
     }
 
+    private async incrementValue(key: string) {
+        return new Promise<number>((resolve, reject) => {
+            if ( this._client ) {
+                this._client.incrby(key, 1, (err, value) => {
+                    if ( !err ) {
+                        resolve(value);
+                    } else {
+                        winston.error("RedisManager.incrementValue: Internal error: ", err);
+                        reject(err);
+                    }
+                });
+            } else {
+                winston.error("RedisManager.incrementValue: Redis client null or undefined");
+                reject("Redis client null or undefined");
+            }
+        });
+    }
+
     public async addIndex(key: string, value: string) {
         winston.debug(util.format("RedisManager.addIndex: %s = %s", key, value));
         var data : string[];
@@ -193,9 +211,7 @@ export class RedisManager {
     private incrementCounterValue(counterKey: string) {
         winston.debug("RedisManager.incrementCounterValue: " + counterKey);
         return new Promise<number>(async resolve => {
-            const value = await RedisManager.instance.getValue(counterKey);
-            const increment = (value != null) ? Number.parseInt(value) : 1;
-            await RedisManager.instance.setValue(counterKey, (increment + 1) + "");
+            const increment = await RedisManager.instance.incrementValue(counterKey);
             resolve(increment);
         });
     }
@@ -204,12 +220,8 @@ export class RedisManager {
         winston.debug("RedisManager.incrementComposedCounterValue: " + keys ? keys.join(",") : "undefined");
         return new Promise<number>(async resolve => {
             var key = "composed";
-            keys.forEach(k => {
-                key += "$$" + k;
-            });
-            const value = await RedisManager.instance.getValue(key);
-            const increment = (value != null) ? Number.parseInt(value) : 1;
-            await RedisManager.instance.setValue(key, (increment + 1) + "");
+            keys.forEach(k => { key += "$$" + k; });
+            const increment = await RedisManager.instance.incrementValue(key);
             resolve(increment);
         });
     }
