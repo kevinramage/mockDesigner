@@ -67,6 +67,7 @@
   "exclude": [
     "templates/**",
     "generated/**",
-    "generated*/**"
+    "generated*/**",
+	"tools/**"
   ]
 }
