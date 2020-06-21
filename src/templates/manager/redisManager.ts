@@ -18,11 +18,15 @@ export class RedisManager {
 
     public getValue(key: string) {
         winston.debug("RedisManager.getValue: " + key);
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<string|null>((resolve, reject) => {
             if ( this._client ) {
                 this._client.get(key, (err, value) => {
                     if ( !err ) {
-                        resolve(value);
+                        if ( value && value != "") {
+                            resolve(value);
+                        } else {
+                            resolve(null);
+                        }
                     } else {
                         winston.error("RedisManager.getValue -Internal error: " + err);
                         reject(err);
@@ -91,7 +95,7 @@ export class RedisManager {
         });
     }
 
-    private async incrementValue(key: string) {
+    private incrementValue(key: string) {
         winston.debug("RedisManager.incrementValue: " + key);
         return new Promise<number>((resolve, reject) => {
             if ( this._client ) {
@@ -110,102 +114,11 @@ export class RedisManager {
         });
     }
 
-    // ----------------------------------------
-    // OBJECT
-    // ----------------------------------------
-
-    private async getObject(key: string) {
-        winston.debug("RedisManager.getObject: " + key);
-        return new Promise<object | null>((resolve, reject) => {
-            if ( this._client ) {
-                this._client.hgetall(key, (err, value) => {
-                    if ( !err ) {
-                        var obj = {};
-                        Object.keys(value).forEach(k => {
-                            Object.defineProperty(obj, k, { value: value[k] })
-                        });
-                        if ( value && Object.keys(value).length > 0 ) {
-                            resolve(obj);
-                        } else {
-                            resolve(null);
-                        }
-                    } else {
-                        winston.error("RedisManager.getObject: Internal error: ", err);
-                        reject(err);
-                    }
-                });
-            } else {
-                winston.error("RedisManager.getObject: Redis client null or undefined");
-                reject("Redis client null or undefined");
-            }
-        });
-    }
-
-    private async setObject(key: string, obj: object, expiration: number) {
-        winston.debug("RedisManager.setObject: " + key);
-        return new Promise<void>((resolve, reject) => {
-            const instance = this;
-            if ( instance._client ) {
-                const promises = Object.keys(obj).map((k) => {
-                    const value = Object.getOwnPropertyDescriptor(obj, key)?.value;
-                    return RedisManager.instance.setObjectField(key, k, value, expiration);
-                });
-                Promise.all(promises).then(() => {
-                    resolve();
-                }).catch((err) => {
-                    winston.error("RedisManager.setObject: Internal error: ", err);
-                    reject(err);
-                });
-            } else {
-                winston.error("RedisManager.getObject: Redis client null or undefined");
-                reject("Redis client null or undefined");
-            }
-        });
-    }
-
-    private setObjectField(key: string, propertyName: string, propertyValue: string, expiration: number) {
-        const instance = this;
-        return new Promise<void>((resolve, reject) => {
-            instance._client?.hset(key, propertyName, propertyValue, (err) => {
-                if ( !err) {
-                    instance._client?.expire(key, expiration, (err)=> {
-                        if ( !err ) {
-                            resolve();
-                        } else {
-                            reject(err);
-                        }
-                    });
-                } else {
-                    reject(err);
-                }
-            });
-        });
-    }
-
-    private deleteObject(key: string) {
-        winston.debug("RedisManager.deleteObject: " + key);
-        return new Promise<object | null>((resolve, reject) => {
-            if ( this._client ) {
-                this._client.hdel(key, (err) => {
-                    if ( !err ) {
-                        resolve();
-                    } else {
-                        winston.error("RedisManager.deleteObject: Internal error: ", err);
-                        reject(err);
-                    }
-                });
-            } else {
-                winston.error("RedisManager.deleteObject: Redis client null or undefined");
-                reject("Redis client null or undefined");
-            }
-        });
-    }
-
-    private getObjects(keys: string[]) {
-        winston.debug("RedisManager.getObjects");
+    private getValues(keys: string[]) {
+        winston.debug("RedisManager.getValues");
         const instance = this;
         return new Promise<object[]>((resolve, reject) => {
-            const promises = keys.map(key => { return instance.getObject(key); });
+            const promises = keys.map(key => { return instance.getObjectWrapper(key); });
             if ( promises.length > 0 ) {
                 Promise.all(promises).then((data) => {
                     const objects : object[] = data.filter(obj => { return obj != null}) as object[];
@@ -227,7 +140,7 @@ export class RedisManager {
         winston.debug("RedisManager.objectExists: " + key);
         const instance = this;
         return new Promise<boolean>((resolve, reject) => {
-            instance.getObject(key).then((data) => {
+            instance.getObjectWrapper(key).then((data) => {
                 resolve(data != null);
             }).catch((err) => {
                 reject(err);
@@ -236,6 +149,7 @@ export class RedisManager {
     }
 
     private updateDeltaObject(source: Object, delta: object) {
+        winston.debug("RedisManager.updateDeltaObject");
         Object.keys(delta).forEach(key => {
             const sourceProperty = Object.getOwnPropertyDescriptor(delta, key);
             const deltaPropertyValue = Object.getOwnPropertyDescriptor(delta, key)?.value;
@@ -343,20 +257,29 @@ export class RedisManager {
         const instance = this;
         return new Promise<Object[]>(async (resolve, reject) => {
             const elementsIds = await instance.getElementsFromList(listKey);
-            const objects = await instance.getObjects(elementsIds);
+            const objects = await instance.getValues(elementsIds);
             resolve(objects);
         });
     }
 
     public getObjectWrapper(elementKey: string) {
-        return this.getObject(elementKey);
+        winston.debug("RedisManager.getObjectWrapper: " + elementKey);
+        const instance = this;
+        return new Promise<Object|null>(async (resolve) => {
+            const value = await instance.getValue(elementKey);
+            if ( value != null ) {
+                resolve(JSON.parse(value));
+            } else {
+                resolve(null);
+            }
+        });
     }
 
     public createObjectWrapper(elementKey: string, listKey: string, obj: object, expiration: number) {
         winston.debug("RedisManager.addObject: " + listKey);
         const instance = this;
         return new Promise<void>((resolve, reject) => {
-            const createObjectPromise = instance.setObject(elementKey, obj, expiration);
+            const createObjectPromise = instance.setExValue(elementKey, expiration, JSON.stringify(obj));
             const addObjectToListPromise = instance.addElementToList(listKey, elementKey);
             Promise.all([createObjectPromise, addObjectToListPromise]).then(() => {
                 resolve();
@@ -372,7 +295,7 @@ export class RedisManager {
         return new Promise<object| null>(async (resolve) => {
             const exists = await instance.objectExists(elementKey);
             if ( exists ) {
-                await instance.setObject(elementKey, obj, expiration);
+                await instance.setExValue(elementKey, expiration, JSON.stringify(obj));
                 resolve(obj);
             } else {
                 resolve(null);
@@ -386,9 +309,9 @@ export class RedisManager {
         return new Promise<object | null>(async (resolve) => {
             const exists = await instance.objectExists(elementKey);
             if ( exists ) {
-                const oldObject = await instance.getObject(elementKey) as object;
+                const oldObject = await instance.getObjectWrapper(elementKey) as object;
                 const newObject = instance.updateDeltaObject(oldObject, obj);
-                await instance.setObject(elementKey, newObject, expiration);
+                await instance.setExValue(elementKey, expiration, JSON.stringify(newObject));
                 resolve(newObject);
             } else {
                 resolve(null);
@@ -402,7 +325,7 @@ export class RedisManager {
         return new Promise<Boolean>(async (resolve) => {
             const result = await instance.objectExists(elementKey);
             if ( result ) {
-                await instance.deleteObject(elementKey);
+                await instance.deleteValue(elementKey);
                 await instance.deleteElementToList(listKey, elementKey);
                 resolve(true);
             } else {
@@ -411,107 +334,23 @@ export class RedisManager {
         });
     }
 
+    public deleteAllObjectsWrapper(listKey: string) {
+        winston.debug("RedisManager.deleteAllObjectsWrapper: " + listKey);
+        const instance = this;
+        return new Promise<void>(async (resolve, reject) => {
+            const elementsKey = await instance.getElementsFromList(listKey);
+            const promises = elementsKey.map(eltKey => { return instance.deleteObjectWrapper(eltKey, listKey); });
+            Promise.all(promises).then(() => {
+                resolve();
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
     public searchObjectWrapper(key: string) {
         
     }
-
-
-    /*
-    public async addIndex(key: string, value: string) {
-        winston.debug(util.format("RedisManager.addIndex: %s = %s", key, value));
-        var data : string[];
-
-        // Get indexes
-        try {
-            data = JSON.parse(await RedisManager.instance.getValue(key));
-            if ( !data ) {
-                data = [];
-            }
-        } catch (ex) {
-            data = [];
-        }
-
-        // Add value
-        data.push(value);
-
-        // Save value
-        await RedisManager.instance.setValue(key, JSON.stringify(data));
-    }
-    */
-
-    /*
-    public async removeIndex(key: string, value: string) {
-        winston.debug(util.format("RedisManager.removeIndex: %s[%s]", key, value));
-        var data : string[];
-
-        // Get indexes
-        try {
-            data = JSON.parse(await RedisManager.instance.getValue(key));
-            if ( !data ) {
-                data = [];
-            }
-        } catch (ex) {
-            data = [];
-        }
-
-        // Add value
-        data = data.filter((valueToAnalyze) => { return valueToAnalyze != value; })
-
-        // Save value
-        await RedisManager.instance.setValue(key, JSON.stringify(data));
-    }
-    */
-
-    /*
-    public async getAllObject(key: string) {
-        winston.debug("RedisManager.getAllObject: " + key);
-
-        // Get indexes
-        try {
-
-            // Read index
-            const data : string[] = JSON.parse(await RedisManager.instance.getValue(key));
-
-            // Read each element present in index
-            const objects : any[] = [];
-            const promises = data.map(index => {
-                return new Promise(async(resolve) => {
-                    const text = await RedisManager.instance.getValue(index);
-                    if ( text ) {
-                        objects.push(JSON.parse(text));
-                    }
-                    resolve();
-                })
-            });
-            await Promise.all(promises);
-            return objects.slice(0, 50);
-
-        } catch ( ex ) {
-            return [];
-        }
-    }
-    */
-
-    /*
-    public saveObject(key: string, fieldIdName: string, fieldIdValue: string, body: object) {
-        winston.debug("RedisManager.saveObject: " + key);
-        return new Promise<void>((resolve, reject) => {
-            if ( this._client ) {
-                const saveKey = util.format("_obj_%s_%s", key, fieldIdValue);
-                const data = { fieldName: fieldIdName, fieldValue: fieldIdValue, body };
-                this._client.set(saveKey, JSON.stringify(data), (err, reply) => {
-                    if ( !err ) {
-                        resolve();
-                    } else {
-                        reject(err);
-                    }
-                });
-            } else {
-                reject("Redis client null or undefined");
-            }
-        });
-    }
-    */
 
     public incrementCounter(keys: string[]) {
         winston.debug("RedisManager.incrementCounter: " + keys ? keys.join(",") : "undefined");

@@ -74,7 +74,7 @@ export class ResponseHandler {
     }
 
     private static sendJSONError(res: Response, errorMessage: string) {
-        const body = JSON.stringify({ "errorMessage": errorMessage});
+        const body = JSON.stringify({ "code": 500, "errorMessage": errorMessage});
         res.status(500);
         res.setHeader("Content-Type", "application/json");
         res.write(body);
@@ -97,7 +97,7 @@ export class ResponseHandler {
     }
 
     private static sendJSONResourceNotFound(res: Response, errorMessage: string) {
-        const body = JSON.stringify({ "errorMessage": errorMessage});
+        const body = JSON.stringify({ code: 404, "errorMessage": errorMessage});
         res.status(404);
         res.setHeader("Content-Type", "application/json");
         res.write(body);
@@ -120,10 +120,10 @@ export class ResponseHandler {
     }
 
     public static sendDefaultJSONInternalError(res: Response) {
-        ResponseHandler.sendJSONError(res, "{ \"code\": 500, \"message\": \"An internal error occured\" }");
+        ResponseHandler.sendJSONError(res, "An internal error occured");
     }
 
     public static sendDefaultJSONResourceNotFound(res: Response) {
-        ResponseHandler.sendJSONResourceNotFound(res, "{ \"code\": 404, \"message\": \"Resource not found\" }");
+        ResponseHandler.sendJSONResourceNotFound(res, "Resource not found");
     }
 }

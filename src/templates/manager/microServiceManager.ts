@@ -1,3 +1,4 @@
+import * as winston from "winston";
 import * as util from "util";
 import { Response } from "express";
 import { Context } from "../context";
@@ -6,20 +7,21 @@ import { RedisManager } from "./redisManager";
 import { ResponseHandler } from "./responseHandler";
 
 export interface IStorage {
-    businessObject: string;
-    propertyName: string;
-    propertyValue: string;
+    businessObject ?: string;
+    propertyName ?: string;
+    propertyValue ?: string;
     parent ?: IStorageParent;
 }
 export interface IStorageParent {
-    businessObject: string;
-    propertyValue: string;
+    businessObject ?: string;
+    propertyValue ?: string;
     parent ?: IStorageParent;
 }
 
 export class MicroServiceManager {
 
     private static defineParentKey(storage ?: IStorageParent) : string {
+        winston.debug("MicroServiceManager.defineParentKey");
         if ( storage ) {
             if ( storage.parent ) {
                 const parentKey = MicroServiceManager.defineParentKey(storage.parent);
@@ -33,6 +35,7 @@ export class MicroServiceManager {
     }
 
     private static getParentKeys(storage ?: IStorageParent) : string[] {
+        winston.debug("MicroServiceManager.getParentKeys");
         if ( storage ) {
             const parentKeys = MicroServiceManager.getParentKeys(storage.parent);
             const parentKey = util.format("%s.%s", storage.businessObject, storage.propertyValue);
@@ -43,10 +46,11 @@ export class MicroServiceManager {
     }
 
     private static async evaluateParentId(context: Context, storage ?: IStorageParent) {
+        winston.debug("MicroServiceManager.evaluateParentId");
         return new Promise<IStorageParent>(async (resolve) => {
             if ( storage ) {
                 storage.parent = await MicroServiceManager.evaluateParentId(context, storage.parent);
-                storage.propertyValue = await TemplateManager.instance.evaluate(storage.propertyValue, context);
+                storage.propertyValue = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
                 resolve(storage);
             } else {
                 resolve(storage);
@@ -55,7 +59,7 @@ export class MicroServiceManager {
     }
 
     public static async getAllObjects(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.getAllObjects");
         try {
 
             // Evaluate parent business object
@@ -77,7 +81,7 @@ export class MicroServiceManager {
             }
 
             // Get objects from redis
-            const objects = RedisManager.instance.getAllObjectsWrapper(parentBusinessObjectKey);
+            const objects = await RedisManager.instance.getAllObjectsWrapper(parentBusinessObjectKey);
 
             // Send 200 response
             const headers : { [ key: string ] : string } = {};
@@ -85,24 +89,24 @@ export class MicroServiceManager {
             await ResponseHandler.sendContent(context, res, 200, JSON.stringify(objects), headers);        
 
         } catch (err) {
+            winston.error("MicroServiceManager.getAllObjects: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
 
     }
 
     public static async getObjectById(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.getObjectById");
         try {
 
             // Evaluate business object
-            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue, context);
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
             const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
 
             // Evaluate parent business object
             storage.parent = await MicroServiceManager.evaluateParentId(context, storage.parent);
             var parentKey = MicroServiceManager.defineParentKey(storage.parent);
             if ( parentKey ) { parentKey = "_" + parentKey; }
-            const parentBusinessObjectKey = util.format("list%s%s", storage.businessObject, parentKey);
 
             // Check parent
             const parents = MicroServiceManager.getParentKeys(storage.parent);
@@ -119,22 +123,27 @@ export class MicroServiceManager {
             // Get object in redis
             const object = await RedisManager.instance.getObjectWrapper(businessObjectKey);
 
-            // Send 201 response
-            const headers : { [ key: string ] : string } = {};
-            headers["Content-Type"] = "application/json";
-            await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
+            // Send 
+            if ( object ) {
+                const headers : { [ key: string ] : string } = {};
+                headers["Content-Type"] = "application/json";
+                await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
+            } else {
+                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+            }
 
         } catch (err) {
+            winston.error("MicroServiceManager.getObjectById: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async createObject(context: Context, res: Response, storage: IStorage, dataExpression: string, expiration: number) {
-        
+        winston.debug("MicroServiceManager.createObject");
         try {
 
             // Evaluate business object
-            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue, context);
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
             const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
 
             // Evaluate parent business object
@@ -146,7 +155,7 @@ export class MicroServiceManager {
             // Evaluate data
             const dataEvaluated = await TemplateManager.instance.evaluate(dataExpression, context);
             const data = JSON.parse(dataEvaluated);
-            data[storage.propertyName] = businessObjectId;
+            data[storage.propertyName as string] = businessObjectId;
 
             // Check parent
             const parents = MicroServiceManager.getParentKeys(storage.parent);
@@ -169,16 +178,17 @@ export class MicroServiceManager {
             await ResponseHandler.sendContent(context, res, 201, JSON.stringify(data), headers);
 
         } catch (err) {
+            winston.error("MicroServiceManager.createObject: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async updateObject(context: Context, res: Response, storage: IStorage, dataExpression: string, expiration: number) {
-
+        winston.debug("MicroServiceManager.updateObject");
         try {
 
             // Evaluate business object
-            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue, context);
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
             const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
 
             // Evaluate parent business object
@@ -205,10 +215,11 @@ export class MicroServiceManager {
             // Update object in redis
             const result = RedisManager.instance.updateObjectWrapper(businessObjectKey, data, expiration);
 
+            // Send response
             if ( result ) {
                 const headers : { [ key: string ] : string } = {};
                 headers["Content-Type"] = "application/json";
-                await ResponseHandler.sendContent(context, res, 200, JSON.stringify(data), headers);
+                await ResponseHandler.sendContent(context, res, 200, dataEvaluated, headers);
 
             } else {
                 await ResponseHandler.sendDefaultJSONResourceNotFound(res);
@@ -216,16 +227,17 @@ export class MicroServiceManager {
 
 
         } catch (err) {
+            winston.error("MicroServiceManager.updateObject: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async updateDeltaObject(context: Context, res: Response, storage: IStorage, dataExpression: string, expiration: number) {
-
+        winston.debug("MicroServiceManager.updateDeltaObject");
         try {
 
             // Evaluate business object
-            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue, context);
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
             const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
 
             // Evaluate parent business object
@@ -262,16 +274,17 @@ export class MicroServiceManager {
             }
 
         } catch (err) {
+            winston.error("MicroServiceManager.updateDeltaObject: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async deleteObject(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.deleteObject");
         try {
 
             // Evaluate business object
-            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue, context);
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
             const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
 
             // Evaluate parent business object
@@ -305,17 +318,14 @@ export class MicroServiceManager {
             }
 
         } catch (err) {
+            winston.error("MicroServiceManager.deleteObject: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async deleteAllObjects(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.deleteAllObjects");
         try {
-
-            // Evaluate business object
-            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue, context);
-            const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
 
             // Evaluate parent business object
             storage.parent = await MicroServiceManager.evaluateParentId(context, storage.parent);
@@ -323,45 +333,56 @@ export class MicroServiceManager {
             if ( parentKey ) { parentKey = "_" + parentKey; }
             const parentBusinessObjectKey = util.format("list%s%s", storage.businessObject, parentKey);
             
+            // Delete object in redis
+            RedisManager.instance.deleteAllObjectsWrapper(parentBusinessObjectKey);
 
+            // Send response
+            const headers : { [ key: string ] : string } = {};
+            headers["Content-Type"] = "application/json";
+            await ResponseHandler.sendContent(context, res, 204, "", headers);
 
         } catch (err) {
+            winston.error("MicroServiceManager.deleteAllObjects: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async searchObjects(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.searchObjects");
         try {
 
         } catch (err) {
+            winston.error("MicroServiceManager.searchObjects: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async enableObject(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.enableObject");
         try {
 
         } catch (err) {
+            winston.error("MicroServiceManager.enableObject: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async disableObject(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.disableObject");
         try {
 
         } catch (err) {
+            winston.error("MicroServiceManager.disableObject: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
     public static async disableObjects(context: Context, res: Response, storage: IStorage) {
-
+        winston.debug("MicroServiceManager.disableObjects");
         try {
 
         } catch (err) {
+            winston.error("MicroServiceManager.disableObjects: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
