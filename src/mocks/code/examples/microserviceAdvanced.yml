@@ -1,0 +1,216 @@
+
+name: MicroServicesAdvanced
+services:
+
+# Get a command
+- name: GetCommand
+  method: GET
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage:
+	        businessObject: command
+	        propertyValue: {{request.params.cmdId}}
+
+# Get a command line
+- name: GetCommandLine
+  method: GET
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage:
+          businessObject: commandLine
+	        propertyValue: {{request.params.cmdLineId}}
+	        parent:
+	          businessObject: command
+	          propertyValue: {{request.params.cmdId}}
+
+# Get a product
+- name: GetProduct
+  method: GET
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage:
+          businessObject: product
+          propertyValue: {{request.params.prdId}}
+          parent:
+            businessObject: commandLine
+	          propertyValue: {{request.params.cmdLineId}}
+	          parent:
+	            businessObject: command
+	            propertyValue: {{request.params.cmdId}}
+
+# Get all commands
+- name: GetAllCommands
+  method: GET
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage:
+          businessObject: command
+
+# Get all command lines
+- name: GetAllCommandLines
+  method: GET
+  path:  /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage:
+          businessObject: commandLine
+	        parent:
+	          businessObject: command
+	          propertyValue: {{request.params.cmdId}}
+
+# Get all products
+- name: GetAllProducts
+  method: GET
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+	          propertyValue: {{request.params.cmdLineId}}
+	          parent:
+	            businessObject: command
+	            propertyValue: {{request.params.cmdId}}
+
+# Create a command
+- name: CreateCommand
+  method: POST
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage:
+          businessObject: command
+          propertyName: commandId
+          propertyValue: {{Increment(Command)}}
+        data: {{.request.body}}
+      expiration: 60
+
+# Create a command line
+- name: CreateCommandLine
+  method: POST
+  path: /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage:
+          businessObject: commandLine
+          propertyName: commandLineId
+	        propertyValue: {{request.params.cmdLineId}}
+	        parent:
+	          businessObject: command
+	          propertyValue: {{request.params.cmdId}}
+        data: {{.request.body}}
+      expiration: 60
+
+# Create a product
+- name: CreateProduct
+  method: POST
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage:
+          businessObject: product
+          propertyName: productId
+          propertyValue: {{Increment(Product)}}
+          parent:
+            businessObject: commandLine
+	          propertyValue: {{request.params.cmdLineId}}
+	          parent:
+	            businessObject: command
+	            propertyValue: {{request.params.cmdId}}
+        data: {{.request.body}}
+      expiration: 60
+
+# Update a command
+- name: UpdateCommand
+  method: UPDATE
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage:
+	        businessObject: command
+          propertyValue: {{request.params.cmdId}}
+        expiration: 60
+
+# Update a command line
+- name: UpdateCommandLine
+  method: UPDATE
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage:
+          businessObject: commandLine
+	        propertyValue: {{request.params.cmdLineId}}
+	        parent:
+	          businessObject: command
+            propertyValue: {{request.params.cmdId}}
+        expiration: 60
+
+# Update a product
+- name: UpdateProduct
+  method: UPDATE
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage:
+          businessObject: product
+          propertyValue: {{request.params.prdId}}
+          parent:
+            businessObject: commandLine
+	          propertyValue: {{request.params.cmdLineId}}
+	          parent:
+	            businessObject: command
+              propertyValue: {{request.params.cmdId}}
+        expiration: 60

@@ -62,6 +62,17 @@ export class ResponseHandler {
         }
     }
 
+    public static sendResourceNotFound(res: Response, errorMessage: string, type: string) {
+        winston.debug("ResponseHandler.sendError");
+        if ( type.toLowerCase() == "application/json") {
+            this.sendJSONResourceNotFound(res, errorMessage);
+        } else if ( type.toLowerCase() == "application/xml" ) {
+            this.sendXMLResourceNotFound(res, errorMessage);
+        } else {
+            this.sendTextResourceNotFound(res, errorMessage);
+        }
+    }
+
     private static sendJSONError(res: Response, errorMessage: string) {
         const body = JSON.stringify({ "errorMessage": errorMessage});
         res.status(500);
@@ -83,5 +94,36 @@ export class ResponseHandler {
         res.setHeader("Content-Type", "text/plain");
         res.write(errorMessage);
         res.end();
+    }
+
+    private static sendJSONResourceNotFound(res: Response, errorMessage: string) {
+        const body = JSON.stringify({ "errorMessage": errorMessage});
+        res.status(404);
+        res.setHeader("Content-Type", "application/json");
+        res.write(body);
+        res.end();
+    }
+
+    private static sendXMLResourceNotFound(res: Response, errorMessage: string) {
+        const body = util.format("<error><message>%s</message></error>", errorMessage)
+        res.status(404);
+        res.setHeader("Content-Type", "application/xml");
+        res.write(body);
+        res.end();
+    }
+
+    private static sendTextResourceNotFound(res: Response, errorMessage: string) {
+        res.status(404);
+        res.setHeader("Content-Type", "text/plain");
+        res.write(errorMessage);
+        res.end();
+    }
+
+    public static sendDefaultJSONInternalError(res: Response) {
+        ResponseHandler.sendJSONError(res, "{ \"code\": 500, \"message\": \"An internal error occured\" }");
+    }
+
+    public static sendDefaultJSONResourceNotFound(res: Response) {
+        ResponseHandler.sendJSONResourceNotFound(res, "{ \"code\": 404, \"message\": \"Resource not found\" }");
     }
 }
