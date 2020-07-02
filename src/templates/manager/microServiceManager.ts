@@ -213,7 +213,10 @@ export class MicroServiceManager {
             }
 
             // Update object in redis
-            const result = RedisManager.instance.updateObjectWrapper(businessObjectKey, data, expiration);
+            if ( data.__enabled == undefined ) {
+                data.__enabled = true;
+            }
+            const result = await RedisManager.instance.updateObjectWrapper(businessObjectKey, data, expiration);
 
             // Send response
             if ( result ) {
@@ -262,12 +265,14 @@ export class MicroServiceManager {
             }
 
             // Update object in redis
-            const result = RedisManager.instance.updateDeltaWrapper(businessObjectKey, data, expiration);
+            const result = await RedisManager.instance.updateDeltaWrapper(businessObjectKey, data, expiration);
+            console.info("result");
+            console.info(result);
 
             if ( result ) {
                 const headers : { [ key: string ] : string } = {};
                 headers["Content-Type"] = "application/json";
-                await ResponseHandler.sendContent(context, res, 200, JSON.stringify(data), headers);
+                await ResponseHandler.sendContent(context, res, 200, JSON.stringify(result), headers);
 
             } else {
                 await ResponseHandler.sendDefaultJSONResourceNotFound(res);
@@ -306,7 +311,7 @@ export class MicroServiceManager {
             }
 
             // Delete object in redis
-            const result = RedisManager.instance.deleteObjectWrapper(businessObjectKey, parentBusinessObjectKey);
+            const result = await RedisManager.instance.deleteObjectWrapper(businessObjectKey, parentBusinessObjectKey);
 
             if ( result ) {
                 const headers : { [ key: string ] : string } = {};
@@ -333,6 +338,18 @@ export class MicroServiceManager {
             if ( parentKey ) { parentKey = "_" + parentKey; }
             const parentBusinessObjectKey = util.format("list%s%s", storage.businessObject, parentKey);
             
+            // Check parent
+            const parents = MicroServiceManager.getParentKeys(storage.parent);
+            const promises = parents.map((parent) => { return RedisManager.instance.objectExists(parent); });
+            if ( promises.length > 0 ) {
+                const results = await Promise.all(promises);
+                const result = results.reduce((previous, current) => { return previous && current; });
+                if ( !result ) {
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    return;
+                }
+            }
+
             // Delete object in redis
             RedisManager.instance.deleteAllObjectsWrapper(parentBusinessObjectKey);
 
@@ -351,15 +368,75 @@ export class MicroServiceManager {
         winston.debug("MicroServiceManager.searchObjects");
         try {
 
+            // Evaluate parent business object
+            storage.parent = await MicroServiceManager.evaluateParentId(context, storage.parent);
+            var parentKey = MicroServiceManager.defineParentKey(storage.parent);
+            if ( parentKey ) { parentKey = "_" + parentKey; }
+            const parentBusinessObjectKey = util.format("list%s%s", storage.businessObject, parentKey);
+            
+            // Check parent
+            const parents = MicroServiceManager.getParentKeys(storage.parent);
+            const promises = parents.map((parent) => { return RedisManager.instance.objectExists(parent); });
+            if ( promises.length > 0 ) {
+                const results = await Promise.all(promises);
+                const result = results.reduce((previous, current) => { return previous && current; });
+                if ( !result ) {
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    return;
+                }
+            }
+
+            // Search object
+            const queries : {[key: string]: string} = {};
+            if ( context.request?.query ) {
+                Object.keys(context.request.query).forEach(key => {
+                    queries[key] = context.request?.query[key] as string;
+                });
+            }
+            const instances = await RedisManager.instance.searchObjectWrapper(parentBusinessObjectKey, queries);
+
+            // Send response
+            const headers : { [ key: string ] : string } = {};
+            headers["Content-Type"] = "application/json";
+            await ResponseHandler.sendContent(context, res, 200, JSON.stringify(instances), headers);
+
         } catch (err) {
             winston.error("MicroServiceManager.searchObjects: ", err);
             await ResponseHandler.sendDefaultJSONInternalError(res);
         }
     }
 
-    public static async enableObject(context: Context, res: Response, storage: IStorage) {
+    public static async enableObject(context: Context, res: Response, storage: IStorage, expiration: number) {
         winston.debug("MicroServiceManager.enableObject");
         try {
+
+            // Evaluate business object
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
+            const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
+
+            // Check parent
+            const parents = MicroServiceManager.getParentKeys(storage.parent);
+            const promises = parents.map((parent) => { return RedisManager.instance.objectExists(parent); });
+            if ( promises.length > 0 ) {
+                const results = await Promise.all(promises);
+                const result = results.reduce((previous, current) => { return previous && current; });
+                if ( !result ) {
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    return;
+                }
+            }
+
+            // Enable object
+            const object = await RedisManager.instance.enableObjectWrapper(businessObjectKey, expiration);
+
+            // Send response
+            if ( object ) {
+                const headers : { [ key: string ] : string } = {};
+                headers["Content-Type"] = "application/json";
+                await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
+            } else {
+                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+            }
 
         } catch (err) {
             winston.error("MicroServiceManager.enableObject: ", err);
@@ -367,9 +444,37 @@ export class MicroServiceManager {
         }
     }
 
-    public static async disableObject(context: Context, res: Response, storage: IStorage) {
+    public static async disableObject(context: Context, res: Response, storage: IStorage, expiration: number) {
         winston.debug("MicroServiceManager.disableObject");
         try {
+
+            // Evaluate business object
+            const businessObjectId = await TemplateManager.instance.evaluate(storage.propertyValue as string, context);
+            const businessObjectKey = util.format("%s.%s", storage.businessObject, businessObjectId);
+
+            // Check parent
+            const parents = MicroServiceManager.getParentKeys(storage.parent);
+            const promises = parents.map((parent) => { return RedisManager.instance.objectExists(parent); });
+            if ( promises.length > 0 ) {
+                const results = await Promise.all(promises);
+                const result = results.reduce((previous, current) => { return previous && current; });
+                if ( !result ) {
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    return;
+                }
+            }
+
+            // Enable object
+            const object = await RedisManager.instance.disableObjectWrapper(businessObjectKey, expiration);
+
+            // Send response
+            if ( object ) {
+                const headers : { [ key: string ] : string } = {};
+                headers["Content-Type"] = "application/json";
+                await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
+            } else {
+                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+            }
 
         } catch (err) {
             winston.error("MicroServiceManager.disableObject: ", err);
@@ -377,9 +482,35 @@ export class MicroServiceManager {
         }
     }
 
-    public static async disableObjects(context: Context, res: Response, storage: IStorage) {
+    public static async disableObjects(context: Context, res: Response, storage: IStorage, expiration: number) {
         winston.debug("MicroServiceManager.disableObjects");
         try {
+
+            // Evaluate parent business object
+            storage.parent = await MicroServiceManager.evaluateParentId(context, storage.parent);
+            var parentKey = MicroServiceManager.defineParentKey(storage.parent);
+            if ( parentKey ) { parentKey = "_" + parentKey; }
+            const parentBusinessObjectKey = util.format("list%s%s", storage.businessObject, parentKey);
+            
+            // Check parent
+            const parents = MicroServiceManager.getParentKeys(storage.parent);
+            const promises = parents.map((parent) => { return RedisManager.instance.objectExists(parent); });
+            if ( promises.length > 0 ) {
+                const results = await Promise.all(promises);
+                const result = results.reduce((previous, current) => { return previous && current; });
+                if ( !result ) {
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    return;
+                }
+            }
+
+            // Disable all objects
+            const instances = await RedisManager.instance.disableAllObjectsWrapper(parentBusinessObjectKey, expiration);
+
+            // Send response
+            const headers : { [ key: string ] : string } = {};
+            headers["Content-Type"] = "application/json";
+            await ResponseHandler.sendContent(context, res, 200, JSON.stringify(instances), headers);
 
         } catch (err) {
             winston.error("MicroServiceManager.disableObjects: ", err);

@@ -132,52 +132,48 @@ export class RedisManager {
         });
     }
 
-    private filterObject(obj: object ) {
-
-    }
-
     public objectExists(key: string) {
         winston.debug("RedisManager.objectExists: " + key);
         const instance = this;
         return new Promise<boolean>((resolve, reject) => {
-            instance.getObjectWrapper(key).then((data) => {
-                resolve(data != null);
+            instance.getObjectWrapper(key).then((data : any | null) => {
+                resolve ( data && data.__enabled );
             }).catch((err) => {
                 reject(err);
             });
         });
     }
 
-    private updateDeltaObject(source: Object, delta: object) {
+    public updateDeltaObject(source: any, delta: any) {
         winston.debug("RedisManager.updateDeltaObject");
         Object.keys(delta).forEach(key => {
-            const sourceProperty = Object.getOwnPropertyDescriptor(delta, key);
-            const deltaPropertyValue = Object.getOwnPropertyDescriptor(delta, key)?.value;
+            const sourceProperty = source[key];
+            const deltaPropertyValue = delta[key];
 
-            if ( sourceProperty && sourceProperty.value) {
+            if ( sourceProperty && typeof sourceProperty == typeof deltaPropertyValue ) {
 
                 // Complex type
-                if ( typeof deltaPropertyValue ) {
+                if ( typeof deltaPropertyValue == "object") {
 
                     // Array
                     if ( deltaPropertyValue.length ) {
                         for ( var index in deltaPropertyValue ) {
-                            if ( sourceProperty.value[index] ) {
-                                this.updateDeltaObject(sourceProperty.value[index], deltaPropertyValue.value[index])
+                            if ( sourceProperty[index] ) {
+                                sourceProperty[index] = this.updateDeltaObject(sourceProperty[index], deltaPropertyValue[index])
                             } else {
-                                sourceProperty.value[index] = deltaPropertyValue.value[index];
+                                sourceProperty[index] = deltaPropertyValue[index];
                             }
                         }
                     } else {
-                        this.updateDeltaObject(sourceProperty.value, deltaPropertyValue);
+                        source = this.updateDeltaObject(sourceProperty, deltaPropertyValue);
                     }
 
-                } else if ( sourceProperty.value != deltaPropertyValue ) {
-                    Object.defineProperty(source, key, { value: deltaPropertyValue});
+                } else if ( sourceProperty != deltaPropertyValue ) {
+                    source[key] = deltaPropertyValue;
                 }
 
             } else {
-                Object.defineProperty(source, key, { value: deltaPropertyValue});
+                source[key] = deltaPropertyValue;
             }
         });
         return source;
@@ -255,10 +251,11 @@ export class RedisManager {
     public getAllObjectsWrapper(listKey: string) {
         winston.debug("RedisManager.getAllObjectsWrapper: " + listKey);
         const instance = this;
-        return new Promise<Object[]>(async (resolve, reject) => {
+        return new Promise<Object[]>(async (resolve) => {
             const elementsIds = await instance.getElementsFromList(listKey);
             const objects = await instance.getValues(elementsIds);
-            resolve(objects);
+            const elts = objects.filter((obj:any) => { return obj.__enabled; })
+            resolve(elts);
         });
     }
 
@@ -268,17 +265,23 @@ export class RedisManager {
         return new Promise<Object|null>(async (resolve) => {
             const value = await instance.getValue(elementKey);
             if ( value != null ) {
-                resolve(JSON.parse(value));
+                const data = JSON.parse(value);
+                if ( data.__enabled ) {
+                    resolve(data);
+                } else {
+                    resolve(null);
+                }
             } else {
                 resolve(null);
             }
         });
     }
 
-    public createObjectWrapper(elementKey: string, listKey: string, obj: object, expiration: number) {
+    public createObjectWrapper(elementKey: string, listKey: string, obj: any, expiration: number) {
         winston.debug("RedisManager.addObject: " + listKey);
         const instance = this;
         return new Promise<void>((resolve, reject) => {
+            obj.__enabled = true;
             const createObjectPromise = instance.setExValue(elementKey, expiration, JSON.stringify(obj));
             const addObjectToListPromise = instance.addElementToList(listKey, elementKey);
             Promise.all([createObjectPromise, addObjectToListPromise]).then(() => {
@@ -306,11 +309,18 @@ export class RedisManager {
     public updateDeltaWrapper(elementKey: string, obj: object, expiration: number) {
         winston.debug("RedisManager.updateDeltaWrapper: " + elementKey);
         const instance = this;
-        return new Promise<object | null>(async (resolve) => {
+        return new Promise<object | null>(async (resolve, reject) => {
             const exists = await instance.objectExists(elementKey);
             if ( exists ) {
+                var newObject = null;
                 const oldObject = await instance.getObjectWrapper(elementKey) as object;
-                const newObject = instance.updateDeltaObject(oldObject, obj);
+                try {
+                    newObject = instance.updateDeltaObject(oldObject, obj);
+                } catch (err) {
+                    reject(err);
+                }
+                console.info("NewObject");
+                console.info(newObject);
                 await instance.setExValue(elementKey, expiration, JSON.stringify(newObject));
                 resolve(newObject);
             } else {
@@ -348,8 +358,68 @@ export class RedisManager {
         });
     }
 
-    public searchObjectWrapper(key: string) {
-        
+    public searchObjectWrapper(keyList: string, values: {[key: string]: string}) {
+        winston.debug("RedisManager.searchObjectWrapper: " + keyList);
+        const instance = this;
+        return new Promise<Object[]>(async (resolve) => {
+            var elements = await instance.getAllObjectsWrapper(keyList);
+            var jsonElts = elements.map(elt => { return elt as any });
+            Object.keys(values).forEach(key => {
+                jsonElts = jsonElts.filter(elt => { return elt[key] === values[key]; });
+            });
+            jsonElts = jsonElts.filter(elt => { return elt.__enabled; })
+            elements = jsonElts.map(elt => { return elt as object });
+            resolve(elements); 
+        });
+    }
+
+    public enableObjectWrapper(key: string, expiration: number) {
+        winston.debug("RedisManager.enableObjectWrapper: " + key);
+        const instance = this;
+        return new Promise<Object|null>(async resolve => {
+            const textValue = await instance.getValue(key);
+            if ( textValue ) {
+                const value = JSON.parse(textValue);
+                value.__enabled = true;
+                await instance.setExValue(key, expiration, JSON.stringify(value));
+                resolve(value);
+            } else {
+                resolve(null);
+            }
+        });
+    }
+
+    public disableObjectWrapper(key: string, expiration: number) {
+        winston.debug("RedisManager.disableObjectWrapper: " + key);
+        const instance = this;
+        return new Promise<Object|null>(async resolve => {
+            const textValue = await instance.getValue(key);
+            if ( textValue ) {
+                const value = JSON.parse(textValue);
+                value.__enabled = false;
+                await instance.setExValue(key, expiration, JSON.stringify(value));
+                resolve(value);
+            } else {
+                resolve(null);
+            }
+        });
+    }
+
+    public disableAllObjectsWrapper(listKey: string, expiration: number) {
+        winston.debug("RedisManager.disableAllObjectsWrapper: " + listKey);
+        const instance = this;
+        return new Promise<void>(async (resolve, reject) => {
+            const elements = await instance.getElementsFromList(listKey);
+            const promises = elements.map(elt => {
+                instance.disableObjectWrapper(elt, expiration);
+            });
+            Promise.all(promises).then(() => {
+                resolve();
+            }).catch((err) => {
+                winston.error("RedisManager.disableAllObjectsWrapper: ", err);
+                reject(err);
+            });
+        });
     }
 
     public incrementCounter(keys: string[]) {

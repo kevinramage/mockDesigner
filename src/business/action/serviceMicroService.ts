@@ -13,7 +13,7 @@ export class ServiceMicroService implements IServiceAction {
     constructor() {
         this._action = "";
         this._data = "{{.request.body}}";
-        this._expiration = 60;
+        this._expiration = 3600;
     }
 
     generate(tab: string): string {
@@ -38,12 +38,32 @@ export class ServiceMicroService implements IServiceAction {
                 code += this.generateUpdate(tab);
             break;
 
+            case "updatedelta":
+                code += this.generateUpdateDelta(tab);
+            break;
+
             case "delete":
                 code += this.generateDelete(tab);
             break;
 
+            case "deleteall":
+                code += this.generateDeleteAll(tab);
+            break;
+
             case "search":
                 code += this.generateSearch(tab);
+            break;
+
+            case "enable":
+                code += this.generateEnable(tab);
+            break;
+
+            case "disable":
+                code += this.generateDisable(tab);
+            break;
+
+            case "disableall":
+                code += this.generateDisableAll(tab);
             break;
         }
 
@@ -103,12 +123,32 @@ export class ServiceMicroService implements IServiceAction {
         return tab + util.format("MicroServiceManager.updateObject(context, res, storage, \"%s\", %d);\n", this.data, this.expiration);
     }
 
+    private generateUpdateDelta(tab: string) {
+        return tab + util.format("MicroServiceManager.updateDeltaObject(context, res, storage, \"%s\", %d);\n", this.data, this.expiration);
+    }
+
     private generateDelete(tab: string) {
         return tab + "MicroServiceManager.deleteObject(context, res, storage);\n";
     }
 
+    private generateDeleteAll(tab: string) {
+        return tab + "MicroServiceManager.deleteAllObjects(context, res, storage);\n";
+    }
+
     private generateSearch(tab: string) {
-        return tab + "MicroServiceManager.getObjectById(context, res, storage);\n";
+        return tab + "MicroServiceManager.searchObjects(context, res, storage);\n";
+    }
+
+    private generateEnable(tab: string) {
+        return tab + util.format("MicroServiceManager.enableObject(context, res, storage, %d);\n", this.expiration);
+    }
+
+    private generateDisable(tab: string) {
+        return tab + util.format("MicroServiceManager.disableObject(context, res, storage, %d);\n", this.expiration);
+    }
+
+    private generateDisableAll(tab: string) {
+        return tab + util.format("MicroServiceManager.disableObjects(context, res, storage, %d);\n", this.expiration);
     }
 
 

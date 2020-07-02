@@ -367,3 +367,153 @@ services:
             parent:
               businessObject: command
               propertyValue: "{{.request.params.cmdId}}"
+
+# Enable command
+- name: EnableCommand
+  method: PUT
+  path: /api/v1/command/:cmdId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+
+# Enable command line
+- name: EnableCommandLine
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Enable product
+- name: EnableProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Disable command
+- name: DisableCommand
+  method: PUT
+  path: /api/v1/command/:cmdId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+
+# Disable command line
+- name: DisableCommandLine
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Disable product
+- name: DisableProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Disable all command
+- name: DisableAllCommands
+  method: PUT
+  path: /api/v1/command/disableAll
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: command
+
+# Disable all command line
+- name: DisableAllCommandLines
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/disableAll
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Disable all product
+- name: DisableAllProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/disableAll
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
