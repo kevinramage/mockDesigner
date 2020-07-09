@@ -1,7 +1,6 @@
 name: MicroServices
 services:
 
-
 # Get commands
 - name: GetAllCommands
   method: GET
@@ -12,7 +11,8 @@ services:
       actions:
       - type: microservice
         action: getall
-        storage: command
+        storage:
+          businessObject: command
 
 # Get a command
 - name: GetCommand
@@ -24,9 +24,9 @@ services:
       actions:
       - type: microservice
         action: get
-        storage: command
-        keys:
-        - "{{.request.params.cmdId}}"
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
 
 # Create a command
 - name: CreateCommand
@@ -38,10 +38,12 @@ services:
       actions:
       - type: microservice
         action: create
-        storage: command
-        identifier: 
-          name: id
-          value: "{{Increment(commandCounter)}}"
+        storage:
+          businessObject: command
+          propertyName: commandId
+          propertyValue: "{{Increment(command)}}"
+        data: "{{.request.body}}"
+        expiration: 60
 
 # Update a command
 - name: UpdateCommand
@@ -53,9 +55,10 @@ services:
       actions:
       - type: microservice
         action: update
-        storage: command
-        keys: 
-        - "{{.request.params.cmdId}}"
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
 
 # Delete a command
 - name: DeleteCommand
@@ -67,9 +70,9 @@ services:
       actions:
       - type: microservice
         action: delete
-        storage: command
-        keys: 
-        - "{{.request.params.cmdId}}"
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
 
 # Get products
 - name: GetAllProducts
@@ -81,9 +84,11 @@ services:
       actions:
       - type: microservice
         action: getall
-        storage: product
-        keys:
-        - "{{.request.params.cmdId}}"
+        storage:
+          businessObject: product
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
 
 # Get a product
 - name: GetProduct
@@ -95,10 +100,12 @@ services:
       actions:
       - type: microservice
         action: get
-        storage: product
-        keys:
-        - "{{.request.params.cmdId}}"
-        - "{{.request.params.prdId}}"
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
 
 # Create a product
 - name: CreateProduct
@@ -110,12 +117,15 @@ services:
       actions:
       - type: microservice
         action: create
-        storage: product
-        identifier: 
-          name: id
-          value: "{{Increment(command{{.request.params.cmdId}}, productCounter)}}"
-        keys: 
-        - "{{.request.params.cmdId}}"
+        storage:
+          businessObject: product
+          propertyName: productId
+          propertyValue: "{{Increment(command{{.request.params.cmdId}}, product)}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+        data: "{{.request.body}}"
+        expiration: 60
 
 # Update a product
 - name: UpdateProduct
@@ -127,14 +137,15 @@ services:
       actions:
       - type: microservice
         action: update
-        storage: product
-        identifier: 
-          name: id
-          value: "{{Increment({{.request.params.cmdId}}, productCounter)}}"
-        keys: 
-        - "{{.request.params.cmdId}}"
-        - "{{.request.params.prdId}}"
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
 
+# Delete a product
 - name: DeleteProduct
   method: DELETE
   path: /api/v1/command/:cmdId/product/:prdId
@@ -144,7 +155,9 @@ services:
       actions:
       - type: microservice
         action: delete
-        storage: product
-        keys: 
-        - "{{.request.params.cmdId}}"
-        - "{{.request.params.prdId}}"
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"

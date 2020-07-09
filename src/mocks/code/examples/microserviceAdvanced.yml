@@ -116,7 +116,7 @@ services:
           propertyName: commandId
           propertyValue: "{{Increment(Command)}}"
         data: "{{.request.body}}"
-      expiration: 60
+        expiration: 60
 
 # Create a command line
 - name: CreateCommandLine
@@ -131,12 +131,12 @@ services:
         storage:
           businessObject: commandLine
           propertyName: commandLineId
-          propertyValue: "{{.request.params.cmdLineId}}"
+          propertyValue: "{{Increment(command{{.request.params.cmdId}}, commandLine)}}"
           parent:
             businessObject: command
             propertyValue: "{{.request.params.cmdId}}"
         data: "{{.request.body}}"
-      expiration: 60
+        expiration: 60
 
 # Create a product
 - name: CreateProduct
@@ -151,7 +151,7 @@ services:
         storage:
           businessObject: product
           propertyName: productId
-          propertyValue: "{{Increment(Product)}}"
+          propertyValue: "{{Increment(command{{.request.params.cmdId}}, commandLine{{.request.params.cmdLineId}}, product)}}"
           parent:
             businessObject: commandLine
             propertyValue: "{{.request.params.cmdLineId}}"
@@ -159,7 +159,7 @@ services:
               businessObject: command
               propertyValue: "{{.request.params.cmdId}}"
         data: "{{.request.body}}"
-      expiration: 60
+        expiration: 60
 
 # Update a command
 - name: UpdateCommand
@@ -517,3 +517,64 @@ services:
             parent:
               businessObject: command
               propertyValue: "{{.request.params.cmdId}}"
+
+# Update delta all commands
+- name: UpdateDeltaAllCommands
+  method: PATCH
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: command
+
+# Update delta all command line
+- name: UpdateDeltaAllCommandLines
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Update delta all products
+- name: UpdateDeltaAllProducts
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Search command
+- name: SearchCommands
+  method: Get
+  path: /api/v1/command/search
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: search
+        storage:
+          businessObject: command

@@ -422,6 +422,23 @@ export class RedisManager {
         });
     }
 
+    public updateDeltaAllObjectsWrapper(listKey: string, obj: object, expiration: number) {
+        winston.debug("RedisManager.updateDeltaAllObjects");
+        const instance = this;
+        return new Promise<Object[]>(async (resolve, reject) => {
+            const elementKeys = await instance.getElementsFromList(listKey);
+            const promises = elementKeys.map(k => {
+                return instance.updateDeltaWrapper(k, obj, expiration);
+            });
+            Promise.all(promises).then((values) => {
+                const data = values.filter((v) => { return v != null; }) as object[];
+                resolve(data);
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
     public incrementCounter(keys: string[]) {
         winston.debug("RedisManager.incrementCounter: " + keys ? keys.join(",") : "undefined");
         return new Promise<Number>(async resolve => {

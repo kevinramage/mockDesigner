@@ -1,16 +1,12 @@
 # Micro Services
 Mock Designer propose an action to simulate a microservice behaviour
 
-## Get all service
+## Get all action
 Return all data of a business object.
-This action will
-* Compute the key to retrieve data (with storage and keys)
-* Retrieve data
-* Send data
 
 **Usage:**
 * action: Must equals to getall to use this action
-* storage: A logical name to store the business object data 
+* storage: The storage system use for this business object
 
 **Example:**
 ```yml
@@ -23,20 +19,16 @@ This action will
       actions:
       - type: microservice
         action: getall
-        storage: command
+        storage:
+          businessObject: command
 ```
 
-## Get service
+## Get action
 Return data of a specific business object
-This action will
-* Compute the key to retrieve data (with storage and keys)
-* Retrieve data
-* Send data
 
 **Usage:**
 * action: Must equals to get to use this action
-* storage: A logical name to store the business object data 
-* identifier.value: The way to get the business object unique identifier 
+* storage: The storage system use for this business object
 
 **Example:**
 ```yml
@@ -49,26 +41,19 @@ This action will
       actions:
       - type: microservice
         action: get
-        storage: command
-        identifier:
-          value: "{{.request.params.cmdId}}"
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
 ```
 
-## Search service
-
-## Create service
-Generate the unique identifier of the business object and save business object in redis database.
-This action will
-* Generate identifier
-* Save data
-* Updade indexes
-* Send data
+## Create action
+Generate an identifier of the business object and save business object in redis database.
 
 **Usage:**
 * action: Must equals to create to use this action
-* storage: A logical name to store the business object data 
-* identifier.name: The name of the unique identifier property
-* identifier.value: The way to generate the business object unique identifier (increment, unique value...)
+* storage: The storage system use for this business object
+* data: data to store
+* expiration: Retention period to keep the data in ms (Default value 3600)
 
 **Example:**
 ```yml
@@ -81,23 +66,22 @@ This action will
       actions:
       - type: microservice
         action: create
-        storage: command
-        identifier: 
-          name: id
-          value: "{{Increment(commandCounter)}}"
+        storage:
+          businessObject: command
+          propertyName: commandId
+          propertyValue: "{{Increment(Command)}}"
+        data: "{{.request.body}}"
+        expiration: 60
 ```
 
-## Update service
+## Update action
 Update an existing business object.
-This action will
-* Compute the key to retrieve data (with storage and keys)
-* Save data
-* Send data
 
 **Usage:**
 * action: Must equals to update to use this action
-* storage: A logical name to store the business object data 
-* identifier.value: The way to get the business object unique identifier 
+* storage: The storage system use for this business object
+* data: data to store
+* expiration: Retention period to keep the data in ms (Default value 3600)
 
 **Example:**
 ```yml
@@ -110,22 +94,71 @@ This action will
       actions:
       - type: microservice
         action: update
-        storage: command
-        identifier: 
-          value: "{{.request.params.cmdId}}"
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
 ```
 
-## Delete service
+## Update delta action
+Get an existing object and apply a differential update to it.
+
+**Usage:**
+* action: Must equals to update to use this action
+* storage: The storage system use for this business object
+* data: data to store
+* expiration: Retention period to keep the data in ms (Default value 3600)
+
+**Example:**
+```yml
+- name: UpdateDeltaCommand
+  method: PATCH
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedelta
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+```
+
+## Update delta action
+Get all existing objects and apply a differential update to it.
+
+**Usage:**
+* action: Must equals to update to use this action
+* storage: The storage system use for this business object
+* data: data to store
+* expiration: Retention period to keep the data in ms (Default value 3600)
+
+**Example:**
+```yml
+- name: UpdateDeltaAllCommandLines
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+```
+
+## Delete action
 Delete an existing business object.
-This action will
-* Delete data
-* Updade indexes
-* Send empty response
 
 **Usage:**
 * action: Must equals to delete to use this action
-* storage: A logical name to store the business object data 
-* identifier.value: The way to get the business object unique identifier 
+* storage: The storage system use for this business object
 
 **Example:**
 ```yml
@@ -138,14 +171,126 @@ This action will
       actions:
       - type: microservice
         action: delete
-        storage: command
-        identifier: 
-          value: "{{.request.params.cmdId}}"
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
 ```
 
-## Storage of business object
+## Delete all action
+Delete all business objects
 
-Store a command: command$$1
-Store command list: command_list
-Store a product: product$$1-1
-Store a product list: product_list$$1
+**Usage:**
+* action: Must equals to delete to use this action
+* storage: The storage system use for this business object
+
+**Example:**
+```yml
+- name: DeleteAllCommands
+  method: DELETE
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: deleteall
+        storage:
+          businessObject: command
+```
+
+## Search
+Search business objects with specifics properties. The mock will use the request query parameters as search conditions, these conditions will be combinated with an and operation to filter data return.
+
+**Usage:**
+* action: Must equals to delete to use this action
+* storage: The storage system use for this business object
+
+**Example:**
+```yml
+- name: SearchCommands
+  method: Get
+  path: /api/v1/command/search
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: search
+        storage:
+          businessObject: command
+```
+
+## Disable action
+Disable an existing object
+A object disabled is not visible from get, get all, update and delta update action
+
+**Usage:**
+* action: Must equals to delete to use this action
+* storage: The storage system use for this business object
+
+**Example:**
+```yml
+- name: DisableCommand
+  method: PUT
+  path: /api/v1/command/:cmdId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+```
+
+## Enable
+Enable an existing object
+A object disabled is not visible from get, get all, update and delta update action
+
+**Usage:**
+* action: Must equals to delete to use this action
+* storage: The storage system use for this business object
+
+**Example:**
+```yml
+- name: EnableCommand
+  method: PUT
+  path: /api/v1/command/:cmdId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+```
+
+## Disable all
+Disable all objects
+A object disabled is not visible from get, get all, update and delta update action
+
+**Usage:**
+* action: Must equals to delete to use this action
+* storage: The storage system use for this business object
+
+**Example:**
+```yml
+- name: DisableAllCommands
+  method: PUT
+  path: /api/v1/command/disableall
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: command
+```
+
+## Next features
+
+* Be able to override the return json body

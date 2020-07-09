@@ -42,6 +42,10 @@ export class ServiceMicroService implements IServiceAction {
                 code += this.generateUpdateDelta(tab);
             break;
 
+            case "updatedeltaall":
+                code += this.generateUpdateDeltaAll(tab);
+            break;
+
             case "delete":
                 code += this.generateDelete(tab);
             break;
@@ -125,6 +129,10 @@ export class ServiceMicroService implements IServiceAction {
 
     private generateUpdateDelta(tab: string) {
         return tab + util.format("MicroServiceManager.updateDeltaObject(context, res, storage, \"%s\", %d);\n", this.data, this.expiration);
+    }
+
+    private generateUpdateDeltaAll(tab: string) {
+        return tab + util.format("MicroServiceManager.updateDeltaAllObject(context, res, storage, \"%s\", %d);\n", this.data, this.expiration);
     }
 
     private generateDelete(tab: string) {

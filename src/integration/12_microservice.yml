@@ -25,44 +25,38 @@ testcases:
 # Clean database values
 - name: CleanDatabaseValues
   steps:
+
+  # Clean counter
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command$$1"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command$$2"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=composed$$command2$$product"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+  ## Clean data
+  - type: http
+    method: DELETE
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command.1"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command_list"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=command.2"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=commandCounter"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product.1"
     assertions:
     - result.statuscode ShouldEqual 204
   - type: http
     method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product$$2-1"
-    assertions:
-    - result.statuscode ShouldEqual 204
-  - type: http
-    method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product$$2-2"
-    assertions:
-    - result.statuscode ShouldEqual 204
-  - type: http
-    method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product_list$$2"
-    assertions:
-    - result.statuscode ShouldEqual 204
-  - type: http
-    method: DELETE
-    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=composed$$command2$$productCounter"
+    url: "http://{{.host}}:{{.port}}/api/v1/_deleteDatabaseValue?name=product.2"
     assertions:
     - result.statuscode ShouldEqual 204
 
@@ -88,7 +82,7 @@ testcases:
     body: "{ \"name\": \"MyCommand\", \"description\": \"MyDescription\" }"
     assertions:
     - result.statuscode ShouldEqual 201
-    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.commandid ShouldEqual 1
     - result.bodyjson.name ShouldEqual MyCommand
     - result.bodyjson.description ShouldEqual MyDescription
   - type: http
@@ -96,7 +90,7 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/1"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.commandid ShouldEqual 1
     - result.bodyjson.name ShouldEqual MyCommand
     - result.bodyjson.description ShouldEqual MyDescription
   - type: http
@@ -105,7 +99,7 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.__len__ ShouldEqual 1
-    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.commandid ShouldEqual 1
     - result.bodyjson.bodyjson0.name ShouldEqual MyCommand
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
   - type: http
@@ -116,7 +110,7 @@ testcases:
     body: "{ \"name\": \"MyCommand2\", \"description\": \"MyDescription2\" }"
     assertions:
     - result.statuscode ShouldEqual 201
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.commandid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyCommand2
     - result.bodyjson.description ShouldEqual MyDescription2
   - type: http
@@ -125,10 +119,10 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.__len__ ShouldEqual 2
-    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.commandid ShouldEqual 1
     - result.bodyjson.bodyjson0.name ShouldEqual MyCommand
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
-    - result.bodyjson.bodyjson1.id ShouldEqual 2
+    - result.bodyjson.bodyjson1.commandid ShouldEqual 2
     - result.bodyjson.bodyjson1.name ShouldEqual MyCommand2
     - result.bodyjson.bodyjson1.description ShouldEqual MyDescription2
 
@@ -140,10 +134,10 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/2"
     headers:
       Content-Type: application/json
-    body: "{ \"id\": 2, \"name\": \"MyCommand2Updated\", \"description\": \"MyDescription2Updated\" }"
+    body: "{ \"commandId\": 2, \"name\": \"MyCommand2Updated\", \"description\": \"MyDescription2Updated\" }"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.commandid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyCommand2Updated
     - result.bodyjson.description ShouldEqual MyDescription2Updated
   - type: http
@@ -151,7 +145,7 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/2"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.commandid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyCommand2Updated
     - result.bodyjson.description ShouldEqual MyDescription2Updated
 
@@ -174,7 +168,7 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.__len__ ShouldEqual 1
-    - result.bodyjson.bodyjson0.id ShouldEqual 2
+    - result.bodyjson.bodyjson0.commandid ShouldEqual 2
     - result.bodyjson.bodyjson0.name ShouldEqual MyCommand2Updated
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription2Updated
 
@@ -200,7 +194,7 @@ testcases:
     body: "{ \"name\": \"MyProduct\", \"description\": \"MyDescription\" }"
     assertions:
     - result.statuscode ShouldEqual 201
-    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.productid ShouldEqual 1
     - result.bodyjson.name ShouldEqual MyProduct
     - result.bodyjson.description ShouldEqual MyDescription
   - type: http
@@ -209,7 +203,7 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.__len__ ShouldEqual 1
-    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.productid ShouldEqual 1
     - result.bodyjson.bodyjson0.name ShouldEqual MyProduct
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
   - type: http
@@ -217,7 +211,7 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/1"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 1
+    - result.bodyjson.productid ShouldEqual 1
     - result.bodyjson.name ShouldEqual MyProduct
     - result.bodyjson.description ShouldEqual MyDescription
   - type: http
@@ -228,7 +222,7 @@ testcases:
     body: "{ \"name\": \"MyProduct2\", \"description\": \"MyDescription2\" }"
     assertions:
     - result.statuscode ShouldEqual 201
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.productid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyProduct2
     - result.bodyjson.description ShouldEqual MyDescription2
   - type: http
@@ -237,10 +231,10 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.__len__ ShouldEqual 2
-    - result.bodyjson.bodyjson0.id ShouldEqual 1
+    - result.bodyjson.bodyjson0.productid ShouldEqual 1
     - result.bodyjson.bodyjson0.name ShouldEqual MyProduct
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription
-    - result.bodyjson.bodyjson1.id ShouldEqual 2
+    - result.bodyjson.bodyjson1.productid ShouldEqual 2
     - result.bodyjson.bodyjson1.name ShouldEqual MyProduct2
     - result.bodyjson.bodyjson1.description ShouldEqual MyDescription2
   - type: http
@@ -248,7 +242,7 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/2"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.productid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyProduct2
     - result.bodyjson.description ShouldEqual MyDescription2
 
@@ -260,10 +254,10 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/2"
     headers:
       Content-Type: application/json
-    body: "{ \"id\": 2, \"name\": \"MyProduct2Updated\", \"description\": \"MyDescription2Updated\" }"
+    body: "{ \"productId\": 2, \"name\": \"MyProduct2Updated\", \"description\": \"MyDescription2Updated\" }"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.productid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyProduct2Updated
     - result.bodyjson.description ShouldEqual MyDescription2Updated
   - type: http
@@ -271,7 +265,7 @@ testcases:
     url: "http://{{.host}}:{{.port}}/api/v1/command/2/product/2"
     assertions:
     - result.statuscode ShouldEqual 200
-    - result.bodyjson.id ShouldEqual 2
+    - result.bodyjson.productid ShouldEqual 2
     - result.bodyjson.name ShouldEqual MyProduct2Updated
     - result.bodyjson.description ShouldEqual MyDescription2Updated
 
@@ -294,6 +288,6 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.bodyjson.__len__ ShouldEqual 1
-    - result.bodyjson.bodyjson0.id ShouldEqual 2
+    - result.bodyjson.bodyjson0.productid ShouldEqual 2
     - result.bodyjson.bodyjson0.name ShouldEqual MyProduct2Updated
     - result.bodyjson.bodyjson0.description ShouldEqual MyDescription2Updated

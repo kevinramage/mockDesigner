@@ -284,6 +284,46 @@ export class MicroServiceManager {
         }
     }
 
+    public static async updateDeltaAllObject(context: Context, res: Response, storage: IStorage, dataExpression: string, expiration: number) {
+        winston.debug("MicroServiceManager.updateDeltaAllObject");
+        try {
+
+            // Evaluate parent business object
+            storage.parent = await MicroServiceManager.evaluateParentId(context, storage.parent);
+            var parentKey = MicroServiceManager.defineParentKey(storage.parent);
+            if ( parentKey ) { parentKey = "_" + parentKey; }
+            const parentBusinessObjectKey = util.format("list%s%s", storage.businessObject, parentKey);
+            
+            // Check parent
+            const parents = MicroServiceManager.getParentKeys(storage.parent);
+            const promises = parents.map((parent) => { return RedisManager.instance.objectExists(parent); });
+            if ( promises.length > 0 ) {
+                const results = await Promise.all(promises);
+                const result = results.reduce((previous, current) => { return previous && current; });
+                if ( !result ) {
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    return;
+                }
+            }
+
+            // Evaluate data
+            const dataEvaluated = await TemplateManager.instance.evaluate(dataExpression, context);
+            const data = JSON.parse(dataEvaluated);
+
+            // Update all objects
+            const objects = await RedisManager.instance.updateDeltaAllObjectsWrapper(parentBusinessObjectKey, data, expiration);
+
+            // Send response
+            const headers : { [ key: string ] : string } = {};
+            headers["Content-Type"] = "application/json";
+            await ResponseHandler.sendContent(context, res, 200, JSON.stringify(objects), headers);
+
+        } catch (err) {
+            winston.error("MicroServiceManager.updateDeltaAllObject: ", err);
+            await ResponseHandler.sendDefaultJSONInternalError(res);
+        }
+    }
+
     public static async deleteObject(context: Context, res: Response, storage: IStorage) {
         winston.debug("MicroServiceManager.deleteObject");
         try {
