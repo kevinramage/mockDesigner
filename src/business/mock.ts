@@ -130,7 +130,7 @@ export class Mock {
         var code = "";
         code += tab + util.format("public static async _defaultResponse(req: Request, res: Response) {\n");
         
-        if ( this._default ) {
+        if ( this._default.length > 0 ) {
 
             // Apply actions defined in mock definition
             code += tab + util.format("\tconst context = new Context(req);\n\n");
