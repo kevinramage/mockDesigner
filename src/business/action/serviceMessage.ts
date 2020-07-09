@@ -33,7 +33,9 @@ export class ServiceMessage implements IServiceAction {
 
         // Send a body
         else {
-            code += tab + util.format("await ResponseHandler.sendContent(context, res, %s, \"%s\", headers);\n", this.status, this.body);
+            var body = this.body || "";
+            body = body.replace(/\"/g, "\\\"");
+            code += tab + util.format("await ResponseHandler.sendContent(context, res, %s, \"%s\", headers);\n", this.status, body);
         }
 
         return code;

@@ -2,13 +2,16 @@ import * as winston from "winston";
 import * as util from "util";
 import { Service } from "./service";
 import { RouteSolver } from "./routeSolver";
+import { IServiceAction } from "./action/serviceAction";
 
 export class Mock {
     private _name : string;
+    private _default : IServiceAction[];
     private _services : Service[];
 
     constructor() {
         this._name = "";
+        this._default = [];
         this._services = [];
     }
 
@@ -125,10 +128,20 @@ export class Mock {
     private generateDefaultResponseService(tab: string) {
         winston.debug("Mock.generateDefaultResponseService");
         var code = "";
-
-        // Generate service
         code += tab + util.format("public static async _defaultResponse(req: Request, res: Response) {\n");
-        code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
+        
+        if ( this._default ) {
+
+            // Apply actions defined in mock definition
+            code += tab + util.format("\tconst context = new Context(req);\n\n");
+            this._default.forEach(action => {
+                code += action.generate(tab + "\t");
+            });
+        } else {
+
+            // Generate default method not allow response
+            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
+        }
         code += tab + util.format("}\n\n");
 
         return code;
@@ -156,6 +169,10 @@ export class Mock {
     public addService(service : Service) {
         service.mockName = this.controllerName;
         this._services.push(service);
+    }
+
+    public addDefaultAction(action: IServiceAction) {
+        this._default.push(action);
     }
 
     public get name() {

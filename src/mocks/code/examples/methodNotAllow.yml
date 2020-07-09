@@ -1,0 +1,18 @@
+name: methodNotAllow
+default:
+- type: message
+  status: 405
+  headers:
+    Content-Type: application/json
+  body: "{ \"message\": \"Invalid request: method not allow\" }"
+services:
+  - name: basicService
+    method: GET
+    path: /api/v1/basicService
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          body: OK

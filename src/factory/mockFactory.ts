@@ -1,6 +1,8 @@
 import { Mock } from "../business/mock";
 import { IMock } from "../interface/mock";
 import { ServiceFactory } from "./serviceFactory";
+import { ActionFactory } from "./actionFactory";
+import { type } from "os";
 
 export class MockFactory {
 
@@ -11,6 +13,14 @@ export class MockFactory {
             const service = ServiceFactory.build(serviceInterface);
             mock.addService(service); 
         });
+        if ( mockInterface.default ) {
+            mockInterface.default.forEach(actionInterface => {
+                const action = ActionFactory.build(actionInterface);
+                if ( action ) {
+                    mock.addDefaultAction(action);
+                }
+            });
+        }
         return mock;
     }
 }

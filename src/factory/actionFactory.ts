@@ -8,10 +8,11 @@ import { IMockMicroServiceAction } from "../interface/mockMicroServiceAction";
 import { ServiceMicroService } from "../business/action/serviceMicroService";
 import { ServiceWait } from "../business/action/serviceWait";
 import { IMockWaitAction } from "../interface/mockWaitAction";
+import { IServiceAction } from "business/action/serviceAction";
 
 export class ActionFactory {
 
-    public static build(actionInterface: IMockAction) {
+    public static build(actionInterface: IMockAction) : IServiceAction | null {
         switch ( actionInterface.type ) {
             case "message":
                 return ActionFactory.buildMessageAction(actionInterface as IMockMessageAction);
