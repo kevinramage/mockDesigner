@@ -32,6 +32,7 @@ export class Mock {
             code += service.generate();
         });
         code += this.generateDatabaseService("\t");
+        code += this.generateDefaultResponseService("\t");
         code += "}\n";
         return code;
     }
@@ -52,6 +53,7 @@ export class Mock {
             code += service.generateRoute();
         });
         code += this.generateServicesRoutes("\t\t");
+        code += this.generateDefaultRoute("\t\t");
         
         return code;
     }
@@ -65,6 +67,13 @@ export class Mock {
         code += tab + util.format("this.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", this.controllerName);
         code += tab + util.format("this.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n\n", this.controllerName);
 
+        return code;
+    }
+
+    private generateDefaultRoute(tab: string) {
+        winston.debug("Mock.generateDefaultRoute");
+        var code = "";
+        code += tab + util.format("this.router.route(\"*\").all(%s._defaultResponse);\n\n", this.controllerName);
         return code;
     }
 
@@ -108,6 +117,18 @@ export class Mock {
         code += tab + util.format("\tawait RedisManager.instance.deleteValue(req.query['name'] as string);\n");
         code += tab + util.format("\tres.status(204);\n");
         code += tab + util.format("\tres.end();\n");
+        code += tab + util.format("}\n\n");
+
+        return code;
+    }
+
+    private generateDefaultResponseService(tab: string) {
+        winston.debug("Mock.generateDefaultResponseService");
+        var code = "";
+
+        // Generate service
+        code += tab + util.format("public static async _defaultResponse(req: Request, res: Response) {\n");
+        code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
         code += tab + util.format("}\n\n");
 
         return code;

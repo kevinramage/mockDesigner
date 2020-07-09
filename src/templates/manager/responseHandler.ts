@@ -126,4 +126,12 @@ export class ResponseHandler {
     public static sendDefaultJSONResourceNotFound(res: Response) {
         ResponseHandler.sendJSONResourceNotFound(res, "Resource not found");
     }
+
+    public static sendMethodNotAllow(res: Response) {
+        res.status(405);
+        res.setHeader("Content-Type", "application/json");
+        const body = { code: "405", message: "Method not allow" }
+        res.write(JSON.stringify(body));
+        res.end();
+    }
 }
