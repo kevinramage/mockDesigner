@@ -12,7 +12,7 @@ export class Main {
         const myFormat = winston.format.printf(({ level, message, timestamp }) => {
             return `${timestamp} - ${level.toUpperCase()}: ${message}`;
         });
-        winston.add(new DailyRotateFile({ filename: "logs/WASP_%DATE%.log", datePattern: 'YYYY-MM-DD', 
+        winston.add(new DailyRotateFile({ filename: "logs/MockDesigner_%DATE%.log", datePattern: 'YYYY-MM-DD', 
             level: 'debug', zippedArchive: true, maxSize: '20m', maxFiles: '14d', format: winston.format.combine(winston.format.timestamp(), myFormat)}));
         winston.remove(winston.transports.Console);
         winston.add(new winston.transports.Console({level: "info", format: winston.format.combine(winston.format.timestamp(), myFormat) }));

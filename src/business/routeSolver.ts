@@ -90,7 +90,7 @@ export class RouteSolver {
     }
 
     public otherRoutes(currentRoute: Route) {
-        return this._routes.filter(r => { return r.id != currentRoute.id; })
+        return this._routes.filter(r => { return r.path != currentRoute.path; })
     }
 
     public static get instance() {
@@ -104,6 +104,7 @@ export class RouteSolver {
 class Route {
     private _id : string | undefined;
     private _path : string;
+    private _originalPath : string;
     private _dependencies : Route[];
     private _order : number | undefined;
     private _code : string;
@@ -113,6 +114,7 @@ class Route {
         this._dependencies = [];
         this._code = code;
         this._path = computedPath;
+        this._originalPath = path;
     }
 
     public addDependency(route: Route) {
@@ -148,5 +150,9 @@ class Route {
 
     public get code() {
         return this._code;
+    }
+
+    public get originalPath() {
+        return this._originalPath;
     }
 }

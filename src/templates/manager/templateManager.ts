@@ -214,7 +214,11 @@ export class TemplateManager {
                     case "headers":
                         return this.evaluateJSONRequestPath(pathRemaining, context.request.headers);
                     case "body":
-                        return this.evaluateJSONRequestPath(pathRemaining, context.request.body);
+                        if ( pathRemaining.length > 0) {
+                            return this.evaluateJSONRequestPath(pathRemaining, context.request.body);
+                        } else {
+                            return JSON.stringify(context.request.body);
+                        }
                     default:
                         winston.warn("TemplateManager.evaluateJSONRequest - Path not correctly defined");
                         return "undefined";
@@ -417,7 +421,7 @@ export class TemplateManager {
             if (propertyText.trim().startsWith(".")) {
                 const key = TemplateManager.determineKey(storageText, keyText);
                 const dataText = await RedisManager.instance.getValue(key);
-                const data = JSON.parse(dataText);
+                const data = JSON.parse(dataText as string);
                 const paths = TemplateManager.determinePath(propertyText);
                 const result = TemplateManager.navigateThroughtObject(data, paths);
                 content = content.replace(fullMatch, result);

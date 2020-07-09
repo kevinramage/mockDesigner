@@ -1,0 +1,580 @@
+
+name: MicroServicesAdvanced
+services:
+
+# Get a command
+- name: GetCommand
+  method: GET
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+
+# Get a command line
+- name: GetCommandLine
+  method: GET
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Get a product
+- name: GetProduct
+  method: GET
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: get
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Get all commands
+- name: GetAllCommands
+  method: GET
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage:
+          businessObject: command
+
+# Get all command lines
+- name: GetAllCommandLines
+  method: GET
+  path:  /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Get all products
+- name: GetAllProducts
+  method: GET
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: getall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Create a command
+- name: CreateCommand
+  method: POST
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage:
+          businessObject: command
+          propertyName: commandId
+          propertyValue: "{{Increment(Command)}}"
+        data: "{{.request.body}}"
+        expiration: 60
+
+# Create a command line
+- name: CreateCommandLine
+  method: POST
+  path: /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage:
+          businessObject: commandLine
+          propertyName: commandLineId
+          propertyValue: "{{Increment(command{{.request.params.cmdId}}, commandLine)}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+        data: "{{.request.body}}"
+        expiration: 60
+
+# Create a product
+- name: CreateProduct
+  method: POST
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: create
+        storage:
+          businessObject: product
+          propertyName: productId
+          propertyValue: "{{Increment(command{{.request.params.cmdId}}, commandLine{{.request.params.cmdLineId}}, product)}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+        data: "{{.request.body}}"
+        expiration: 60
+
+# Update a command
+- name: UpdateCommand
+  method: PUT
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+
+# Update a command line
+- name: UpdateCommandLine
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+
+# Update a product
+- name: UpdateProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: update
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+
+# Patch a command
+- name: PatchCommand
+  method: PATCH
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedelta
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+
+# Patch a command line
+- name: PatchCommandLine
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedelta
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+
+# Patch a product
+- name: PatchProduct
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedelta
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+        expiration: 60
+
+# Delete a command
+- name: DeleteCommand
+  method: DELETE
+  path: /api/v1/command/:cmdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: delete
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+
+# Delete a command line
+- name: DeleteCommandLine
+  method: DELETE
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: delete
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Delete a product
+- name: DeleteProduct
+  method: DELETE
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: delete
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Delete all commands
+- name: DeleteAllCommands
+  method: DELETE
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: deleteall
+        storage:
+          businessObject: command
+
+# Delete all command lines
+- name: DeleteAllCommandLines
+  method: DELETE
+  path: /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: deleteall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Delete all products
+- name: DeleteAllProducts
+  method: DELETE
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: deleteall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Enable command
+- name: EnableCommand
+  method: PUT
+  path: /api/v1/command/:cmdId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+
+# Enable command line
+- name: EnableCommandLine
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Enable product
+- name: EnableProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId/enable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: enable
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Disable command
+- name: DisableCommand
+  method: PUT
+  path: /api/v1/command/:cmdId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: command
+          propertyValue: "{{.request.params.cmdId}}"
+
+# Disable command line
+- name: DisableCommandLine
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: commandLine
+          propertyValue: "{{.request.params.cmdLineId}}"
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Disable product
+- name: DisableProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/:prdId/disable
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disable
+        storage:
+          businessObject: product
+          propertyValue: "{{.request.params.prdId}}"
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Disable all command
+- name: DisableAllCommands
+  method: PUT
+  path: /api/v1/command/disableAll
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: command
+
+# Disable all command line
+- name: DisableAllCommandLines
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/disableAll
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Disable all product
+- name: DisableAllProduct
+  method: PUT
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product/disableAll
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: disableall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Update delta all commands
+- name: UpdateDeltaAllCommands
+  method: PATCH
+  path: /api/v1/command
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: command
+
+# Update delta all command line
+- name: UpdateDeltaAllCommandLines
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: commandLine
+          parent:
+            businessObject: command
+            propertyValue: "{{.request.params.cmdId}}"
+
+# Update delta all products
+- name: UpdateDeltaAllProducts
+  method: PATCH
+  path: /api/v1/command/:cmdId/commandLine/:cmdLineId/product
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: updatedeltaall
+        storage:
+          businessObject: product
+          parent:
+            businessObject: commandLine
+            propertyValue: "{{.request.params.cmdLineId}}"
+            parent:
+              businessObject: command
+              propertyValue: "{{.request.params.cmdId}}"
+
+# Search command
+- name: SearchCommands
+  method: Get
+  path: /api/v1/command/search
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: microservice
+        action: search
+        storage:
+          businessObject: command

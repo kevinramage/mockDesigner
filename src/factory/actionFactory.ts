@@ -70,17 +70,14 @@ export class ActionFactory {
         // Storage
         serviceMicroService.storage = actionInterface.storage;
 
-        // Id
-        if ( actionInterface.identifier ) {
-            serviceMicroService.identifierName = actionInterface.identifier.name;
-            serviceMicroService.identifierValue = actionInterface.identifier.value;
+        // Data
+        if ( actionInterface.data ) {
+            serviceMicroService.data = actionInterface.data;
         }
 
-        // Keys
-        if ( actionInterface.keys ) {
-            actionInterface.keys.forEach(key => {
-                serviceMicroService.addKey(key);
-            });
+        // Expiration
+        if ( actionInterface.expiration ) {
+            serviceMicroService.expiration = actionInterface.expiration;
         }
 
         return serviceMicroService;
