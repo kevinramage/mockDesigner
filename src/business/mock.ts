@@ -7,12 +7,14 @@ import { IServiceAction } from "./action/serviceAction";
 export class Mock {
     private _name : string;
     private _default : IServiceAction[];
+    private _error : IServiceAction[];
     private _services : Service[];
 
     constructor() {
         this._name = "";
         this._default = [];
         this._services = [];
+        this._error = [];
     }
 
     public generate() {
@@ -36,6 +38,8 @@ export class Mock {
         });
         code += this.generateDatabaseService("\t");
         code += this.generateDefaultResponseService("\t");
+        code += this.generateSendInternalError("\t");
+
         code += "}\n";
         return code;
     }
@@ -86,7 +90,7 @@ export class Mock {
 
         // Generate get database counter
         code += tab + util.format("public static async _getDatabaseValue(req: Request, res: Response) {\n");
-        code += tab + util.format("\twinston.debug(\"%s._getDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\twinston.debug(\"%s._getDatabaseCounter\");\n", this.controllerName);
         code += tab + util.format("\tconst value = await RedisManager.instance.getValue(req.query['name'] as string);\n");
         code += tab + util.format("\tif ( value != null ) {\n");
         code += tab + util.format("\t\tres.status(200);\n");
@@ -100,7 +104,7 @@ export class Mock {
 
         // Generate reset database counter
         code += tab + util.format("public static async _resetDatabaseCounter(req: Request, res: Response) {\n");
-        code += tab + util.format("\twinston.debug(\"%s._resetDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\twinston.debug(\"%s._resetDatabaseCounter\");\n", this.controllerName);
         code += tab + util.format("\tawait RedisManager.instance.setValue(req.body.name, \"0\");\n");
         code += tab + util.format("\tres.status(204);\n");
         code += tab + util.format("\tres.end();\n");
@@ -108,7 +112,7 @@ export class Mock {
 
         // Generate update database value code
         code += tab + util.format("public static async _updateDatabaseValue(req: Request, res: Response) {\n");
-        code += tab + util.format("\twinston.debug(\"%s._updateDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\twinston.debug(\"%s._updateDatabaseCounter\");\n", this.controllerName);
         code += tab + util.format("\tawait RedisManager.instance.setValue(req.body.name, req.body.value);\n");
         code += tab + util.format("\tres.status(204);\n");
         code += tab + util.format("\tres.end();\n");
@@ -116,7 +120,7 @@ export class Mock {
 
         // Generate delete database value code
         code += tab + util.format("public static async _deleteDatabaseValue(req: Request, res: Response) {\n");
-        code += tab + util.format("\twinston.debug(\"%s._updateDatabaseCounter\");\n", this.name);
+        code += tab + util.format("\twinston.debug(\"%s._updateDatabaseCounter\");\n", this.controllerName);
         code += tab + util.format("\tawait RedisManager.instance.deleteValue(req.query['name'] as string);\n");
         code += tab + util.format("\tres.status(204);\n");
         code += tab + util.format("\tres.end();\n");
@@ -134,13 +138,17 @@ export class Mock {
 
             // Apply actions defined in mock definition
             code += tab + util.format("\tconst context = new Context(req);\n\n");
+            code += tab + util.format("\ttry {\n");
             this._default.forEach(action => {
-                code += action.generate(tab + "\t");
+                code += action.generate(tab + "\t\t");
             });
+            code += tab + util.format("\t} catch ( ex ) {\n");
+            code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.controllerName);
+            code += tab + util.format("\t}\n");
         } else {
 
             // Generate default method not allow response
-            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
+            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(req, res);\n");
         }
         code += tab + util.format("}\n\n");
 
@@ -166,6 +174,29 @@ export class Mock {
         return code;
     }
 
+    private generateSendInternalError(tab: string) {
+        var code = "";
+
+        code += tab + util.format("public static async __sendInternalError(context: Context, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s.__sendInternalError\");\n", this.controllerName);
+
+        if ( this._error.length > 0 ) {
+            code += tab + util.format("\ttry {\n");
+            this._error.forEach(action => {
+                code += action.generate(tab + "\t\t");
+            });
+            code += tab + util.format("\t} catch ( ex ) {\n");
+            code += tab + util.format("\t\tResponseHandler.sendInternalError(res);\t\n");
+            code += tab + util.format("\t}\n");
+        } else {
+            code += tab + util.format("\tResponseHandler.sendInternalError(res);\t\n");
+        }
+        
+        code += tab + util.format("}\n\n");
+
+        return code;
+    }
+
     public addService(service : Service) {
         service.mockName = this.controllerName;
         this._services.push(service);
@@ -173,6 +204,10 @@ export class Mock {
 
     public addDefaultAction(action: IServiceAction) {
         this._default.push(action);
+    }
+
+    public addErrorAction(action: IServiceAction) {
+        this._error.push(action);
     }
 
     public get name() {

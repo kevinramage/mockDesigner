@@ -134,4 +134,12 @@ export class ResponseHandler {
         res.write(JSON.stringify(body));
         res.end();
     }
+
+    public static sendInternalError(res: Response) {
+        res.status(500);
+        res.setHeader("Content-Type", "application/json");
+        const body = { code: "500", message: "An internal error occured" }
+        res.write(JSON.stringify(body));
+        res.end();
+    }
 }

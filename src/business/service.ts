@@ -41,7 +41,7 @@ export class Service {
         // Generate response handler
         code += tab + util.format("public static async %s(req: Request, res: Response) {\n", this.methodName);
         code += tab + util.format("\twinston.debug(\"%s.%s\");\n", this.mockName, this.methodName);
-
+        
         // Define context
         code += tab + "\tconst context = new Context(req);\n";
 
@@ -67,23 +67,29 @@ export class Service {
         // Generate business method
         code += tab + util.format("public static async _%s(context: Context, res: Response) {\n", this.methodName);
         code += tab + util.format("\twinston.debug(\"%s._%s\");\n", this.mockName, this.methodName);
+        code += tab + util.format("\ttry {\n");
 
         // Apply behaviours
-        code += tab + "\tvar triggerApplied = false, expression, evaluation, key, behaviour;\n\n"
+        code += tab + "\t\tvar triggerApplied = false, expression, evaluation, key, behaviour;\n\n"
         this._behaviours.forEach(behaviour => {
-            code += behaviour.generate(tab + "\t");
+            code += behaviour.generate(tab + "\t\t");
         });
 
         // Apply triggers
         this._triggers.forEach(trigger => {
-            code += trigger.generate(this.mockName, this.methodName, tab + "\t");
+            code += trigger.generate(this.mockName, this.methodName, tab + "\t\t");
         });        
 
         // Apply a default trigger if there are no trigger to apply
-        code += tab + "\tif ( !triggerApplied ) {\n";
-        code += tab + util.format("\t\twinston.warn(\"%s.%s: No trigger to apply\");\n", this.mockName, this.methodName);
-        code += tab + "\t\tResponseHandler.sendError(res, \"No trigger to apply\", \"\");\n";
-        code += tab + "\t}\n";
+        code += tab + "\t\tif ( !triggerApplied ) {\n";
+        code += tab + util.format("\t\t\twinston.warn(\"%s.%s: No trigger to apply\");\n", this.mockName, this.methodName);
+        code += tab + "\t\t\tResponseHandler.sendError(res, \"No trigger to apply\", \"\");\n";
+        code += tab + "\t\t}\n";
+
+        // Manage internal error
+        code += tab + util.format("\t} catch ( ex ) {\n");
+        code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.mockName);
+        code += tab + util.format("\t}\n");
 
         code += tab + "}\n\n";
 

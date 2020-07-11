@@ -38,6 +38,7 @@ export class ServiceMessage implements IServiceAction {
             code += tab + util.format("await ResponseHandler.sendContent(context, res, %s, \"%s\", headers);\n", this.status, body);
         }
 
+
         return code;
     }
 

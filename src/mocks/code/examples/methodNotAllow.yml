@@ -5,6 +5,12 @@ default:
   headers:
     Content-Type: application/json
   body: "{ \"message\": \"Invalid request: method not allow\" }"
+error:
+- type: message
+  status: 500
+  headers:
+    Content-Type: application/json
+  body: "{ \"message\": \"You destroy the system :/ !!! \" }"
 services:
   - name: basicService
     method: GET

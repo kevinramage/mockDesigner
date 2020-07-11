@@ -21,6 +21,14 @@ export class MockFactory {
                 }
             });
         }
+        if ( mockInterface.error ) {
+            mockInterface.error.forEach(actionInterface => {
+                const action = ActionFactory.build(actionInterface);
+                if ( action ) {
+                    mock.addErrorAction(action);
+                }
+            });
+        }
         return mock;
     }
 }
