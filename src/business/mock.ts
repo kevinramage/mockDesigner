@@ -148,7 +148,7 @@ export class Mock {
         } else {
 
             // Generate default method not allow response
-            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(req, res);\n");
+            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
         }
         code += tab + util.format("}\n\n");
 
