@@ -37,7 +37,7 @@ Mock Designer propose an action to save data in a storage, the storage option al
 ## Data sources
 An expression to add some dynamism in a response: data source.
 Data source propose a solution to manage simple and structured data set.
-[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/datasource.md)
+[More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/dataSource.md)
 
 ## Request
 An expression to add some dynamism in a response: request.
