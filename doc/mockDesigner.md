@@ -29,7 +29,7 @@ Mock designer propose differents internal services to help the administration.
 To simulate authentication system, Mock Designer propose a solution that simulate the main authentication system: basic ...
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/authentication.md)
 
-## Error
+## Error management
 To secure the mock usage, you can override the default mock designer message (method not allow, timeout, internal error) ...
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/error.md)
 

@@ -32,10 +32,12 @@ services:
   method: GET
   path: /api/v1/myService
   response:
-    actions:
-    - type: message
-      status: 200
-      body: OK
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK
 ```
 
 ## Documentation
@@ -59,7 +61,8 @@ This feature will come in future version
 
 ## Use cases
 
-Some classical use cases will be added in future version to help you to understand the interest of the tool.
+Some situations are complex to manage with classical mock system.
+[You can find examples here](https://github.com/kevinramage/mockDesigner/blob/master/doc/usecase.md)
 
 ## Integration
 
