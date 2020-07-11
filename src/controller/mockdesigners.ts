@@ -8,7 +8,7 @@ import { MockDesigner } from "./mockdesigner";
 import { KEYS, ERRORS } from "../constantes";
 import { Mocks } from "../business/mocks";
 import { Mock } from "../business/mock";
-import { FileManagement } from "../utils/fileManagement";
+import { FileManagement } from "../templates/util/fileManagement";
 import { IKeyValue } from "../interface/keyValue";
 
 export class MockDesigners {

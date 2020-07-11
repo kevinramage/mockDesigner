@@ -30,7 +30,7 @@ Execute the following statement to compile the mock system:
 > Run mock
 `docker-compose -f generated/docker-compose.yml up -d --build`
 
-> Execute a GET request
+> Execute a POST request
 POST /api/v1/login HTTP/1.1
 Host: localhost:7001
 Content-Type: application/json
@@ -49,7 +49,7 @@ After this request execution, we just have a simple json
 }
 ```
 
-Now must include a condition in our response. We will add a new data trigger to generate the error response. [More informations about this trigger](https://github.com/kevinramage/mockDesigner/blob/master/doc/dataTrigger.md).
+Now, we must include a condition in our response. We will add a new data trigger to generate the error response. [More informations about this trigger](https://github.com/kevinramage/mockDesigner/blob/master/doc/dataTrigger.md).
 So now, we have two triggers, one trigger with condition and a second trigger, the default trigger.
 The first trigger will manage the error case, we just have to add a condition to check username parameter equals to 'userAuthFailed'. 
 The second trigger will manage the classical case.

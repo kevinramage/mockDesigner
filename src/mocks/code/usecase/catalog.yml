@@ -1,0 +1,14 @@
+name: catalogMock
+services:
+- name: catalogService
+  method: GET
+  path: /api/v1/offer/:id
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        headers:
+          content-type: application/json
+        bodyFile: ../responses/usecase/offer.json

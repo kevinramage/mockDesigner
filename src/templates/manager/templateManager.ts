@@ -6,6 +6,7 @@ import { v4 } from "uuid";
 import { RedisManager } from "./redisManager";
 import { Context } from "../context";
 import { XMLUtils } from "../util/XMLUtils";
+import { FileManagement } from "../util/fileManagement";
 // {{.imports}}
 
 export class TemplateManager {
@@ -40,12 +41,12 @@ export class TemplateManager {
         winston.debug("TemplateManager.registerDataSources");
         const instance = this;
         try {
-            fs.readdirSync("data").forEach(file => {
+            const files = FileManagement.readDirectoryReccursively("data");
+            files.forEach(file => {
                 if ( file.endsWith(".json")) {
                     try {
                         const fileName = path.basename(file, ".json");
-                        const fileUri = path.join("data", file);
-                        const content = fs.readFileSync(fileUri);
+                        const content = fs.readFileSync(file);
                         const data = JSON.parse(content.toString());
                         instance._dataSources[fileName] = data as object[];
                     } catch ( err ) {

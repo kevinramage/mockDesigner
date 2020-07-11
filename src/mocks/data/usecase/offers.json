@@ -1,0 +1,7 @@
+[
+{ "id": "OFF_MEDIA_1", "name": "Media 1", "product": "PRD_MEDIA_1", "startDate": "2020/01/01", "expiredDate": "2020/12/01" },
+{ "id": "OFF_MEDIA_2", "name": "Media 2", "product": "PRD_MEDIA_2", "startDate": "2020/01/01", "expiredDate": "2020/12/01" },
+{ "id": "OFF_MEDIA_3", "name": "Media 3", "product": "PRD_MEDIA_3", "startDate": "2020/01/01", "expiredDate": "2020/12/01" },
+{ "id": "OFF_MEDIA_4", "name": "Media 4", "product": "PRD_MEDIA_4", "startDate": "2020/01/01", "expiredDate": "2020/12/01" },
+{ "id": "OFF_MEDIA_5", "name": "Media 5", "product": "PRD_MEDIA_5", "startDate": "2020/01/01", "expiredDate": "2020/12/01" }
+]
