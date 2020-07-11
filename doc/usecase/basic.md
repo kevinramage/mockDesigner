@@ -1,11 +1,10 @@
 # Basic service with request informations
 
-## Need
+## Requirements
 We want to simulate a simple service, this service send an hello word message with the username parameter sent from the request.
 We want to listen on path /api/v1/helloService on GET method. We will use username query parameter to collect the username.
 
 ## Implementation
-
 First, we will write a basic service
 ```yaml
 name: helloWorldMock
