@@ -11,12 +11,12 @@ export class ResponseHandler {
         winston.debug("ResponseHandler.sendContentFromFile");
         var body = "", errorMessage = "";
         const defaultResponseDirectory = "responses";
+        const responseDirectory = fs.existsSync(defaultResponseDirectory) ? defaultResponseDirectory : "../" +defaultResponseDirectory;
         try {
-            const responseDirectory = fs.existsSync(defaultResponseDirectory) ? defaultResponseDirectory : "../" +defaultResponseDirectory;
             const buffer = fs.readFileSync(util.format("%s/%s", responseDirectory, fileName));
             body = buffer.toString();
         } catch (err) {
-            errorMessage = util.format("Impossible to find the file: %s/%s", defaultResponseDirectory, fileName);
+            errorMessage = util.format("Impossible to find the file: %s/%s", responseDirectory, fileName);
             const contentTypeKey = Object.keys(headers).find(h => { return h.toLowerCase() == "content-type"; });
             var contentType = "plain/text";
             if ( contentTypeKey ) {
@@ -140,6 +140,13 @@ export class ResponseHandler {
         res.setHeader("Content-Type", "application/json");
         const body = { code: "500", message: "An internal error occured" }
         res.write(JSON.stringify(body));
+        res.end();
+    }
+
+    public static sendYAMLCOntent(body: string, res: Response) {
+        res.status(200);
+        res.setHeader("Content-Type", "text/vnd.yaml");
+        res.write(body);
         res.end();
     }
 }

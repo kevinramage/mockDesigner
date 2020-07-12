@@ -100,3 +100,11 @@ content-Type: application/json
 ```
 DELETE /api/v1/_deleteDatabaseCounter?name=myKey
 ```
+
+**Source Code**
+
+Get the source code of the mock deployed with the following request:
+
+> Execute a GET request
+GET /api/v1/_sourceCode HTTP/1.1
+Host: localhost:7001

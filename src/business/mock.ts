@@ -6,12 +6,14 @@ import { IServiceAction } from "./action/serviceAction";
 
 export class Mock {
     private _name : string;
+    private _sourceCode : string;
     private _default : IServiceAction[];
     private _error : IServiceAction[];
     private _services : Service[];
 
     constructor() {
         this._name = "";
+        this._sourceCode = "";
         this._default = [];
         this._services = [];
         this._error = [];
@@ -39,6 +41,7 @@ export class Mock {
         code += this.generateDatabaseService("\t");
         code += this.generateDefaultResponseService("\t");
         code += this.generateSendInternalError("\t");
+        code += this.generateSendSourceCodeService("\t");
 
         code += "}\n";
         return code;
@@ -60,6 +63,7 @@ export class Mock {
             code += service.generateRoute();
         });
         code += this.generateServicesRoutes("\t\t");
+        code += this.generateSendSourceCodeRoute("\t\t");
         code += this.generateDefaultRoute("\t\t");
         
         return code;
@@ -81,6 +85,13 @@ export class Mock {
         winston.debug("Mock.generateDefaultRoute");
         var code = "";
         code += tab + util.format("this.router.route(\"*\").all(%s._defaultResponse);\n\n", this.controllerName);
+        return code;
+    }
+
+    private generateSendSourceCodeRoute(tab: string) {
+        winston.debug("Mock.generateSendSourceCodeRoute");
+        var code = "";
+        code += tab + util.format("this.router.route(\"/api/v1/_sourceCode\").get(%s._sendSourceCode);\n\n", this.controllerName);
         return code;
     }
 
@@ -155,6 +166,16 @@ export class Mock {
         return code;
     }
 
+    private generateSendSourceCodeService(tab: string) {
+        winston.debug("Mock.generateSendSourceCodeService");
+        var code = "";
+        const body = this.sourceCode.replace(/\"/g, "\\\"").replace(/\r/g, "").replace(/\n/g, "\\n");
+        code += tab + util.format("public static async _sendSourceCode(req: Request, res: Response) {\n");
+        code += tab + util.format("\tResponseHandler.sendYAMLCOntent(\"%s\", res);\n", body);
+        code += tab + util.format("}\n\n");
+        return code;
+    }
+
     private generateServicesRoutes(tab: string) {
         winston.debug("Mock.generateServicesRoutes");
         var code = "";
@@ -221,5 +242,13 @@ export class Mock {
 
     public get controllerName() {
         return this._name.replace(" ", "_").toLowerCase();
+    }
+
+    public get sourceCode() {
+        return this._sourceCode;
+    }
+
+    public set sourceCode(value) {
+        this._sourceCode = value;
     }
 }

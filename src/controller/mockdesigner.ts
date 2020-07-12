@@ -70,6 +70,9 @@ export class MockDesigner {
 
                 // Use the factory to build business object
                 this._mock = MockFactory.build(this._mockInterface);
+
+                // Save the source code
+                this._mock.sourceCode = body;
             } else {
                 throw new Error(ERRORS.INVALID_INPUTDIR_ISDIRECTORY);
             }
