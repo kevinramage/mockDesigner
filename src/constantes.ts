@@ -5,6 +5,7 @@ export module KEYS {
     export const ROUTES = "// {{.routes}}";
     export const REGISTER = "// {{.register}}";
     export const DOCKERPORT = "##PORTS";
+    export const DOCU = "##DOCU";
 }
 
 export module ERRORS {

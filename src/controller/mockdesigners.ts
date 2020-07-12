@@ -2,7 +2,6 @@ import * as winston from "winston";
 import * as path from "path";
 import * as fs from "fs";
 import * as util from "util";
-import { exec } from "child_process";
 import { MockProjectManagement } from "./mockProjectManagement";
 import { MockDesigner } from "./mockdesigner";
 import { KEYS, ERRORS } from "../constantes";
@@ -19,6 +18,7 @@ export class MockDesigners {
     private _port : number = 7001;
     private _inputDir : string = "";
     private _outputDir : string = "generated";
+    private _modules : string = "";
 
     constructor() {
         this._mockProjectManagement = new MockProjectManagement();
@@ -114,12 +114,19 @@ export class MockDesigners {
     private addProjectFiles() {
         winston.debug("MockDesigners.addProjectFiles");
 
+        // Update docker file part
+        var docuMockValue = "";
+        if ( this.modules && this.modules.includes("mockDocu")) {
+            docuMockValue = "  docu:\\n    build:\\n      context: .\\n      dockerfile: Dockerfile-docu\\n    ports:\\n    - 8642:8642";
+            docuMockValue = docuMockValue.replace(/\\n/g, "\n");
+        }
+
         // Variables
         const dockerPort = "- \"" + this._port + ":" + this._port + "\"";
         const variables : {[key: string] : IKeyValue[]} = {};
         variables["package.json"] = [{key: KEYS.APPNAME, value: this._name.toLowerCase()}];
         variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}];
-        variables["docker-compose.yml"] = [ {key: KEYS.DOCKERPORT, value: dockerPort}];
+        variables["docker-compose.yml"] = [ {key: KEYS.DOCKERPORT, value: dockerPort}, { key: KEYS.DOCU, value: docuMockValue }];
         
         // Update template code
         const data = this.importExternalsFunctions();
@@ -193,5 +200,13 @@ export class MockDesigners {
     public get mockDirectory() {
         const inputDir = this.inputDir.replace(/\\/g, "/").replace("./", "");
         return inputDir.substring(0, inputDir.indexOf("/"));
+    }
+
+    public get modules() {
+        return this._modules;
+    }
+
+    public set modules(value) {
+        this._modules = value;
     }
 }

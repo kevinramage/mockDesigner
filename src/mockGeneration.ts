@@ -74,6 +74,9 @@ export class Main {
         if ( program.output ) {
             mockDesigners.outputDir = program.output;
         }
+        
+        // Modules
+        mockDesigners.modules = program.modules;
 
         winston.info("MockDesigner - Start");
         if ( error == "" ) {
