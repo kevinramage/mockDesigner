@@ -16,5 +16,11 @@ services:
     - REDIS_URL=redis
     networks:
     - md_network
+  docu:
+    build:
+      context: .
+      dockerfile: Dockerfile-docu
+    ports:
+    - 8642:8642
 networks:
   md_network:

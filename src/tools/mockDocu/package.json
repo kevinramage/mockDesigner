@@ -1,0 +1,32 @@
+{
+    "name": "mockdocu",
+    "version": "1.0.0",
+    "description": "",
+    "main": "mockdocu.js",
+    "scripts": {
+        "start": "npm run build && node dist/mockDocu.js",
+        "build": "tsc",
+        "unitTest": "mocha -r ts-node/register unitTests/*.ts"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "commander": "^5.1.0",
+        "rimraf": "^3.0.2",
+        "winston": "^3.3.3",
+        "winston-daily-rotate-file": "^4.5.0",
+        "yaml": "^1.10.0"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.11",
+        "@types/commander": "^2.12.2",
+        "@types/mocha": "^7.0.2",
+        "@types/node": "^13.13.2",
+        "@types/winston": "^2.4.4",
+        "@types/yaml": "^1.9.7",
+        "chai": "^4.2.0",
+        "mocha": "^8.0.1",
+        "ts-node": "^8.10.2",
+        "typescript": "^3.8.3"
+    }
+}
