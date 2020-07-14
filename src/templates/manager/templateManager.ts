@@ -20,9 +20,13 @@ export class TemplateManager {
     }
 
     public init() {
+        winston.debug("TemplateManager.init");
+        const previous = new Date();
         this.registerFunction();
         this.registerDataSources();
         this.registerExternalFunctions();
+        const diff = Math.abs( Math.floor(new Date().getTime() - previous.getTime()));
+        winston.info("TemplateManager.init: Initialization done in " + diff + " ms.");
     }
 
     private registerFunction() {
@@ -383,7 +387,7 @@ export class TemplateManager {
             const dataSource = TemplateManager.instance._dataSources[dataSourceName];
             if ( dataSource ) {
                 const length = dataSource.length;
-                const index = TemplateManager._random(length);
+                const index = TemplateManager._random(length - 1);
                 return dataSource[index];
             } else {
                 winston.warn("TemplateManager.randomDataSource - Datasource not exists: " + dataSourceName);    
