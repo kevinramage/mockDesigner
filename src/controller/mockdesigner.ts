@@ -135,9 +135,16 @@ export class MockDesigner {
             validationErrors.push(ERRORS.MOCKSERVICES_ATLEASTONE);
         }
         if ( mock.services ) {
+            const servicesName : string[] = [];
             const instance = this;
             mock.services.forEach(service => {
                 instance.validateService(service, validationErrors, validationWarnings);
+                if ( service.name ) {
+                    if ( servicesName.includes(service.name)) {
+                        validationErrors.push(util.format(ERRORS.SERVICENAME_ALREADYEXISTS, service.name));
+                    }
+                    servicesName.push(service.name);
+                }
             });
         }
 

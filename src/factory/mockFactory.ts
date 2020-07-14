@@ -9,10 +9,14 @@ export class MockFactory {
     public static build (mockInterface: IMock) {
         const mock : Mock = new Mock();
         mock.name = mockInterface.name;
+
+        // Service
         mockInterface.services.forEach(serviceInterface => {
             const service = ServiceFactory.build(serviceInterface);
             mock.addService(service); 
         });
+
+        // Default route
         if ( mockInterface.default ) {
             mockInterface.default.forEach(actionInterface => {
                 const action = ActionFactory.build(actionInterface);
@@ -21,6 +25,8 @@ export class MockFactory {
                 }
             });
         }
+
+        // Default error handling
         if ( mockInterface.error ) {
             mockInterface.error.forEach(actionInterface => {
                 const action = ActionFactory.build(actionInterface);
@@ -29,6 +35,7 @@ export class MockFactory {
                 }
             });
         }
+
         return mock;
     }
 }

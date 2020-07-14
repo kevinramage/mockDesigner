@@ -41,7 +41,7 @@ export class ServiceFactory {
         }
 
         // Route
-        service.route.path = serviceInterface.path;
+        service.route.path = serviceInterface.path || "/";
         if ( serviceInterface.method ) {
             service.route.method = serviceInterface.method;
         } else {

@@ -26,6 +26,7 @@ export module ERRORS {
     export const MOCKSERVICES_MISSING = "You must define a mock services. The services property must be not empty";
     export const MOCKSERVICES_ATLEASTONE = "You must define at least one service";
     export const SERVICENAME_MISSING = "You must define a service name. The service name property must be not empty";
+    export const SERVICENAME_ALREADYEXISTS = "You already define a service name with the value '%s'. The service name property must be unique";
     export const SERVICEMETHOD_INVALID = "The service method must match with one of the following values: GET, HEAD, POST, PUT, DELETE, CONNECT, OPTIONS, TRACE, PATCH";
     export const AUTHENTICATIONTYPE_MISSING = "You must define a authentication type. The authentication type property must be not empty";
     export const AUTHENTICATIONTYPE_INVALID = "The service authentication must match with one of the following values: BASIC, APIKEY";

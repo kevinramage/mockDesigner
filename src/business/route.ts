@@ -1,7 +1,6 @@
 import * as winston from "winston";
 import * as util from "util";
 import { Service } from "./service";
-import { RouteSolver } from "./routeSolver";
 
 export class Route {
 

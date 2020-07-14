@@ -98,7 +98,7 @@ export class Main {
                 winston.info("MockDesigner - Complete");
             } catch ( ex ) {
                 const validationError = ex as ValidationError;
-                if ( validationError ) {
+                if ( validationError && validationError.errors ) {
                     console.error(colors.red("ERROR: " + validationError.message));
                     validationError.errors.forEach(err => {
                         console.error(colors.red("ERROR: " + err));
