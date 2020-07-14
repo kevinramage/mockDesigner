@@ -7,16 +7,20 @@ services:
     triggers:
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('AA')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^AA.*"
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/premium.json"
+        bodyFile: "../responses/usecase/searchClient/Premium.json"
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('04')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^04.*"
       actions:
       - type: message
         status: 200
@@ -25,7 +29,9 @@ services:
         bodyFile: "../responses/usecase/searchClient/categoryA.json"
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('03')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^03.*"
       actions:
       - type: message
         status: 200
@@ -34,7 +40,9 @@ services:
         bodyFile: "../responses/usecase/searchClient/categoryB.json"
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('02')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^02.*"
       actions:
       - type: message
         status: 200

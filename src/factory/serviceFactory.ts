@@ -5,7 +5,7 @@ import { ActionFactory } from "./actionFactory";
 import { AUTHENTICATION_TYPE, HTTP_METHODS } from "../constantes";
 import { BasicAuthentication } from "../business/authentication/basicAuthentication";
 import { ApiKeyAuthentication } from "../business/authentication/apiKeyAuthentication";
-import { IMockDataTriger } from "../interface/mockDataTrigger";
+import { IMockDataTrigger } from "../interface/mockDataTrigger";
 import { ServiceData } from "../business/trigger/serviceData";
 import { IMockCheckTrigger } from "../interface/mockCheckTrigger";
 import { ServiceCheck } from "../business/trigger/serviceCheck";
@@ -23,6 +23,8 @@ import { IMockValidationTrigger } from "../interface/mockValidationTrigger";
 import { ServiceValidation } from "../business/trigger/serviceValidation";
 import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
 import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
+import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
+import { Condition } from "../templates/condition";
 
 export class ServiceFactory {
 
@@ -61,7 +63,7 @@ export class ServiceFactory {
                     service.addTrigger(instance.buildWithoutTrigger(trigger));
                 break;
                 case "data":
-                    service.addTrigger(instance.buildDataTrigger(trigger as IMockDataTriger));
+                    service.addTrigger(instance.buildDataTrigger(trigger as IMockDataTrigger));
                 break;
                 case "check":
                     service.addTrigger(instance.buildCheckTrigger(trigger as IMockCheckTrigger));
@@ -123,12 +125,14 @@ export class ServiceFactory {
         return serviceWithoutTrigger;
     }
 
-    private static buildDataTrigger(dataTrigger: IMockDataTriger) {
+    private static buildDataTrigger(dataTrigger: IMockDataTrigger) {
+        const instance = this;
         const serviceDataTrigger = new ServiceData();
 
         // Expression
         dataTrigger.conditions.forEach(condition => {
-            serviceDataTrigger.addCondition(condition);
+            const conditionService = instance.buildDataTriggerCondition(condition);
+            serviceDataTrigger.addCondition(conditionService);
         });
 
         // Actions
@@ -140,6 +144,21 @@ export class ServiceFactory {
         });
 
         return serviceDataTrigger;
+    }
+
+    private static buildDataTriggerCondition(condition: IMockDataTriggerCondition) {
+        const serviceCondition : Condition = new Condition();
+
+        // Left operand
+        serviceCondition.leftOperand = condition.leftOperand;
+
+        // Operation
+        serviceCondition.operation = condition.operation;
+
+        // Right operand
+        serviceCondition.rightOperand = condition.rightOperand;
+        
+        return serviceCondition;
     }
 
     private static buildCheckTrigger(dataTrigger: IMockCheckTrigger) {

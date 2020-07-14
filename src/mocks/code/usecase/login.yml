@@ -7,7 +7,9 @@ services:
     triggers:
     - type: data
       conditions:
-      - "'{{.request.body.username}}' == 'userAuthFailed'"
+      - leftOperand: "{{.request.body.username}}"
+        operation: EQUALS
+        rightOperand: userAuthFailed
       actions:
       - type: message
         status: 403

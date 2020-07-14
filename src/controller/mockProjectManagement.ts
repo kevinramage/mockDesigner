@@ -13,8 +13,23 @@ export class MockProjectManagement {
     }
 
     public createFile(fileName: string, body: string) {
-        winston.debug("MockProjectManagement.writeFile: %s", fileName);
+        winston.debug(util.format("MockProjectManagement.writeFile: %s", fileName));
         this._files[fileName] = body;
+    }
+
+    public copyFile(source: string, target: string) {
+        winston.debug(util.format("MockProjectManagement.copyFile: %s to %s", source, target));
+        var code = null;
+        try {
+            code = fs.readFileSync(source).toString();
+        } catch (ex) {
+            winston.error("MockProjectManagement.copyFile - Internal error during copy: ", ex);
+        }
+        if ( code ) {
+            this._files[target] = code;
+        } else {
+            this._files[target] = "";
+        }
     }
 
     public updateFile(fileName: string, key: string, code: string) {

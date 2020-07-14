@@ -7,14 +7,14 @@ import * as colors from "colors";
 import { IMock } from "../interface/mock";
 import { Mock } from "../business/mock";
 import { MockFactory } from "../factory/mockFactory";
-import { ERRORS, HTTP_METHODS, WARNING, AUTHENTICATION_TYPE } from "../constantes";
+import { ERRORS, HTTP_METHODS, WARNING, AUTHENTICATION_TYPE, CONDITION_OPERATION } from "../constantes";
 import { IMockService } from "../interface/mockService";
 import { IMockResponse } from "../interface/mockResponse";
 import { IMockAction } from "../interface/mockAction";
 import { IMockMessageAction } from "../interface/mockMessageAction";
 import { IMockSaveAction } from "../interface/mockSaveAction";
 import { IMockTrigger } from "../interface/mockTrigger";
-import { IMockDataTriger } from "../interface/mockDataTrigger";
+import { IMockDataTrigger } from "../interface/mockDataTrigger";
 import { IMockAuthentication } from "interface/mockAuthentication";
 import { IMockRandomTrigger } from "interface/mockRandomTrigger";
 import { IMockSequentialTrigger } from "interface/mockSequentialTrigger";
@@ -23,6 +23,7 @@ import { IMockWaitAction } from "interface/mockWaitAction";
 import { IMockMicroServiceAction } from "interface/mockMicroServiceAction";
 import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
 import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
+import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
 
 export class ValidationError extends Error {
     private _errors : string[];
@@ -253,7 +254,7 @@ export class MockDesigner {
         else {
             switch ( mockTrigger.type.toLowerCase() ) {
                 case "data":
-                    this.validateDataTrigger(mockTrigger as IMockDataTriger, validationErrors, validationWarnings);
+                    this.validateDataTrigger(mockTrigger as IMockDataTrigger, validationErrors, validationWarnings);
                 break;
                 case "random":
                     this.validateRandomTrigger(mockTrigger as IMockRandomTrigger, validationErrors, validationWarnings);
@@ -273,18 +274,46 @@ export class MockDesigner {
         }
     }
 
-    private validateDataTrigger(mockDataTrigger: IMockDataTriger, validationErrors: string[], validationWarnings: string[]) {
+    private validateDataTrigger(mockDataTrigger: IMockDataTrigger, validationErrors: string[], validationWarnings: string[]) {
+        const instance = this;
         
         // Conditions
         if ( !mockDataTrigger.conditions ) { validationErrors.push(ERRORS.DATATRIGGERCONDITIONS_MISSING); }
         else if ( !mockDataTrigger.conditions.length ) { validationErrors.push(ERRORS.DATATRIGGERCONDITIONS_MISSING); }
         else if ( mockDataTrigger.conditions.length == 0 ) { validationErrors.push(ERRORS.DATATRIGGERCONDITIONS_ATLEASTONE); }
+        else {
+            mockDataTrigger.conditions.forEach(condition => {
+                instance.validateDataTriggerCondition(condition, validationErrors, validationWarnings);
+            });
+        }
 
         // Actions
         if ( !mockDataTrigger.actions ) { validationErrors.push(ERRORS.TRIGGERACTIONS_MISSING); }
         else if ( !mockDataTrigger.actions.length ) { validationErrors.push(ERRORS.TRIGGERACTIONS_MISSING); }
         else if ( mockDataTrigger.actions.length == 0 ) { validationErrors.push(ERRORS.TRIGGERACTIONS_ATLEASTONE); } 
         this.validateActions(mockDataTrigger.actions, validationErrors, validationWarnings);
+    }
+
+    private validateDataTriggerCondition(mockDataTriggerCondition: IMockDataTriggerCondition, validationErrors: string[], validationWarnings: string[]) {
+
+        const conditions = [ CONDITION_OPERATION.EQUALS, CONDITION_OPERATION.NOT_EQUALS, CONDITION_OPERATION.MATCHES, CONDITION_OPERATION.NOT_MATCHES ];
+
+        // Left operand
+        if ( !mockDataTriggerCondition.leftOperand ) {
+            validationErrors.push(ERRORS.DATATRIGGERCONDITION_LEFTOPERANDMISSING);
+        }
+
+        // Operation
+        if ( !mockDataTriggerCondition.operation ) {
+            validationErrors.push(ERRORS.DATATRIGGERCONDITION_OPERATIONMISSING);
+        } else if ( !conditions.includes(mockDataTriggerCondition.operation) ) {
+            validationErrors.push(ERRORS.DATATRIGGERCONDITION_INVALIDOPERATION);
+        }
+
+        // Right operand
+        if ( !mockDataTriggerCondition.rightOperand ) {
+            validationErrors.push(ERRORS.DATATRIGGERCONDITION_RIGHTOPERANDMISSING);
+        }
     }
 
     private validateRandomTrigger(mockRandomTrigger: IMockRandomTrigger, validationErrors: string[], validationWarnings: string[]) {

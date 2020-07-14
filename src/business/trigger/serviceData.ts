@@ -2,10 +2,11 @@ import * as winston from "winston";
 import * as util from "util";
 import { IServiceTrigger } from "./serviceTrigger";
 import { IServiceAction } from "../action/serviceAction";
+import { Condition } from "../../templates/condition";
 
 export class ServiceData implements IServiceTrigger {
 
-    private _conditions : string[];
+    private _conditions : Condition[];
     private _actions :  IServiceAction[];
 
     constructor() {
@@ -17,7 +18,6 @@ export class ServiceData implements IServiceTrigger {
         winston.debug("ServiceData.generate");
         var code = "";
         code += tab + "if ( !triggerApplied ) {\n";
-        code += tab + "\tvar conditionsPassed = true, expression;\n\n";
         code += this.generateCondition(tab + "\t");
         code += tab + "\tif ( conditionsPassed ) {\n\n";
         code += tab + "\t\t// Apply action linked\n";
@@ -34,19 +34,16 @@ export class ServiceData implements IServiceTrigger {
     private generateCondition(tab: string) {
         winston.debug("ServiceData.generateCondition");
         var code = "";
+        code += tab + "// Conditions\n";
+        code += tab + "var condition : Condition;\n"
+        code += tab + "const conditions : Condition[] = [];\n";
         this._conditions.forEach(condition => {
-            code += tab + util.format("// Evaluation %s\n", condition);
-            code += tab + util.format("expression = await TemplateManager.instance.evaluate(\"%s\", context);\n", condition);
-            code += tab + "try {\n";
-            code += tab + "\tevaluation = eval(expression);\n";
-            code += tab + "\tif ( !evaluation ) {\n";
-            code += tab + "\t\tconditionsPassed = false;\n"
-            code += tab + "\t}\n"
-            code += tab + "} catch (err) {\n";
-            code += tab + "\tevaluation = false;\n"
-            code += tab + "}\n\n";
-
+            code += tab + util.format("condition = new Condition(\"%s\", \"%s\", \"%s\");\n", condition.leftOperand, condition.operation, condition.rightOperand);
+            code += tab + "conditions.push(condition);\n";
         });
+        code += tab + "const conditionEvaluator = new ConditionEvaluator();\n";
+        code += tab + "const conditionsPassed = await conditionEvaluator.evaluateConditions(context, conditions);\n";
+
         return code;
     }
 
@@ -55,7 +52,7 @@ export class ServiceData implements IServiceTrigger {
         this._actions.push(action);
     }
 
-    public addCondition(condition: string) {
+    public addCondition(condition: Condition) {
         winston.debug("ServiceData.addExpression");
         this._conditions.push(condition);
     }

@@ -110,7 +110,7 @@ export class Generator {
         code += "------\n";
         code += "**Conditions**: \n";
         trigger.conditions.forEach(condition => {
-            code += util.format("* %s\n", condition);
+            code += util.format("* %s  %s  %s\n", condition.leftOperand, condition.operation, condition.rightOperand);
         });
         code += "\n**Actions**: \n";
         trigger.actions.forEach(action => {

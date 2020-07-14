@@ -9,8 +9,14 @@ export interface INoTrigger extends ITrigger {
 }
 
 export interface IDataTrigger extends ITrigger {
-    conditions: string[];
+    conditions: ICondition[];
     actions: IAction[];
+}
+
+export interface ICondition {
+    leftOperand: string;
+    operation: string;
+    rightOperand: string;
 }
 
 export interface IValidateTrigger extends ITrigger {

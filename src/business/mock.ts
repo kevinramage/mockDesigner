@@ -33,6 +33,8 @@ export class Mock {
         code += "import { XMLUtils } from \"../util/XMLUtils\";\n";
         code += "import { TimeUtils } from \"../util/TimeUtils\";\n";
         code += "import { ValidationUtils } from \"../util/ValidationUtils\";\n";
+        code += "import { Condition } from \"../condition\";\n";
+        code += "import { ConditionEvaluator } from \"../manager/ConditionEvaluator\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._services.forEach(service => {
@@ -169,7 +171,8 @@ export class Mock {
     private generateSendSourceCodeService(tab: string) {
         winston.debug("Mock.generateSendSourceCodeService");
         var code = "";
-        const body = this.sourceCode.replace(/\"/g, "\\\"").replace(/\r/g, "").replace(/\n/g, "\\n");
+        var body = this.sourceCode.replace(/\"/g, "\\\"").replace(/\r/g, "").replace(/\n/g, "\\n");
+        body = body.replace(/\\\\"/g, "\\\"")
         code += tab + util.format("public static async _sendSourceCode(req: Request, res: Response) {\n");
         code += tab + util.format("\tResponseHandler.sendYAMLCOntent(\"%s\", res);\n", body);
         code += tab + util.format("}\n\n");

@@ -6,9 +6,13 @@ services:
   response:
     triggers:
     - type: data
-      conditions: 
-      - "'{{.request.params.id}}' == '99999'"
-      - "'{{.request.body.name}}' == 'ERROR_500'"
+      conditions:
+      - leftOperand: "{{.request.params.id}}"
+        operation: EQUALS
+        rightOperand: "99999"
+      - leftOperand: "{{.request.body.name}}"
+        operation: EQUALS
+        rightOperand: "ERROR_500"
       actions:
       - type: message
         status: 500

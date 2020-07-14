@@ -1,7 +1,7 @@
 import { IMockTrigger } from "./mockTrigger";
-import { IMockAction } from "./mockAction";
+import { IMockDataTriggerCondition } from "./mockDataTriggerCondition";
 
-export interface IMockDataTriger extends IMockTrigger {
+export interface IMockDataTrigger extends IMockTrigger {
     type: "data";
-    conditions: string[];
+    conditions: IMockDataTriggerCondition[];
 }
