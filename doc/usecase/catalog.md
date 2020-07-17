@@ -86,7 +86,7 @@ services:
         status: 200
         headers:
           content-type: application/json
-        bodyFile: ../responses/usecase/offer.json
+        bodyFile: ./usecase/offer.json
 ```
 
 Now, we just have to generate the code and run it and we have the following response:

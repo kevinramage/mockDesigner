@@ -11,4 +11,4 @@ services:
           status: 200
           headers:
             content-type: application/xml
-          bodyFile: ../responses/examples/request.xml
+          bodyFile: ./examples/request.xml

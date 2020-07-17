@@ -29,47 +29,55 @@ services:
     triggers:
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('AA')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^AA.*"
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/premium.json"
+        bodyFile: "./usecase/searchClient/Premium.json"
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('04')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^04.*"
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryA.json"
+        bodyFile: "./usecase/searchClient/categoryA.json"
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('03')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^03.*"
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryB.json"
+        bodyFile: "./usecase/searchClient/categoryB.json"
     - type: data
       conditions:
-      - "'{{.request.query.clientId}}'.startsWith('02')"
+      - leftOperand: "{{.request.query.clientId}}"
+        operation: MATCHES
+        rightOperand: "^02.*"
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryC.json"
+        bodyFile: "./usecase/searchClient/categoryC.json"
     - type: none
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryD.json"
+        bodyFile: "./usecase/searchClient/categoryD.json"
 ```
 
 Execute the following statement to compile the mock system:

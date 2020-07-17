@@ -16,7 +16,7 @@ actions:
   status: 200
   headers:
     Content-Type: application/json
-  bodyFile: ../responses/examples/data.json
+  bodyFile: ./examples/data.json
 ```
 
 ## Expression

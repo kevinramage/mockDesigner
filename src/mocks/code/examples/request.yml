@@ -11,4 +11,4 @@ services:
           status: 200
           headers:
             content-type: application/json
-          bodyFile: ../responses/examples/request.json
+          bodyFile: ./examples/request.json

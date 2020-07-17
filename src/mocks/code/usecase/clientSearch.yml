@@ -15,7 +15,7 @@ services:
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/Premium.json"
+        bodyFile: "./usecase/searchClient/Premium.json"
     - type: data
       conditions:
       - leftOperand: "{{.request.query.clientId}}"
@@ -26,7 +26,7 @@ services:
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryA.json"
+        bodyFile: "./usecase/searchClient/categoryA.json"
     - type: data
       conditions:
       - leftOperand: "{{.request.query.clientId}}"
@@ -37,7 +37,7 @@ services:
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryB.json"
+        bodyFile: "./usecase/searchClient/categoryB.json"
     - type: data
       conditions:
       - leftOperand: "{{.request.query.clientId}}"
@@ -48,11 +48,11 @@ services:
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryC.json"
+        bodyFile: "./usecase/searchClient/categoryC.json"
     - type: none
       actions:
       - type: message
         status: 200
         headers:
           content-type: application/json
-        bodyFile: "../responses/usecase/searchClient/categoryD.json"
+        bodyFile: "./usecase/searchClient/categoryD.json"

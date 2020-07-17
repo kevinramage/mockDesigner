@@ -11,4 +11,4 @@ services:
         status: 200
         headers:
           content-type: application/json
-        bodyFile: ../responses/usecase/offer.json
+        bodyFile: ./usecase/offer.json
