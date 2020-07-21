@@ -55,6 +55,7 @@ jobs:
     # Add build badge
     - name: AddBuildBadge
       uses: alvivi/shield-badge@v1
-      label: Build
-      text: Success
-      color: 100
+      with:
+        label: Build
+        text: Success
+        color: 100
