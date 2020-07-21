@@ -51,3 +51,10 @@ jobs:
         RETURN_CODE=$(cat src/test_results.xml | grep "<failure>" | wc -l)
         echo $RETURN_CODE
         exit $RETURN_CODE
+    
+    # Add build badge
+    - name: AddBuildBadge
+      uses: alvivi/shield-badge@v1
+      label: Build
+      text: Success
+      color: 100
