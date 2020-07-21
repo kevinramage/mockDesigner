@@ -1,15 +1,15 @@
 {
     "name": "mockdocu",
     "version": "1.0.0",
-    "description": "",
+    "description": "MockDocu generate mock description documentation",
     "main": "mockdocu.js",
     "scripts": {
         "start": "npm run build && node dist/mockDocu.js",
         "build": "tsc",
         "unitTest": "mocha -r ts-node/register unitTests/*.ts"
     },
-    "author": "",
-    "license": "ISC",
+    "author": "Kevin RAMAGE",
+    "license": "Apache-2.0",
     "dependencies": {
         "commander": "^5.1.0",
         "rimraf": "^3.0.2",

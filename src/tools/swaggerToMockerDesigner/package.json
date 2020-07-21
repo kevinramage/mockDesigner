@@ -1,15 +1,15 @@
 {
-    "name": "swaggertomockerdesigner",
+    "name": "swaggertomockdesigner",
     "version": "1.0.0",
-    "description": "",
+    "description": "SwaggerToMockDesigner help you to generate mock description from a swagger file",
     "main": "swaggerToMockDesigner.js",
     "scripts": {
         "start": "npm run build && node dist/swaggerToMockDesigner.js",
         "build": "tsc",
         "unitTest": "mocha -r ts-node/register unitTests/*.ts"
     },
-    "author": "",
-    "license": "ISC",
+    "author": "Kevin RAMAGE",
+    "license": "Apache-2.0",
     "dependencies": {
         "@apidevtools/swagger-parser": "^9.0.1",
         "commander": "^5.1.0",

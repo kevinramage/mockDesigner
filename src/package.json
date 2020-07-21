@@ -1,7 +1,7 @@
 {
   "name": "mockdesigner",
   "version": "1.0.0",
-  "description": "",
+  "description": "Mock Designer help you to generate code to create easily your mock",
   "main": "mockGeneration.js",
   "scripts": {
     "start": "npm run build && node dist/mockGeneration.js",
@@ -11,8 +11,8 @@
     "winTest": ".\\venom.exe run --output-dir . .\\integration\\*.yml",
     "runSwaggerTool": "tsc tools/swaggerToMockDesigner.ts && node tools/swaggerToMockDesigner.js"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Kevin RAMAGE",
+  "license": "Apache-2.0",
   "dependencies": {
     "commander": "^5.1.0",
     "express-session": "^1.17.1",
