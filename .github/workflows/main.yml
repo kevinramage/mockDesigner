@@ -39,7 +39,7 @@ jobs:
       run: ls -la
 
     # Artifact result
-    - uses: kevinramage/runVenomTests@7d08a965b09c663ccc31e00c05698aba418bc873
+    - uses: kevinramage/runVenomTests@248f3ee9d734c2ec1ee40d06bc58e358e78bb0be
       with:
         workingDirectory: src
         artifactName: results.xml
