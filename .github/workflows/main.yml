@@ -36,13 +36,12 @@ jobs:
         chmod +x wait
         
     - name: Build site assets
-      working-directory: ${{ github.workspace }}
       run: ls -la
 
     # Artifact result
-    - uses: kevinramage/runVenomTests@c1b4f4500a96fa97ac815ec3535878e41ca172a6
+    - uses: kevinramage/runVenomTests@58a7a1434e673b8f917005fac4f80693216040d9
       with:
         artifactName: results.xml
-        venom_path: ./integration/*.yml
+        venom_path: ./src/integration/*.yml
         venom_parallel: "2"
         venom_outputdir: "."
