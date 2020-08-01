@@ -39,7 +39,7 @@ jobs:
       run: ls -la
 
     # Artifact result
-    - uses: kevinramage/runVenomTests@fd232bfa8f2e81cb871bf60b88e0b56f3f24353b
+    - uses: kevinramage/runVenomTests@f0bea358fd58085d2031aa1b49b6a4cb6d81468c
       with:
         artifactName: results.xml
         venom_path: ./integration/*.yml
