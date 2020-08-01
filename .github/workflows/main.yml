@@ -33,10 +33,18 @@ jobs:
       run: |
         cd src
         chmod +x wait
+        
+    - name: Build site assets
+      working-directory: ${{ github.workspace }}
+      run: ls -la
+      
+    - name: Build site assets
+      working-directory: ${{ github.workspace }}/src
+      run: ls -la
 
     # Artifact result
     - uses: kevinramage/runVenomTests@c1b4f4500a96fa97ac815ec3535878e41ca172a6
-      working-directory: ./src
+      working-directory: ${{ github.workspace }}/src
       with:
         artifactName: results.xml
         venom_path: ./integration/*.yml
