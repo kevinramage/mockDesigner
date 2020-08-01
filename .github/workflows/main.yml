@@ -2,7 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   build:
@@ -24,38 +28,17 @@ jobs:
         cd src
         npm install
 
-    # Download venom executable
-    - name: Download venom executable
-      run: |
-        cd src/integration
-        chmod +x downloadVenom.sh
-        ./downloadVenom.sh
-
-    # Execute integration tests
+    # Add right to wait shell script
     - name: Execute integration tests
       run: |
         cd src
-        chmod +x integration/venom.linux-amd64
         chmod +x wait
-        ./integration/venom.linux-amd64 run --parallel 2 --output-dir . ./integration/*.yml
 
     # Artifact result
-    - uses: actions/upload-artifact@v2
+    - uses: kevinramage/runVenomTests@v1
       with:
-        name: test_results
-        path: src/test_results.xml
-
-    # Proceed report
-    - name: AnalyzeReport
-      run: |
-        RETURN_CODE=$(cat src/test_results.xml | grep "<failure>" | wc -l)
-        echo $RETURN_CODE
-        exit $RETURN_CODE
-    
-    # Add build badge
-    - name: AddBuildBadge
-      uses: alvivi/shield-badge@v1
-      with:
-        label: Build
-        text: Success
-        color: 100
+        workspace: src
+        artifactName: results.xml
+        venom_path: ./integration/*.yml
+        venom_parallel: "2"
+        venom_outputdir: "."
