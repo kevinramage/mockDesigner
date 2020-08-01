@@ -41,6 +41,7 @@ jobs:
     # Artifact result
     - uses: kevinramage/runVenomTests@f0bea358fd58085d2031aa1b49b6a4cb6d81468c
       with:
+        workingDirectory: src
         artifactName: results.xml
         venom_path: ./integration/*.yml
         venom_parallel: "2"
