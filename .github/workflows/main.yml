@@ -35,9 +35,9 @@ jobs:
         chmod +x wait
 
     # Artifact result
-    - uses: kevinramage/runVenomTests@efc9295f70a3c60a269dd8f2bf7454f1960893b7
+    - uses: kevinramage/runVenomTests@c1b4f4500a96fa97ac815ec3535878e41ca172a6
+      working-directory: ./src
       with:
-        workspace: src
         artifactName: results.xml
         venom_path: ./integration/*.yml
         venom_parallel: "2"
