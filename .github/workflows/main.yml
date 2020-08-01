@@ -39,9 +39,9 @@ jobs:
       run: ls -la
 
     # Artifact result
-    - uses: kevinramage/runVenomTests@58a7a1434e673b8f917005fac4f80693216040d9
+    - uses: kevinramage/runVenomTests@e3d6f6b8b8baf34c065be67db5ad5bc575a188f3
       with:
         artifactName: results.xml
-        venom_path: ./src/integration/*.yml
+        venom_path: ./integration/*.yml
         venom_parallel: "2"
         venom_outputdir: "."
