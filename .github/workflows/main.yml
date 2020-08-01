@@ -35,7 +35,7 @@ jobs:
         chmod +x wait
 
     # Artifact result
-    - uses: kevinramage/runVenomTests@340ab0d02d5f7e93959e4299b4b62139ac9b8eec
+    - uses: kevinramage/runVenomTests@947bd999f5dba003c045c58f133c2167b5a352e2
       with:
         workspace: src
         artifactName: results.xml
