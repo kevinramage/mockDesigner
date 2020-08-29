@@ -79,6 +79,7 @@ export class Mock {
         code += tab + util.format("this.router.route(\"/api/v1/_resetDatabaseCounter\").post(%s._resetDatabaseCounter);\n", this.controllerName);
         code += tab + util.format("this.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", this.controllerName);
         code += tab + util.format("this.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n\n", this.controllerName);
+        code += tab + util.format("this.router.route(\"/api/v1/_getRequest\").get(%s._getRequest);\n\n", this.controllerName);
 
         return code;
     }
@@ -139,6 +140,12 @@ export class Mock {
         code += tab + util.format("\tres.end();\n");
         code += tab + util.format("}\n\n");
 
+        // Generate get request
+        code += tab + util.format("public static async _getRequest(req: Request, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s._getRequest\");\n", this.controllerName);
+        code += tab + util.format("\tawait ResponseHandler.getRequest(req, res);\n");
+        code += tab + util.format("}\n\n");
+
         return code;
     }
 
@@ -146,11 +153,11 @@ export class Mock {
         winston.debug("Mock.generateDefaultResponseService");
         var code = "";
         code += tab + util.format("public static async _defaultResponse(req: Request, res: Response) {\n");
+        code += tab + util.format("\tconst context = new Context(req);\n\n");
         
         if ( this._default.length > 0 ) {
 
             // Apply actions defined in mock definition
-            code += tab + util.format("\tconst context = new Context(req);\n\n");
             code += tab + util.format("\ttry {\n");
             this._default.forEach(action => {
                 code += action.generate(tab + "\t\t");
@@ -161,7 +168,7 @@ export class Mock {
         } else {
 
             // Generate default method not allow response
-            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
+            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(context, res);\n");
         }
         code += tab + util.format("}\n\n");
 
@@ -174,7 +181,7 @@ export class Mock {
         var body = this.sourceCode.replace(/\"/g, "\\\"").replace(/\r/g, "").replace(/\n/g, "\\n");
         body = body.replace(/\\\\"/g, "\\\"")
         code += tab + util.format("public static async _sendSourceCode(req: Request, res: Response) {\n");
-        code += tab + util.format("\tResponseHandler.sendYAMLCOntent(\"%s\", res);\n", body);
+        code += tab + util.format("\tResponseHandler.sendYAMLContent(\"%s\", res);\n", body);
         code += tab + util.format("}\n\n");
         return code;
     }
@@ -210,10 +217,10 @@ export class Mock {
                 code += action.generate(tab + "\t\t");
             });
             code += tab + util.format("\t} catch ( ex ) {\n");
-            code += tab + util.format("\t\tResponseHandler.sendInternalError(res);\t\n");
+            code += tab + util.format("\t\tResponseHandler.sendInternalError(context, res);\t\n");
             code += tab + util.format("\t}\n");
         } else {
-            code += tab + util.format("\tResponseHandler.sendInternalError(res);\t\n");
+            code += tab + util.format("\tResponseHandler.sendInternalError(context, res);\t\n");
         }
         
         code += tab + util.format("}\n\n");

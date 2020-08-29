@@ -1,0 +1,16 @@
+name: basicMock
+services:
+  - name: basicService
+    method: GET
+    path: /api/v1/basicService/:id
+    requestStorage:
+      keys:
+      - "{{.request.params.id}}"
+      - "{{.request.body.deliveryId}}"
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          body: OK
