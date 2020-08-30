@@ -2,7 +2,6 @@ import { Mock } from "../business/mock";
 import { IMock } from "../interface/mock";
 import { ServiceFactory } from "./serviceFactory";
 import { ActionFactory } from "./actionFactory";
-import { type } from "os";
 
 export class MockFactory {
 
@@ -12,8 +11,10 @@ export class MockFactory {
 
         // Service
         mockInterface.services.forEach(serviceInterface => {
-            const service = ServiceFactory.build(serviceInterface);
-            mock.addService(service); 
+            const serviceGroup = ServiceFactory.build(serviceInterface);
+            if ( serviceGroup ) {
+                mock.addServiceGroup(serviceGroup); 
+            }
         });
 
         // Default route

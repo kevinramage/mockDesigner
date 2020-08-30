@@ -25,8 +25,11 @@ import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
 import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
 import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
 import { Condition } from "../templates/condition";
+import { ServiceGroup } from "../business/serviceGroup";
 
 export class ServiceFactory {
+
+    private static _serviceGroups : { [key: string]: ServiceGroup} = {};
 
     public static build(serviceInterface: IMockService) {
         const service : Service = new Service();
@@ -43,17 +46,29 @@ export class ServiceFactory {
         }
 
         // Route
-        service.route.path = serviceInterface.path || "/";
-        if ( serviceInterface.method ) {
-            service.route.method = serviceInterface.method;
-        } else {
-            service.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
+        const path = serviceInterface.path || "/";
+
+        // Generate service group
+        var serviceGroupCreated = false;
+        var serviceGroup = ServiceFactory._serviceGroups[path];
+        if ( !serviceGroup ) {
+            serviceGroup = new ServiceGroup();
+            serviceGroup.mockName = service.name;
+            ServiceFactory._serviceGroups[path] = serviceGroup;
+            serviceGroupCreated = true;
+            serviceGroup.route.path = path;
+            if ( serviceInterface.method ) {
+                serviceGroup.route.method = serviceInterface.method;
+            } else {
+                serviceGroup.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
+            }
+            if ( serviceInterface.pingPath ) {
+                serviceGroup.route.pingPath = serviceInterface.pingPath;
+            } else {
+                serviceGroup.route.pingPath = serviceInterface.path;
+            }
         }
-        if ( serviceInterface.pingPath ) {
-            service.route.pingPath = serviceInterface.pingPath;
-        } else {
-            service.route.pingPath = serviceInterface.path;
-        }
+        serviceGroup.addService(service);
 
         // Triggers
         const instance = this;
@@ -118,7 +133,7 @@ export class ServiceFactory {
             }
         }
 
-        return service;
+        return serviceGroupCreated ? serviceGroup : null;
     }
 
     private static buildWithoutTrigger(dataTrigger: IMockTrigger) {
