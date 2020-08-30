@@ -55,10 +55,6 @@ This feature will come in future version
 
 This feature will come in future version
 
-### Monitor the request and response
-
-This feature will come in future version
-
 ## Use cases
 
 Some situations are complex to manage with classical mock system.
