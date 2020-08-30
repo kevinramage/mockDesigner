@@ -168,7 +168,7 @@ export class MockDesigner {
             if ( !methods.includes(method) ) {
                 validationErrors.push(ERRORS.SERVICEMETHOD_INVALID);
             }
-        } else {
+        } else if ( !mockService.soapAction ) {
             validationWarnings.push(WARNING.SERVICEMETHOD_MISSING);
         }
 

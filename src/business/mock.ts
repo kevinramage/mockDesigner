@@ -3,19 +3,20 @@ import * as util from "util";
 import { Service } from "./service";
 import { RouteSolver } from "./routeSolver";
 import { IServiceAction } from "./action/serviceAction";
+import { ServiceGroup } from "./serviceGroup";
 
 export class Mock {
     private _name : string;
     private _sourceCode : string;
     private _default : IServiceAction[];
     private _error : IServiceAction[];
-    private _services : Service[];
+    private _serviceGroups : ServiceGroup[];
 
     constructor() {
         this._name = "";
         this._sourceCode = "";
         this._default = [];
-        this._services = [];
+        this._serviceGroups = [];
         this._error = [];
     }
 
@@ -37,8 +38,8 @@ export class Mock {
         code += "import { ConditionEvaluator } from \"../manager/ConditionEvaluator\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
-        this._services.forEach(service => {
-            code += service.generate();
+        this._serviceGroups.forEach(serviceGroup => {
+            code += serviceGroup.generate();
         });
         code += this.generateDatabaseService("\t");
         code += this.generateDefaultResponseService("\t");
@@ -61,8 +62,8 @@ export class Mock {
         var code = "";
 
         code += this.generateDatabaseServiceRoutes("\t\t");
-        this._services.forEach(service => {
-            code += service.generateRoute();
+        this._serviceGroups.forEach(serviceGroup => {
+            code += serviceGroup.generateRoute();
         });
         code += this.generateServicesRoutes("\t\t");
         code += this.generateSendSourceCodeRoute("\t\t");
@@ -184,9 +185,8 @@ export class Mock {
         var code = "";
 
         // Use resolver to sort routes
-        this._services.forEach(s => {
-            const functionName = util.format("%s.%s", s.mockName, s.methodName);
-            RouteSolver.instance.addRoute(s.route.method, s.route.path, functionName);
+        this._serviceGroups.forEach(serviceGroup => {
+            serviceGroup.addRoute();
         });
         const routes = RouteSolver.instance.resolve();
 
@@ -221,9 +221,9 @@ export class Mock {
         return code;
     }
 
-    public addService(service : Service) {
-        service.mockName = this.controllerName;
-        this._services.push(service);
+    public addServiceGroup(serviceGroup : ServiceGroup) {
+        serviceGroup.mockName = this.controllerName;
+        this._serviceGroups.push(serviceGroup);
     }
 
     public addDefaultAction(action: IServiceAction) {
@@ -240,7 +240,7 @@ export class Mock {
 
     public set name(value) {
         this._name = value;
-        this._services.forEach(service => { service.mockName = this.controllerName; });
+        this._serviceGroups.forEach(serviceGroup => { serviceGroup.mockName = this.controllerName; });
     }
 
     public get controllerName() {

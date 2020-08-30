@@ -1,7 +1,6 @@
 import * as winston from "winston";
 import * as util from "util";
 import { IServiceTrigger } from "./trigger/serviceTrigger";
-import { Route } from "./route";
 import { IAuthentication } from "./authentication/authentication";
 import { Behaviour } from "./behaviour";
 
@@ -13,14 +12,12 @@ export class Service {
     private _authentication : IAuthentication | undefined;
     private _triggers : IServiceTrigger[];
     private _behaviours : Behaviour[];
-    private _route : Route;
 
     constructor() {
         this._mockName = "";
         this._name = "";
         this._triggers = [];
         this._behaviours = [];
-        this._route = new Route();
     }
 
     public generate() {
@@ -206,11 +203,6 @@ export class Service {
         return code;
     }
 
-    public generateRoute() {
-        winston.debug("Service.generateRoute");
-        return this._route.generate(this.mockName ,this);
-    }
-
     public addTrigger(trigger: IServiceTrigger) {
         this._triggers.push(trigger);
     }
@@ -230,13 +222,6 @@ export class Service {
         this._behaviours.forEach(behaviour => {
             behaviour.mockName = instance.methodName;
         });
-    }
-
-    public get route() {
-        return this._route;
-    }
-    public set route(value) {
-        this._route = value;
     }
 
     public get authentication() {
