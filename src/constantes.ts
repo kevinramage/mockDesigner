@@ -70,6 +70,8 @@ export module ERRORS {
     export const MICROSERVICEACTIONIDENTIFIER_MISSING = "You must define microservice identifier. The microservice identifier property must be not empty";
     export const MICROSERVICEACTIONIDENTIFIERID_MISSING = "You must define microservice identifier id. The microservice identifier id property must be not empty";
     export const MICROSERVICEACTIONIDENTIFIERNAME_MISSING = "You must define microservice identifier value. The microservice identifier value property must be not empty";
+
+    export const REQUESTSTORAGE_KEYS_MISSING = "You must define request storage keys value. The request storage keys property must be not empty";
 }
 
 export module WARNING {

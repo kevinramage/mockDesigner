@@ -11,7 +11,7 @@ Docker and npm tools required to use Mock Designer.
 To use it describe your mock behaviour in yaml file and execute the tool to generate the code link.
 
 You can find bellow a command to execute the tool.
-`npm run start -- --input tests/basic.yml`
+`npm run start -- --input mocks/code/examples/basic.yml`
 Now, you can find a directory named "generated" that contains the source code of the mock system.
 You can run the mock system with the following command:
 `docker-compose -f generated/docker-compose.yml up -d --build`
@@ -52,10 +52,6 @@ To use all features of Mock Designer, you must know some basics notions: trigger
 This feature will come in future version
 
 ### Generate definition from WSDL
-
-This feature will come in future version
-
-### Monitor the request and response
 
 This feature will come in future version
 

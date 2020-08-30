@@ -45,7 +45,7 @@
     "errorhandler": "^1.5.1",
     "express": "^4.17.1",
     "express-validator": "^6.6.1",
-    "mocha": "^8.1.1",
+    "mocha": "^8.1.2",
     "morgan": "^1.10.0",
     "querystring": "^0.2.0",
     "redis": "^2.8.0",

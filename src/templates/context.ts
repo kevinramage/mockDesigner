@@ -1,12 +1,18 @@
 import { Request } from "express";
 
 export class Context {
+    private _serviceName : string;
+    private _requestStorageKeys : string[];
+    private _requestStorageExpiration : number;
     private _request : Request | undefined;
     private _dataSources : {[key: string] : object};
     private _data : object;
     private _messages : string[];
 
     constructor(request ?: Request) {
+        this._serviceName = "";
+        this._requestStorageExpiration = 0;
+        this._requestStorageKeys = [];
         this._request = request;
         this._dataSources = {};
         this._data = {
@@ -19,8 +25,12 @@ export class Context {
         this._messages.push(message);
     }
 
+    public addRequestStorageKey(key: string) {
+        this._requestStorageKeys.push(key);
+    }
+
     public get request() {
-        return this._request;
+        return this._request as Request;
     }
     public set request(value) {
         this._request = value;
@@ -55,5 +65,25 @@ export class Context {
 
     public get messages() {
         return this._messages;
+    }
+
+    public get serviceName() {
+        return this._serviceName;
+    }
+
+    public set serviceName(value) {
+        this._serviceName = value;
+    }
+
+    public get requestStorageKeys() {
+        return this._requestStorageKeys;
+    }
+
+    public get requestStorageExpiration() {
+        return this._requestStorageExpiration;
+    }
+
+    public set requestStorageExpiration(value) {
+        this._requestStorageExpiration = value;
     }
 }

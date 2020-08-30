@@ -1,5 +1,6 @@
 import { IMockAuthentication } from "./mockAuthentication";
 import { IMockResponse } from "./mockResponse";
+import { IMockServiceRequestStorage } from "./mockServiceRequestStorage";
 
 export interface IMockService {
     name : string;
@@ -11,4 +12,5 @@ export interface IMockService {
     authentication ?: IMockAuthentication;
     data ?: object;
     response : IMockResponse;
+    requestStorage ?: IMockServiceRequestStorage;
 }

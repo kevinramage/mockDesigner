@@ -1,8 +1,14 @@
 import * as winston from "winston";
 import * as redis from "redis";
 import * as util from "util";
+import { Request } from "express";
+import { TemplateManager } from "./templateManager";
+import { Context } from "../context";
 
 export class RedisManager {
+
+    public static REQUEST_STORAGE = "requests";
+
     public static MAX_ELEMENTS = 100;
     private static _instance : RedisManager;
     private _client : redis.RedisClient | undefined;
@@ -481,6 +487,110 @@ export class RedisManager {
             } else {
                 resolve(true);
             }
+        });
+    }
+
+    // ----------------------------------------------------
+    // System to get and save requests and responses
+    // ----------------------------------------------------
+
+    public async saveRequestAndResponse(context: Context, status: number, body: string, headers: {[key: string]: string}) {
+        winston.debug("RedisManager.saveRequestAndResponse: " + context.serviceName);
+        const instance = this;
+        return new Promise<void>(async (resolve, reject) => {
+            const keysEvaluated : string[] = [];
+            for ( var i = 0; i < context.requestStorageKeys.length; i++) {
+                const keyEvaluated = await TemplateManager.instance.evaluate(context.requestStorageKeys[i], context);
+                keysEvaluated.push(keyEvaluated);
+            }
+            const storageKey = instance.generateRequestStorageKey(context.serviceName, keysEvaluated);
+            const content = instance.generateJsonRequestAndResponse(context.request, status, body, headers);
+            instance.setExValue(storageKey, context.requestStorageExpiration, JSON.stringify(content)).then(() => {
+                resolve();
+            }).catch((err) => {
+                reject(err);
+            });
+        });
+    }
+
+    private generateRequestStorageKey(serviceName: string, keys: string[]) {
+        winston.debug("RedisManager.generateRequestStorageKey");
+        var storageKey = RedisManager.REQUEST_STORAGE + "_" + serviceName.toLowerCase() ;
+        if ( keys ) {
+            storageKey += "_" + keys.join("_");
+        };
+        return storageKey;
+    }
+
+    private generateJsonRequestAndResponse(request: Request, status: number, body: string, headers: {[key: string]: string}) {
+        return {
+            request: this.generateJsonRequest(request),
+            response: this.generateJsonResponse(status, body, headers)
+        };
+    }
+
+    private generateJsonRequest(request: Request) {
+        const host = request.header("host");
+        var url = host ? util.format("%s://%s%s", request.protocol, host, request.path) : request.url;
+        if ( host ) {
+            const keys = Object.keys(request.query);
+            const query = keys.map(k => { return util.format("%s=%s", k, request.query[k]) }).join("&");
+            if ( keys.length > 0 ) {
+                url += "?" + query;
+            }
+        }
+        const requestObject = {
+            protocol: request.protocol,
+            url: url,
+            path: request.path,
+            method: request.method,
+            headers: [] as object[],
+            body: request.body
+        };
+
+        // Headers
+        for ( var i = 0; i < request.rawHeaders.length; i += 2) {
+            requestObject.headers.push({
+                key: request.rawHeaders[i],
+                value: request.rawHeaders[i+1]
+            })
+        }
+        
+        return requestObject;
+    }
+
+    private generateJsonResponse(status: number, body: string, headers: {[key: string]: string}) {
+        const responseObject = {
+            status: status,
+            headers: [] as object[],
+            body: body
+        };
+
+        // Headers
+        Object.keys(headers).forEach(headerKey => {
+            responseObject.headers.push({
+                key: headerKey,
+                value: headers[headerKey]
+            })
+        });
+        
+        return responseObject;
+    }
+
+    public async getRequest(serviceName: string, keys: string[]) {
+        winston.debug("RedisManager.getRequest: " + serviceName);
+        const instance = this;
+        return new Promise<object | null>((resolve, reject) => {
+            const storageKey = instance.generateRequestStorageKey(serviceName, keys);
+            instance.getValue(storageKey).then(content => {
+                if ( content ) {
+                    resolve(JSON.parse(content))
+                } else {
+                    resolve(null);
+                }
+            }).catch(err => {
+                reject(err);
+            });
         });
     }
 
