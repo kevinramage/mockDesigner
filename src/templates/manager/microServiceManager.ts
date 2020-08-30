@@ -75,7 +75,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -90,7 +90,7 @@ export class MicroServiceManager {
 
         } catch (err) {
             winston.error("MicroServiceManager.getAllObjects: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
 
     }
@@ -115,7 +115,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -129,12 +129,12 @@ export class MicroServiceManager {
                 headers["Content-Type"] = "application/json";
                 await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
             } else {
-                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
             }
 
         } catch (err) {
             winston.error("MicroServiceManager.getObjectById: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -164,7 +164,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -179,7 +179,7 @@ export class MicroServiceManager {
 
         } catch (err) {
             winston.error("MicroServiceManager.createObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -207,7 +207,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -225,13 +225,13 @@ export class MicroServiceManager {
                 await ResponseHandler.sendContent(context, res, 200, dataEvaluated, headers);
 
             } else {
-                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
             }
 
 
         } catch (err) {
             winston.error("MicroServiceManager.updateObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -259,7 +259,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -275,12 +275,12 @@ export class MicroServiceManager {
                 await ResponseHandler.sendContent(context, res, 200, JSON.stringify(result), headers);
 
             } else {
-                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
             }
 
         } catch (err) {
             winston.error("MicroServiceManager.updateDeltaObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -301,7 +301,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -320,7 +320,7 @@ export class MicroServiceManager {
 
         } catch (err) {
             winston.error("MicroServiceManager.updateDeltaAllObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -345,7 +345,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -359,12 +359,12 @@ export class MicroServiceManager {
                 await ResponseHandler.sendContent(context, res, 204, "", headers);
 
             } else {
-                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
             }
 
         } catch (err) {
             winston.error("MicroServiceManager.deleteObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -385,7 +385,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -400,7 +400,7 @@ export class MicroServiceManager {
 
         } catch (err) {
             winston.error("MicroServiceManager.deleteAllObjects: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -421,7 +421,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -442,7 +442,7 @@ export class MicroServiceManager {
 
         } catch (err) {
             winston.error("MicroServiceManager.searchObjects: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -461,7 +461,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -475,12 +475,12 @@ export class MicroServiceManager {
                 headers["Content-Type"] = "application/json";
                 await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
             } else {
-                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
             }
 
         } catch (err) {
             winston.error("MicroServiceManager.enableObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -499,7 +499,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -513,12 +513,12 @@ export class MicroServiceManager {
                 headers["Content-Type"] = "application/json";
                 await ResponseHandler.sendContent(context, res, 200, JSON.stringify(object), headers);
             } else {
-                await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
             }
 
         } catch (err) {
             winston.error("MicroServiceManager.disableObject: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 
@@ -539,7 +539,7 @@ export class MicroServiceManager {
                 const results = await Promise.all(promises);
                 const result = results.reduce((previous, current) => { return previous && current; });
                 if ( !result ) {
-                    await ResponseHandler.sendDefaultJSONResourceNotFound(res);
+                    await ResponseHandler.sendDefaultJSONResourceNotFound(context, res);
                     return;
                 }
             }
@@ -554,7 +554,7 @@ export class MicroServiceManager {
 
         } catch (err) {
             winston.error("MicroServiceManager.disableObjects: ", err);
-            await ResponseHandler.sendDefaultJSONInternalError(res);
+            await ResponseHandler.sendDefaultJSONInternalError(context, res);
         }
     }
 }

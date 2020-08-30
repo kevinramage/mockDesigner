@@ -12,12 +12,16 @@ export class Service {
     private _authentication : IAuthentication | undefined;
     private _triggers : IServiceTrigger[];
     private _behaviours : Behaviour[];
+    private _requestStorageKeys : string[];
+    private _requestStorageExpiration : number;
 
     constructor() {
         this._mockName = "";
         this._name = "";
         this._triggers = [];
         this._behaviours = [];
+        this._requestStorageKeys = [];
+        this._requestStorageExpiration = 3600 * 48;
     }
 
     public generate() {
@@ -41,6 +45,11 @@ export class Service {
         
         // Define context
         code += tab + "\tconst context = new Context(req);\n";
+        code += tab + util.format("\tcontext.serviceName = \"%s\";\n", this.methodName);
+        code += tab + util.format("\tcontext.requestStorageExpiration = %d;\n", this.requestStorageExpiration);
+        this.requestStorageKeys.forEach(key => {
+            code += tab + util.format("\tcontext.addRequestStorageKey(\"%s\");\n", key);
+        });
 
         // Prepare the call to the service method
         var codeToCallService = "";
@@ -80,7 +89,7 @@ export class Service {
         // Apply a default trigger if there are no trigger to apply
         code += tab + "\t\tif ( !triggerApplied ) {\n";
         code += tab + util.format("\t\t\twinston.warn(\"%s.%s: No trigger to apply\");\n", this.mockName, this.methodName);
-        code += tab + "\t\t\tResponseHandler.sendError(res, \"No trigger to apply\", \"\");\n";
+        code += tab + "\t\t\tResponseHandler.sendError(context, res, \"No trigger to apply\", \"\");\n";
         code += tab + "\t\t}\n";
 
         // Manage internal error
@@ -213,6 +222,10 @@ export class Service {
         this._behaviours.push(behaviour);
     }
 
+    public addRequestStorageKey(monitoringKey: string) {
+        this._requestStorageKeys.push(monitoringKey);
+    }
+
     public get name() {
         return this._name;
     }
@@ -257,5 +270,17 @@ export class Service {
 
     public get methodName() {
         return this._name.replace(" ", "_").toLowerCase();
+    }
+
+    public get requestStorageKeys() {
+        return this._requestStorageKeys;
+    }
+
+    public get requestStorageExpiration() {
+        return this._requestStorageExpiration;
+    }
+
+    public set requestStorageExpiration(value) {
+        this._requestStorageExpiration = value;
     }
 }

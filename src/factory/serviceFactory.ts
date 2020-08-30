@@ -123,6 +123,16 @@ export class ServiceFactory {
             });
         }
 
+        // Monitoring
+        if ( serviceInterface.requestStorage && serviceInterface.requestStorage.keys ) {
+            serviceInterface.requestStorage.keys.forEach(key => {
+                service.addRequestStorageKey(key);
+            });
+            if ( serviceInterface.requestStorage.expiration ) {
+                service.requestStorageExpiration = serviceInterface.requestStorage.expiration;
+            }
+        }
+
         return serviceGroupCreated ? serviceGroup : null;
     }
 

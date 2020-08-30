@@ -24,6 +24,7 @@ import { IMockMicroServiceAction } from "interface/mockMicroServiceAction";
 import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
 import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
 import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
+import { IMockServiceRequestStorage } from "interface/mockServiceRequestStorage";
 
 export class ValidationError extends Error {
     private _errors : string[];
@@ -195,6 +196,11 @@ export class MockDesigner {
         if ( !mockService.response ) { validationErrors.push(ERRORS.SERVICERESPONSE_MISSING); }
         else if ( typeof mockService.response != "object" ) { validationErrors.push(ERRORS.SERVICERESPONSE_MISSING); }
         else { this.validateResponse(mockService.response, validationErrors, validationWarnings); }
+
+        // Monitoring
+        if ( mockService.requestStorage ) {
+            this.validateRequestStorageService(mockService.requestStorage, validationErrors, validationWarnings);
+        }
     }
 
     private validateAuthentication(authentication: IMockAuthentication, validationErrors: string[], validationWarnings: string[]) {
@@ -445,6 +451,12 @@ export class MockDesigner {
     private validateMicroserviceAction(mockAction: IMockMicroServiceAction, validationErrors: string[], validationWarnings: string[] ) {
 
 
+    }
+
+    private validateRequestStorageService(requestStorage: IMockServiceRequestStorage, validationErrors: string[], validationWarnings: string[]) {
+        if ( !requestStorage.keys ) {
+            validationErrors.push(ERRORS.REQUESTSTORAGE_KEYS_MISSING);
+        }
     }
 
     public get mock() {
