@@ -50,11 +50,11 @@ export class ServiceFactory {
 
         // Generate service group
         var serviceGroupCreated = false;
-        var serviceGroup = ServiceFactory._serviceGroups[path];
+        var serviceGroup = ServiceFactory._serviceGroups[service.methodName + ";" + path];
         if ( !serviceGroup ) {
             serviceGroup = new ServiceGroup();
             serviceGroup.mockName = service.name;
-            ServiceFactory._serviceGroups[path] = serviceGroup;
+            ServiceFactory._serviceGroups[service.methodName + ";" + path] = serviceGroup;
             serviceGroupCreated = true;
             serviceGroup.route.path = path;
             if ( serviceInterface.method ) {
