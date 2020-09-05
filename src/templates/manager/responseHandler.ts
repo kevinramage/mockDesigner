@@ -35,10 +35,11 @@ export class ResponseHandler {
         res.status(status);
 
         // Headers
-        Object.keys(headers).forEach(async key => {
-            const headerValue = await TemplateManager.instance.evaluate(headers[key], context);
-            res.setHeader(key, headerValue);
-        });
+        for ( var i = 0; i < Object.keys(headers).length; i++) {
+            const headerKey = Object.keys(headers)[i];
+            const headerValue = await TemplateManager.instance.evaluate(headers[headerKey], context);
+            res.setHeader(Object.keys(headers)[i], headerValue);
+        };
 
         // Body
         if ( body ) {
