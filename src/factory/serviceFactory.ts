@@ -48,20 +48,26 @@ export class ServiceFactory {
         // Route
         const path = serviceInterface.path || "/";
 
+        // Method
+        var method = "";
+        if ( serviceInterface.method ) {
+            method = serviceInterface.method;
+        } else {
+            method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
+        }
+
         // Generate service group
         var serviceGroupCreated = false;
-        var serviceGroup = ServiceFactory._serviceGroups[service.methodName + ";" + path];
+        var serviceGroup = ServiceFactory._serviceGroups[method + ";" + path];
+        console.info("ServiceGroup: " + method + ";" + path);
+        console.info("ServiceGroup exists ? " + (serviceGroup ? "true": "false)"));
         if ( !serviceGroup ) {
             serviceGroup = new ServiceGroup();
             serviceGroup.mockName = service.name;
-            ServiceFactory._serviceGroups[service.methodName + ";" + path] = serviceGroup;
+            ServiceFactory._serviceGroups[method + ";" + path] = serviceGroup;
             serviceGroupCreated = true;
             serviceGroup.route.path = path;
-            if ( serviceInterface.method ) {
-                serviceGroup.route.method = serviceInterface.method;
-            } else {
-                serviceGroup.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
-            }
+            serviceGroup.route.method = method;
             if ( serviceInterface.pingPath ) {
                 serviceGroup.route.pingPath = serviceInterface.pingPath;
             } else {
