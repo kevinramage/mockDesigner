@@ -57,3 +57,33 @@ testcases:
     assertions:
     - result.statuscode ShouldEqual 200
     - result.body ShouldEqual OK
+
+# Test regex case
+- name: TestRegexCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTrigger/coucoua"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual Coucou
+
+# Test in case
+- name: TestInCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTrigger/1001"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual "Ohhh good id ..."
+
+# Test range case
+- name: TestInCase
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/dataTrigger/2010"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual "Ahh ok, it's works too"

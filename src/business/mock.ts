@@ -35,7 +35,7 @@ export class Mock {
         code += "import { TimeUtils } from \"../util/TimeUtils\";\n";
         code += "import { ValidationUtils } from \"../util/ValidationUtils\";\n";
         code += "import { Condition } from \"../condition\";\n";
-        code += "import { ConditionEvaluator } from \"../manager/ConditionEvaluator\";\n";
+        code += "import { ConditionEvaluator } from \"../manager/conditionEvaluator\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._serviceGroups.forEach(serviceGroup => {
