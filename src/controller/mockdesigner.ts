@@ -302,7 +302,12 @@ export class MockDesigner {
 
     private validateDataTriggerCondition(mockDataTriggerCondition: IMockDataTriggerCondition, validationErrors: string[], validationWarnings: string[]) {
 
-        const conditions = [ CONDITION_OPERATION.EQUALS, CONDITION_OPERATION.NOT_EQUALS, CONDITION_OPERATION.MATCHES, CONDITION_OPERATION.NOT_MATCHES ];
+        const conditions = [ 
+            CONDITION_OPERATION.EQUALS, CONDITION_OPERATION.NOT_EQUALS, 
+            CONDITION_OPERATION.MATCHES, CONDITION_OPERATION.NOT_MATCHES,
+            CONDITION_OPERATION.IN, CONDITION_OPERATION.NOT_IN,
+            CONDITION_OPERATION.RANGE
+        ];
 
         // Left operand
         if ( !mockDataTriggerCondition.leftOperand ) {

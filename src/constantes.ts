@@ -52,7 +52,7 @@ export module ERRORS {
     export const DATATRIGGERCONDITION_LEFTOPERANDMISSING = "For each data condition, you must define the left operand property";
     export const DATATRIGGERCONDITION_RIGHTOPERANDMISSING = "For each data condition, you must define the right operand property";
     export const DATATRIGGERCONDITION_OPERATIONMISSING = "For each data condition, you must define the operation property";
-    export const DATATRIGGERCONDITION_INVALIDOPERATION = "For each data condition, the operation must be equals to EQUALS, NOT_EQUALS, MATCHES, NOT_MATCHES";
+    export const DATATRIGGERCONDITION_INVALIDOPERATION = "For each data condition, the operation must be equals to EQUALS, NOT_EQUALS, MATCHES, NOT_MATCHES, IN, NOT_IN, RANGE";
     export const RANDOMTRIGGERPROBABILITY_MISSING = "You must define random trigger probability. The random trigger probability property must be not empty";
     export const VALIDATETRIGGERMANDATORIESFIELDS_MISSING = "You must define validate trigger mandatories fields. The validate trigger mandatories fields property must be not empty";
     export const VALIDATETRIGGERMANDATORIESFIELDS_ATLEASTONE = "You must define at least one mandatory field";
@@ -107,4 +107,7 @@ export module CONDITION_OPERATION {
     export const NOT_EQUALS = "NOT_EQUALS";
     export const MATCHES = "MATCHES";
     export const NOT_MATCHES = "NOT_MATCHES";
+    export const IN = "IN";
+    export const NOT_IN = "NOT_IN";
+    export const RANGE = "RANGE";
 }
