@@ -59,8 +59,6 @@ export class ServiceFactory {
         // Generate service group
         var serviceGroupCreated = false;
         var serviceGroup = ServiceFactory._serviceGroups[method + ";" + path];
-        console.info("ServiceGroup: " + method + ";" + path);
-        console.info("ServiceGroup exists ? " + (serviceGroup ? "true": "false)"));
         if ( !serviceGroup ) {
             serviceGroup = new ServiceGroup();
             serviceGroup.mockName = service.name;
