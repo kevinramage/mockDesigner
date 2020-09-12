@@ -5,6 +5,9 @@ import { IAuthentication } from "./authentication/authentication";
 import { Behaviour } from "./behaviour";
 
 export class Service {
+
+    public static DEFAULT_REQ_STORAGE_EXPIRATION = 3600 * 48;
+
     private _mockName: string;
     private _name : string;
     private _soapAction : string | undefined;
@@ -21,7 +24,7 @@ export class Service {
         this._triggers = [];
         this._behaviours = [];
         this._requestStorageKeys = [];
-        this._requestStorageExpiration = 3600 * 48;
+        this._requestStorageExpiration = Service.DEFAULT_REQ_STORAGE_EXPIRATION;
     }
 
     public generate() {

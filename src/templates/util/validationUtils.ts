@@ -1,16 +1,24 @@
+import * as winston from "winston";
 import { Context } from "../context";
-import { NavigationUtils } from "./NavigationUtils";
+import { NavigationUtils } from "./navigationUtils";
+import { EnumField } from "../enumField";
 
 export class ValidationUtils {
 
-    public static validate(context: Context, mandatoriesFields: string[]) {
-
+    public static validate(context: Context, mandatoriesFields: string[], enumFields: EnumField[]) {
+        winston.debug("ValidationUtils.validate");
         var result = "";
+
+        // Mandatories fields
         mandatoriesFields.forEach(mandatoryField => {
             const newResult = NavigationUtils.checkMandatoryField(context.request?.body, mandatoryField, "JSON");
-            if ( newResult != "" ) {
-                result = NavigationUtils.concatResult(result, newResult);
-            }
+            result = NavigationUtils.concatResult(result, newResult);
+        });
+
+        // Enum fields
+        enumFields.forEach(enumField => {
+            const newResult = NavigationUtils.checkEnumField(context.request?.body, enumField.field, enumField.values, "JSON");
+            result = NavigationUtils.concatResult(result, newResult);
         });
 
         return result;

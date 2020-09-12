@@ -360,13 +360,38 @@ export class MockDesigner {
 
     private validateValidateTrigger(mockValidateTrigger: IMockValidationTrigger, validationErrors: string[], validationWarnings: string[]) {
 
-        // Mandatories fields
-        if ( !mockValidateTrigger.mandatoriesFields ) {
-            validationErrors.push(ERRORS.VALIDATETRIGGERMANDATORIESFIELDS_MISSING);
-        } else if ( !mockValidateTrigger.mandatoriesFields.length ) {
-            validationErrors.push(ERRORS.VALIDATETRIGGERMANDATORIESFIELDS_MISSING);
-        } else if ( mockValidateTrigger.mandatoriesFields.length == 0) {
-            validationErrors.push(ERRORS.VALIDATETRIGGERMANDATORIESFIELDS_ATLEASTONE);
+        // Fields
+        if ( !mockValidateTrigger.mandatoriesFields && !mockValidateTrigger.enumFields ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_MISSING);
+        } else if ( mockValidateTrigger.mandatoriesFields && !mockValidateTrigger.mandatoriesFields.length ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_MISSING);
+        } else if ( mockValidateTrigger.enumFields && !mockValidateTrigger.enumFields.length ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_MISSING);
+        } else if ( mockValidateTrigger.mandatoriesFields && mockValidateTrigger.mandatoriesFields.length == 0 ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_ATLEASTONE);
+        } else if ( mockValidateTrigger.enumFields && mockValidateTrigger.enumFields.length == 0) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_ATLEASTONE);
+        }
+
+        // Enum field 
+        if ( mockValidateTrigger.enumFields ) {
+            mockValidateTrigger.enumFields.forEach(enumField => {
+
+                // Field must be present
+                if ( !enumField.field ) {
+                    validationErrors.push(ERRORS.VALIDATETRIGGERENUMFIELD_MISSING);
+                }
+
+                // Values must be present
+                if ( !enumField.values || !enumField.values.length ) {
+                    validationErrors.push(ERRORS.VALIDATETRIGGERENUMVALUES_MISSING);
+                }
+
+                // At leat one value defined
+                else if ( enumField.values.length == 0 ) {
+                    validationErrors.push(ERRORS.VALIDATETRIGGERENUMVALUES_ATLEASTONE);
+                }
+            });
         }
         
         // Actions

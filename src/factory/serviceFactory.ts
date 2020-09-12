@@ -26,6 +26,7 @@ import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
 import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
 import { Condition } from "../templates/condition";
 import { ServiceGroup } from "../business/serviceGroup";
+import { EnumField } from "../templates/enumField";
 
 export class ServiceFactory {
 
@@ -279,6 +280,15 @@ export class ServiceFactory {
         if ( dataValidation.mandatoriesFields ) {
             dataValidation.mandatoriesFields.forEach(f => {
                 serviceValidationTrigger.addMandoryField(f);
+            });
+        }
+
+        // Enum field
+        if ( dataValidation.enumFields ) {
+            dataValidation.enumFields.forEach(f => {
+                const enumField = new EnumField(f.field);
+                f.values.forEach(v => { enumField.addValue(v); });
+                serviceValidationTrigger.addEnumField(enumField);
             });
         }
 
