@@ -63,7 +63,7 @@ export class NavigationUtils {
         winston.debug("NavigationUtils.checkMandatoryFieldPath: " + expression);
 
         // Security
-        if ( paths.length == 0 ) { return ""; }
+        if ( !paths || paths.length == 0 ) { return ""; }
 
         // Get field
         const field = NavigationUtils.getField(content, paths[0], system);
@@ -107,6 +107,7 @@ export class NavigationUtils {
     }
 
     public static getField(content: any, field: string, system: NAVIGATION_SYSTEM) : any {
+        winston.debug("NavigationUtils.getField: " + field);
         if ( system == "JSON") {
             return NavigationUtils.getFieldFromJSON(content, field);
         } else {
@@ -115,6 +116,7 @@ export class NavigationUtils {
     }
 
     public static getFieldRecursively(content: any, path: string, system: NAVIGATION_SYSTEM) : any {
+        winston.debug("NavigationUtils.getFieldRecursively: " + path);
         const index = path.indexOf(".");
         if ( index != -1 ) {
             const rootPath = path.substr(0, index);
@@ -129,7 +131,7 @@ export class NavigationUtils {
                     const elementContent = NavigationUtils.getFieldRecursively(element, remainingPath, system);
                     
                     // Array
-                    if ( element != null && typeof elementContent == "object" && elementContent.length ) {
+                    if ( elementContent != null && typeof elementContent == "object" && elementContent.length ) {
                         results = results.concat(element as Array<string>);
 
                     // String
