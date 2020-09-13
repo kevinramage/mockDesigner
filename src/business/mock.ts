@@ -166,6 +166,7 @@ export class Mock {
                 code += action.generate(tab + "\t\t");
             });
             code += tab + util.format("\t} catch ( ex ) {\n");
+            code += tab + util.format("\t\twinston.error(\"%s - Internal error: \", ex);\n", this.controllerName);
             code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.controllerName);
             code += tab + util.format("\t}\n");
         } else {

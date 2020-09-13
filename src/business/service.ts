@@ -97,6 +97,8 @@ export class Service {
 
         // Manage internal error
         code += tab + util.format("\t} catch ( ex ) {\n");
+        code += tab + util.format("\t\twinston.error(\"%s._%s - Internal error: \", ex);\n", this.mockName, this.methodName);
+        code += tab + util.format("\t\twinston.error(ex.stack);\n");
         code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.mockName);
         code += tab + util.format("\t}\n");
 
