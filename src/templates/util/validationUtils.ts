@@ -3,8 +3,19 @@ import { Context } from "../context";
 import { NavigationUtils } from "./navigationUtils";
 import { EnumField } from "../enumField";
 
+/**
+ * Validation class use to operation some checks on incoming requests
+ * - Check mandatory fields
+ * - Check enum field
+ */
 export class ValidationUtils {
 
+    /**
+     * Validate a request to check mandatories fields and enum fields
+     * @param context context to use for the validation
+     * @param mandatoriesFields mandatories fields to check
+     * @param enumFields enum fields to check
+     */
     public static validate(context: Context, mandatoriesFields: string[], enumFields: EnumField[]) {
         winston.debug("ValidationUtils.validate");
         var result = "";

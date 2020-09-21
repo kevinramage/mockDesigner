@@ -62,4 +62,51 @@ testcases:
     - result.statuscode ShouldEqual 400
     - result.body ShouldEqual "Mandatories fields missing products[1].name"
 
-# Check types
+# Check enum fields
+- name: CheckEnumFields
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/sendToDelivery"
+    headers:
+      Content-Type: application/json
+    body: "{ \"deliveryDate\": \"test\", \"products\": [{ \"id\": \"test\", \"name\": \"test\" }] }"
+    assertions:
+    - result.statuscode ShouldEqual 400
+    - result.body ShouldEqual "Type is not valid"
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/sendToDelivery"
+    headers:
+      Content-Type: application/json
+    body: "{ \"deliveryDate\": \"test\", \"type\": \"coucou\", \"products\": [{ \"id\": \"test\", \"name\": \"test\" }] }"
+    assertions:
+    - result.statuscode ShouldEqual 400
+    - result.body ShouldEqual "Type is not valid"
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/sendToDelivery"
+    headers:
+      Content-Type: application/json
+    body: "{ \"deliveryDate\": \"test\", \"type\": \"PERSONNAL\", \"products\": [{ \"id\": \"test\", \"name\": \"test\" }] }"
+    assertions:
+    - result.statuscode ShouldEqual 400
+    - result.body ShouldEqual "DeliveryMode is not valid"
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/sendToDelivery"
+    headers:
+      Content-Type: application/json
+    body: "{ \"deliveryDate\": \"test\", \"type\": \"PERSONNAL\", \"products\": [{ \"id\": \"test\", \"name\": \"test\", \"DeliveryMode\": \"coucou\" }] }"
+    assertions:
+    - result.statuscode ShouldEqual 400
+    - result.body ShouldEqual "DeliveryMode is not valid"
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/sendToDelivery"
+    headers:
+      Content-Type: application/json
+    body: "{ \"deliveryDate\": \"test\", \"type\": \"PERSONNAL\", \"products\": [{ \"id\": \"test\", \"name\": \"test\", \"deliveryMode\": \"IMMEDIATE\" }] }"
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldEqual "OK"

@@ -2,13 +2,18 @@ import * as winston from "winston";
 import * as util from "util";
 import { XMLUtils } from "./XMLUtils";
 
+/**
+ * Class to navigate through a formatted content: JSON, XML, UrlEncoded
+ */
 export class NavigationUtils {
     
 
     public static checkMandatoryField(content: object, mandatoryField: string, system: NAVIGATION_SYSTEM) : string{
         winston.debug("NavigationUtils.checkMandatoryField: " + mandatoryField);
         if ( mandatoryField != "" ) {
-            return NavigationUtils.checkMandatoryFieldPath(content, mandatoryField.split("."), system, "");
+            const result = NavigationUtils.checkMandatoryFieldPath(content, mandatoryField.split("."), system, "");
+            winston.debug("NavigationUtils.checkMandatoryField - Result : " + result);
+            return result;
         } else {
             return "";
         }
@@ -63,24 +68,34 @@ export class NavigationUtils {
         winston.debug("NavigationUtils.checkMandatoryFieldPath: " + expression);
 
         // Security
-        if ( !paths || paths.length == 0 ) { return ""; }
+        if ( !paths || paths.length == 0 ) { 
+            winston.warn("NavigationUtils.checkMandatoryFieldPath: invalid paths (empty length)");
+            return ""; 
+        }
 
         // Get field
         const field = NavigationUtils.getField(content, paths[0], system);
         const newExpression = expression !="" ? expression + "." + paths[0] : paths[0];
         const isFinalField = paths.length == 1;
+        winston.debug("NavigationUtils.checkMandatoryFieldPath: isFinalField: " + isFinalField + " - newExpression: " + newExpression);
 
         if ( !isFinalField && field && typeof field == "object" ) {
             const fields = field as Array<Object>;
             if ( field.length != undefined ) {
-                return NavigationUtils.checkMandantoryArrayField(fields, paths, system, newExpression);
+                const result = NavigationUtils.checkMandantoryArrayField(fields, paths, system, newExpression);
+                winston.debug("NavigationUtils.checkMandatoryFieldPath - Result: " + result);
+                return result;
             } else {
                 const newPaths = paths.slice(1);
-                return NavigationUtils.checkMandatoryFieldPath(field, newPaths, system, newExpression);
+                const result = NavigationUtils.checkMandatoryFieldPath(field, newPaths, system, newExpression);
+                winston.debug("NavigationUtils.checkMandatoryFieldPath - Result: " + result);
+                return result;
             }
         } else {
             const isMissing = (field == null && isFinalField);
-            return isMissing ? newExpression : "";
+            const result = (isMissing ? newExpression : "");
+            winston.debug("NavigationUtils.checkMandatoryFieldPath - Result: " + result);
+            return result;
         }
     }
 
@@ -98,14 +113,29 @@ export class NavigationUtils {
         return result;
     }
 
+    /**
+     * Concatenate and format two results
+     * @param resultA previous result to concatenate
+     * @param resultB next result to concatenate
+     */
     public static concatResult(resultA: string, resultB: string) : string {
-        if ( resultA != "" )  {
+        winston.debug("NavigationUtils.concatResult: " + resultA + ", " + resultB);
+        if ( resultA != "" && resultB != "" )  {
             return resultA + ", " + resultB;
-        } else {
+        } else if ( resultA != "")  {
+            return resultA;
+        }  else {
             return resultB;
         }
     }
 
+    /**
+     * Get field from a formatted content
+     * When you browse array object, browse all instances of the array
+     * @param content content to browse
+     * @param field field to search
+     * @param system navigation system to use (JSON, XML)
+     */
     public static getField(content: any, field: string, system: NAVIGATION_SYSTEM) : any {
         winston.debug("NavigationUtils.getField: " + field);
         if ( system == "JSON") {
@@ -154,18 +184,27 @@ export class NavigationUtils {
 
     /**
      * Return the content of search field or null if not found
-     * @param content content to browser
+     * @param content content to browse
      * @param field field to search
      */
     public static getFieldFromJSON(content: any, field: string) {
+        winston.debug("NavigationUtils.getFieldFromJSON: " + field);
         if ( content && content[field]) {
-            return content[field];
+            const result = content[field];
+            winston.debug("NavigationUtils.getFieldFromJSON - Result : " + result);
+            return result;
         } else {
             return null;
         }
     }
 
+    /**
+     * Return the content of search field or null if not found
+     * @param content content to browse
+     * @param field field to search
+     */
     public static getFieldFromXML(content: object, field: string) {
+        winston.debug("NavigationUtils.getFieldFromXML: " + field);
         return XMLUtils.getNodeValue(content, [ field ]);
     }
  
