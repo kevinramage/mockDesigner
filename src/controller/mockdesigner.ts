@@ -24,6 +24,7 @@ import { IMockMicroServiceAction } from "interface/mockMicroServiceAction";
 import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
 import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
 import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
+import { IMockServiceRequestStorage } from "interface/mockServiceRequestStorage";
 
 export class ValidationError extends Error {
     private _errors : string[];
@@ -168,7 +169,7 @@ export class MockDesigner {
             if ( !methods.includes(method) ) {
                 validationErrors.push(ERRORS.SERVICEMETHOD_INVALID);
             }
-        } else {
+        } else if ( !mockService.soapAction ) {
             validationWarnings.push(WARNING.SERVICEMETHOD_MISSING);
         }
 
@@ -195,6 +196,11 @@ export class MockDesigner {
         if ( !mockService.response ) { validationErrors.push(ERRORS.SERVICERESPONSE_MISSING); }
         else if ( typeof mockService.response != "object" ) { validationErrors.push(ERRORS.SERVICERESPONSE_MISSING); }
         else { this.validateResponse(mockService.response, validationErrors, validationWarnings); }
+
+        // Monitoring
+        if ( mockService.requestStorage ) {
+            this.validateRequestStorageService(mockService.requestStorage, validationErrors, validationWarnings);
+        }
     }
 
     private validateAuthentication(authentication: IMockAuthentication, validationErrors: string[], validationWarnings: string[]) {
@@ -296,7 +302,12 @@ export class MockDesigner {
 
     private validateDataTriggerCondition(mockDataTriggerCondition: IMockDataTriggerCondition, validationErrors: string[], validationWarnings: string[]) {
 
-        const conditions = [ CONDITION_OPERATION.EQUALS, CONDITION_OPERATION.NOT_EQUALS, CONDITION_OPERATION.MATCHES, CONDITION_OPERATION.NOT_MATCHES ];
+        const conditions = [ 
+            CONDITION_OPERATION.EQUALS, CONDITION_OPERATION.NOT_EQUALS, 
+            CONDITION_OPERATION.MATCHES, CONDITION_OPERATION.NOT_MATCHES,
+            CONDITION_OPERATION.IN, CONDITION_OPERATION.NOT_IN,
+            CONDITION_OPERATION.RANGE
+        ];
 
         // Left operand
         if ( !mockDataTriggerCondition.leftOperand ) {
@@ -349,13 +360,38 @@ export class MockDesigner {
 
     private validateValidateTrigger(mockValidateTrigger: IMockValidationTrigger, validationErrors: string[], validationWarnings: string[]) {
 
-        // Mandatories fields
-        if ( !mockValidateTrigger.mandatoriesFields ) {
-            validationErrors.push(ERRORS.VALIDATETRIGGERMANDATORIESFIELDS_MISSING);
-        } else if ( !mockValidateTrigger.mandatoriesFields.length ) {
-            validationErrors.push(ERRORS.VALIDATETRIGGERMANDATORIESFIELDS_MISSING);
-        } else if ( mockValidateTrigger.mandatoriesFields.length == 0) {
-            validationErrors.push(ERRORS.VALIDATETRIGGERMANDATORIESFIELDS_ATLEASTONE);
+        // Fields
+        if ( !mockValidateTrigger.mandatoriesFields && !mockValidateTrigger.enumFields ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_MISSING);
+        } else if ( mockValidateTrigger.mandatoriesFields && !mockValidateTrigger.mandatoriesFields.length ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_MISSING);
+        } else if ( mockValidateTrigger.enumFields && !mockValidateTrigger.enumFields.length ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_MISSING);
+        } else if ( mockValidateTrigger.mandatoriesFields && mockValidateTrigger.mandatoriesFields.length == 0 ) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_ATLEASTONE);
+        } else if ( mockValidateTrigger.enumFields && mockValidateTrigger.enumFields.length == 0) {
+            validationErrors.push(ERRORS.VALIDATETRIGGERFIELDS_ATLEASTONE);
+        }
+
+        // Enum field 
+        if ( mockValidateTrigger.enumFields ) {
+            mockValidateTrigger.enumFields.forEach(enumField => {
+
+                // Field must be present
+                if ( !enumField.field ) {
+                    validationErrors.push(ERRORS.VALIDATETRIGGERENUMFIELD_MISSING);
+                }
+
+                // Values must be present
+                if ( !enumField.values || !enumField.values.length ) {
+                    validationErrors.push(ERRORS.VALIDATETRIGGERENUMVALUES_MISSING);
+                }
+
+                // At leat one value defined
+                else if ( enumField.values.length == 0 ) {
+                    validationErrors.push(ERRORS.VALIDATETRIGGERENUMVALUES_ATLEASTONE);
+                }
+            });
         }
         
         // Actions
@@ -445,6 +481,12 @@ export class MockDesigner {
     private validateMicroserviceAction(mockAction: IMockMicroServiceAction, validationErrors: string[], validationWarnings: string[] ) {
 
 
+    }
+
+    private validateRequestStorageService(requestStorage: IMockServiceRequestStorage, validationErrors: string[], validationWarnings: string[]) {
+        if ( !requestStorage.keys ) {
+            validationErrors.push(ERRORS.REQUESTSTORAGE_KEYS_MISSING);
+        }
     }
 
     public get mock() {

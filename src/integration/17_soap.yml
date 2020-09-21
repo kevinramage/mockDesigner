@@ -1,0 +1,93 @@
+name: Soap
+vars:
+  host: "localhost"
+  port: 7017
+  output: generated_soap_1
+testcases:
+
+# Build mock
+- name: BuildMockService
+  steps:
+  - type: exec
+    script: npm run start -- --input mocks/code/examples/soap.yml --port {{.port}} --output {{.output}}
+    assertions:
+    - result.code ShouldEqual 0
+  - type: exec
+    script: docker-compose -f {{.output}}/docker-compose.yml up -d --force-recreate --build
+  - type: exec
+    script: ./wait {{.output}}_was_1
+  - type: http
+    method: GET
+    url: "http://{{.host}}:{{.port}}/api/v1/soapCreateService/_ping"
+    assertions:
+    - result.statuscode ShouldEqual 204
+
+# Check create service
+- name: CheckCreateService
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/object"
+    headers:
+      SOAPAction: create
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldContainSubstring "<soap:id>1</soap:id>"
+    - result.body ShouldContainSubstring "<soap:message>Created</soap:message>"
+    - result.body ShouldContainSubstring "<soap:createOperation>"
+    - result.body ShouldContainSubstring "</soap:createOperation>"
+
+# Check update service
+- name: CheckUpdateService
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/object"
+    headers:
+      SOAPAction: update
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldContainSubstring "<soap:id>1</soap:id>"
+    - result.body ShouldContainSubstring "<soap:message>Updated</soap:message>"
+    - result.body ShouldContainSubstring "<soap:updateOperation>"
+    - result.body ShouldContainSubstring "</soap:updateOperation>"
+
+# Check delete service
+- name: CheckDeleteService
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/object"
+    headers:
+      SOAPAction: delete
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldContainSubstring "<soap:id>1</soap:id>"
+    - result.body ShouldContainSubstring "<soap:message>Deleted</soap:message>"
+    - result.body ShouldContainSubstring "<soap:deleteOperation>"
+    - result.body ShouldContainSubstring "</soap:deleteOperation>"
+
+# Check retrieve service
+- name: CheckRetrieveService
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/object"
+    headers:
+      SOAPAction: retrieve
+    assertions:
+    - result.statuscode ShouldEqual 200
+    - result.body ShouldContainSubstring "<soap:id>1</soap:id>"
+    - result.body ShouldContainSubstring "<soap:name>bla</soap:name>"
+    - result.body ShouldContainSubstring "<soap:description>bla bla</soap:description>"
+    - result.body ShouldContainSubstring "<soap:object>"
+    - result.body ShouldContainSubstring "</soap:object>"
+
+# Check no SOAP action
+- name: CheckNoSOAPAction
+  steps:
+  - type: http
+    method: POST
+    url: "http://{{.host}}:{{.port}}/api/v1/object"
+    assertions:
+    - result.statuscode ShouldEqual 405

@@ -1,11 +1,13 @@
 import * as winston from "winston";
 import * as util from "util";
 import { IServiceTrigger } from "./trigger/serviceTrigger";
-import { Route } from "./route";
 import { IAuthentication } from "./authentication/authentication";
 import { Behaviour } from "./behaviour";
 
 export class Service {
+
+    public static DEFAULT_REQ_STORAGE_EXPIRATION = 3600 * 48;
+
     private _mockName: string;
     private _name : string;
     private _soapAction : string | undefined;
@@ -13,14 +15,16 @@ export class Service {
     private _authentication : IAuthentication | undefined;
     private _triggers : IServiceTrigger[];
     private _behaviours : Behaviour[];
-    private _route : Route;
+    private _requestStorageKeys : string[];
+    private _requestStorageExpiration : number;
 
     constructor() {
         this._mockName = "";
         this._name = "";
         this._triggers = [];
         this._behaviours = [];
-        this._route = new Route();
+        this._requestStorageKeys = [];
+        this._requestStorageExpiration = Service.DEFAULT_REQ_STORAGE_EXPIRATION;
     }
 
     public generate() {
@@ -44,6 +48,11 @@ export class Service {
         
         // Define context
         code += tab + "\tconst context = new Context(req);\n";
+        code += tab + util.format("\tcontext.serviceName = \"%s\";\n", this.methodName);
+        code += tab + util.format("\tcontext.requestStorageExpiration = %d;\n", this.requestStorageExpiration);
+        this.requestStorageKeys.forEach(key => {
+            code += tab + util.format("\tcontext.addRequestStorageKey(\"%s\");\n", key);
+        });
 
         // Prepare the call to the service method
         var codeToCallService = "";
@@ -83,11 +92,13 @@ export class Service {
         // Apply a default trigger if there are no trigger to apply
         code += tab + "\t\tif ( !triggerApplied ) {\n";
         code += tab + util.format("\t\t\twinston.warn(\"%s.%s: No trigger to apply\");\n", this.mockName, this.methodName);
-        code += tab + "\t\t\tResponseHandler.sendError(res, \"No trigger to apply\", \"\");\n";
+        code += tab + "\t\t\tResponseHandler.sendError(context, res, \"No trigger to apply\", \"\");\n";
         code += tab + "\t\t}\n";
 
         // Manage internal error
         code += tab + util.format("\t} catch ( ex ) {\n");
+        code += tab + util.format("\t\twinston.error(\"%s._%s - Internal error: \", ex);\n", this.mockName, this.methodName);
+        code += tab + util.format("\t\twinston.error(ex.stack);\n");
         code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.mockName);
         code += tab + util.format("\t}\n");
 
@@ -206,11 +217,6 @@ export class Service {
         return code;
     }
 
-    public generateRoute() {
-        winston.debug("Service.generateRoute");
-        return this._route.generate(this.mockName ,this);
-    }
-
     public addTrigger(trigger: IServiceTrigger) {
         this._triggers.push(trigger);
     }
@@ -219,6 +225,10 @@ export class Service {
         behaviour.mockName = this.mockName;
         behaviour.serviceName = this.methodName;
         this._behaviours.push(behaviour);
+    }
+
+    public addRequestStorageKey(monitoringKey: string) {
+        this._requestStorageKeys.push(monitoringKey);
     }
 
     public get name() {
@@ -230,13 +240,6 @@ export class Service {
         this._behaviours.forEach(behaviour => {
             behaviour.mockName = instance.methodName;
         });
-    }
-
-    public get route() {
-        return this._route;
-    }
-    public set route(value) {
-        this._route = value;
     }
 
     public get authentication() {
@@ -272,5 +275,17 @@ export class Service {
 
     public get methodName() {
         return this._name.replace(" ", "_").toLowerCase();
+    }
+
+    public get requestStorageKeys() {
+        return this._requestStorageKeys;
+    }
+
+    public get requestStorageExpiration() {
+        return this._requestStorageExpiration;
+    }
+
+    public set requestStorageExpiration(value) {
+        this._requestStorageExpiration = value;
     }
 }

@@ -25,8 +25,12 @@ import { IMockBasicAuthentication } from "interface/mockBasicAuthentication";
 import { IMockApiKeyAuthentication } from "interface/mockApiKeyAuthentication";
 import { IMockDataTriggerCondition } from "interface/mockDataTriggerCondition";
 import { Condition } from "../templates/condition";
+import { ServiceGroup } from "../business/serviceGroup";
+import { EnumField } from "../templates/enumField";
 
 export class ServiceFactory {
+
+    private static _serviceGroups : { [key: string]: ServiceGroup} = {};
 
     public static build(serviceInterface: IMockService) {
         const service : Service = new Service();
@@ -43,17 +47,33 @@ export class ServiceFactory {
         }
 
         // Route
-        service.route.path = serviceInterface.path || "/";
+        const path = serviceInterface.path || "/";
+
+        // Method
+        var method = "";
         if ( serviceInterface.method ) {
-            service.route.method = serviceInterface.method;
+            method = serviceInterface.method;
         } else {
-            service.route.method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
+            method = (service.soapAction) ? HTTP_METHODS.POST : HTTP_METHODS.GET;
         }
-        if ( serviceInterface.pingPath ) {
-            service.route.pingPath = serviceInterface.pingPath;
-        } else {
-            service.route.pingPath = serviceInterface.path;
+
+        // Generate service group
+        var serviceGroupCreated = false;
+        var serviceGroup = ServiceFactory._serviceGroups[method + ";" + path];
+        if ( !serviceGroup ) {
+            serviceGroup = new ServiceGroup();
+            serviceGroup.mockName = service.name;
+            ServiceFactory._serviceGroups[method + ";" + path] = serviceGroup;
+            serviceGroupCreated = true;
+            serviceGroup.route.path = path;
+            serviceGroup.route.method = method;
+            if ( serviceInterface.pingPath ) {
+                serviceGroup.route.pingPath = serviceInterface.pingPath;
+            } else {
+                serviceGroup.route.pingPath = serviceInterface.path;
+            }
         }
+        serviceGroup.addService(service);
 
         // Triggers
         const instance = this;
@@ -108,7 +128,17 @@ export class ServiceFactory {
             });
         }
 
-        return service;
+        // Monitoring
+        if ( serviceInterface.requestStorage && serviceInterface.requestStorage.keys ) {
+            serviceInterface.requestStorage.keys.forEach(key => {
+                service.addRequestStorageKey(key);
+            });
+            if ( serviceInterface.requestStorage.expiration ) {
+                service.requestStorageExpiration = serviceInterface.requestStorage.expiration;
+            }
+        }
+
+        return serviceGroupCreated ? serviceGroup : null;
     }
 
     private static buildWithoutTrigger(dataTrigger: IMockTrigger) {
@@ -250,6 +280,15 @@ export class ServiceFactory {
         if ( dataValidation.mandatoriesFields ) {
             dataValidation.mandatoriesFields.forEach(f => {
                 serviceValidationTrigger.addMandoryField(f);
+            });
+        }
+
+        // Enum field
+        if ( dataValidation.enumFields ) {
+            dataValidation.enumFields.forEach(f => {
+                const enumField = new EnumField(f.field);
+                f.values.forEach(v => { enumField.addValue(v); });
+                serviceValidationTrigger.addEnumField(enumField);
             });
         }
 

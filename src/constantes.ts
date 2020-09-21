@@ -52,10 +52,13 @@ export module ERRORS {
     export const DATATRIGGERCONDITION_LEFTOPERANDMISSING = "For each data condition, you must define the left operand property";
     export const DATATRIGGERCONDITION_RIGHTOPERANDMISSING = "For each data condition, you must define the right operand property";
     export const DATATRIGGERCONDITION_OPERATIONMISSING = "For each data condition, you must define the operation property";
-    export const DATATRIGGERCONDITION_INVALIDOPERATION = "For each data condition, the operation must be equals to EQUALS, NOT_EQUALS, MATCHES, NOT_MATCHES";
+    export const DATATRIGGERCONDITION_INVALIDOPERATION = "For each data condition, the operation must be equals to EQUALS, NOT_EQUALS, MATCHES, NOT_MATCHES, IN, NOT_IN, RANGE";
     export const RANDOMTRIGGERPROBABILITY_MISSING = "You must define random trigger probability. The random trigger probability property must be not empty";
-    export const VALIDATETRIGGERMANDATORIESFIELDS_MISSING = "You must define validate trigger mandatories fields. The validate trigger mandatories fields property must be not empty";
-    export const VALIDATETRIGGERMANDATORIESFIELDS_ATLEASTONE = "You must define at least one mandatory field";
+    export const VALIDATETRIGGERFIELDS_MISSING = "You must define validate trigger mandatories or enum fields. Mandatories fields and enum fieds property can't be empty";
+    export const VALIDATETRIGGERFIELDS_ATLEASTONE = "You must define at least one mandatory field or at least one enum field";
+    export const VALIDATETRIGGERENUMFIELD_MISSING = "You must define a field property for a enum field validation";
+    export const VALIDATETRIGGERENUMVALUES_MISSING = "You must define a values property for a enum field validation";
+    export const VALIDATETRIGGERENUMVALUES_ATLEASTONE = "You must define at leat one value for a enum field validation";
 
     export const MESSAGEACTIONBODY_DEFINED2TIMES = "You can't define body and bodyFile properties for the same action";
     export const SAVEACTIONSTORAGE_MISSING = "You must define save action storage. The save action storage property must be not empty";
@@ -70,6 +73,8 @@ export module ERRORS {
     export const MICROSERVICEACTIONIDENTIFIER_MISSING = "You must define microservice identifier. The microservice identifier property must be not empty";
     export const MICROSERVICEACTIONIDENTIFIERID_MISSING = "You must define microservice identifier id. The microservice identifier id property must be not empty";
     export const MICROSERVICEACTIONIDENTIFIERNAME_MISSING = "You must define microservice identifier value. The microservice identifier value property must be not empty";
+
+    export const REQUESTSTORAGE_KEYS_MISSING = "You must define request storage keys value. The request storage keys property must be not empty";
 }
 
 export module WARNING {
@@ -105,4 +110,7 @@ export module CONDITION_OPERATION {
     export const NOT_EQUALS = "NOT_EQUALS";
     export const MATCHES = "MATCHES";
     export const NOT_MATCHES = "NOT_MATCHES";
+    export const IN = "IN";
+    export const NOT_IN = "NOT_IN";
+    export const RANGE = "RANGE";
 }

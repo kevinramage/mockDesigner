@@ -1,7 +1,8 @@
 import { IMockTrigger } from "./mockTrigger";
-import { IMockAction } from "./mockAction";
+import { IMockValidationEnum } from "./mockValidationEnum";
 
 export interface IMockValidationTrigger extends IMockTrigger {
     type: "validate";
     mandatoriesFields: string[];
+    enumFields: IMockValidationEnum[];
 }

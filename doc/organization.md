@@ -13,13 +13,38 @@ Inside each these directories, you can add subdirectories to organize your diffe
 
 ## Code structure
 
-A mock defined with a specific structure:
-Mock
-|_ Services
-|___Behaviours
-|_____Actions
-|___Trigger
-|_____Actions
+A mock is a system defined on a specific, this system contains one or several services.
+A service listen on a path, a method and a soap action (for SOAP service).
+
+* Rest service
+```yml
+- name: GetAllCommands
+  method: GET
+  path: /api/v1/command
+```  
+
+* SOAP service
+```yml
+- name: soapCreateService
+  soapAction: create
+  path: /api/v1/command
+```
+
+A service match a specific structure:
+
+```yml
+  - name: behaviourService
+    method: POST
+    path: /api/v1/behaviourService
+    response:
+      behaviours:
+      - name: ERROR_500
+        ...
+      triggers:
+      - type: none
+        actions:
+        ...
+```
 
 * Behaviour: Behaviour executed in first. Behaviour allow to execute alternative use cases.
 * Trigger: Trigger executed in second.

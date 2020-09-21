@@ -1,14 +1,44 @@
 # Internal Services
 
 Mock designer propose differents internal services to help the administration.
+Mock designer propose a solution to get request and response on a service.
 
-### Ping
+## Get request and response
+
+### Define keys for your service
+
+On request storage section, define a keys section to retrieve request and response with these keys.
+The request and response will be saved 48 hours. 
+If a new request received with the same keys values, the new request will erase the existing one.
+Take care, the order of the keys definition is important. 
+
+```yaml
+  - name: basicService
+    method: GET
+    path: /api/v1/basicService/:id
+    requestStorage:
+      keys:
+      - "{{.request.params.id}}"
+      - "{{.request.body.deliveryId}}"
+```
+
+### Call service to get request and response
+
+Call the service "_getRequest" to get request and response.
+The service name query must be defined.
+To define query parameters, define the first key with the query key parameter "key1", define the second key with the query key parameter "key2" ...
+
+```
+GET /api/v1/_getRequest?serviceName=basicService&key1=1234&key2=1
+```
+
+## Ping
 A basic ping to check if the service is available
 ```
 GET /api/v1/myServiceName/_ping
 ```
 
-### Behaviour
+## Behaviour
 A system to get, create, update, delete behaviour instances
 
 **Get all behaviours**
@@ -46,7 +76,7 @@ content-Type: application/json
 DELETE /api/v1/myServiceName/_behaviour
 ```
 
-### Service counter
+## Service counter
 
 **Get Service counter**
 ```
@@ -68,7 +98,7 @@ content-Type: application/json
 }
 ```
 
-### Database service
+## Database service
 
 **Get database value**
 ```
@@ -101,7 +131,7 @@ content-Type: application/json
 DELETE /api/v1/_deleteDatabaseCounter?name=myKey
 ```
 
-**Source Code**
+## Source Code
 
 Get the source code of the mock deployed with the following request:
 

@@ -1,5 +1,4 @@
 import * as winston from "winston";
-import * as colors from "colors";
 import * as util from "util";
 import * as path from "path";
 import { MockDesigners } from "./controller/mockdesigners";
@@ -99,15 +98,16 @@ export class Main {
             } catch ( ex ) {
                 const validationError = ex as ValidationError;
                 if ( validationError && validationError.errors ) {
-                    console.error(colors.red("ERROR: " + validationError.message));
+                    console.error('\x1b[31m', "ERROR: " + validationError.message);
                     validationError.errors.forEach(err => {
-                        console.error(colors.red("ERROR: " + err));
+                        console.error('\x1b[31m', "ERROR: " + err);
                     });
                 } else {
-                    console.error("ERROR - " + ex.message);
-                    console.error(ex);
+                    console.error('\x1b[31m', "ERROR - " + ex.message);
+                    console.error('\x1b[0m', ex);
                 }
-                console.info("");
+                // Reset color
+                console.info('\x1b[0m', '');
             }
         } else {
             console.error("ERROR - " + error);

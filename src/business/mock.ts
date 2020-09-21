@@ -3,19 +3,20 @@ import * as util from "util";
 import { Service } from "./service";
 import { RouteSolver } from "./routeSolver";
 import { IServiceAction } from "./action/serviceAction";
+import { ServiceGroup } from "./serviceGroup";
 
 export class Mock {
     private _name : string;
     private _sourceCode : string;
     private _default : IServiceAction[];
     private _error : IServiceAction[];
-    private _services : Service[];
+    private _serviceGroups : ServiceGroup[];
 
     constructor() {
         this._name = "";
         this._sourceCode = "";
         this._default = [];
-        this._services = [];
+        this._serviceGroups = [];
         this._error = [];
     }
 
@@ -32,13 +33,14 @@ export class Mock {
         code += "import { Context } from \"../context\";\n";
         code += "import { XMLUtils } from \"../util/XMLUtils\";\n";
         code += "import { TimeUtils } from \"../util/TimeUtils\";\n";
-        code += "import { ValidationUtils } from \"../util/ValidationUtils\";\n";
+        code += "import { ValidationUtils } from \"../util/validationUtils\";\n";
         code += "import { Condition } from \"../condition\";\n";
-        code += "import { ConditionEvaluator } from \"../manager/ConditionEvaluator\";\n";
+        code += "import { ConditionEvaluator } from \"../manager/conditionEvaluator\";\n";
+        code += "import { EnumField } from \"../enumField\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
-        this._services.forEach(service => {
-            code += service.generate();
+        this._serviceGroups.forEach(serviceGroup => {
+            code += serviceGroup.generate();
         });
         code += this.generateDatabaseService("\t");
         code += this.generateDefaultResponseService("\t");
@@ -61,8 +63,8 @@ export class Mock {
         var code = "";
 
         code += this.generateDatabaseServiceRoutes("\t\t");
-        this._services.forEach(service => {
-            code += service.generateRoute();
+        this._serviceGroups.forEach(serviceGroup => {
+            code += serviceGroup.generateRoute();
         });
         code += this.generateServicesRoutes("\t\t");
         code += this.generateSendSourceCodeRoute("\t\t");
@@ -79,6 +81,7 @@ export class Mock {
         code += tab + util.format("this.router.route(\"/api/v1/_resetDatabaseCounter\").post(%s._resetDatabaseCounter);\n", this.controllerName);
         code += tab + util.format("this.router.route(\"/api/v1/_updateDatabaseValue\").put(%s._updateDatabaseValue);\n", this.controllerName);
         code += tab + util.format("this.router.route(\"/api/v1/_deleteDatabaseValue\").delete(%s._deleteDatabaseValue);\n\n", this.controllerName);
+        code += tab + util.format("this.router.route(\"/api/v1/_getRequest\").get(%s._getRequest);\n\n", this.controllerName);
 
         return code;
     }
@@ -139,6 +142,12 @@ export class Mock {
         code += tab + util.format("\tres.end();\n");
         code += tab + util.format("}\n\n");
 
+        // Generate get request
+        code += tab + util.format("public static async _getRequest(req: Request, res: Response) {\n");
+        code += tab + util.format("\twinston.debug(\"%s._getRequest\");\n", this.controllerName);
+        code += tab + util.format("\tawait ResponseHandler.getRequest(req, res);\n");
+        code += tab + util.format("}\n\n");
+
         return code;
     }
 
@@ -146,22 +155,24 @@ export class Mock {
         winston.debug("Mock.generateDefaultResponseService");
         var code = "";
         code += tab + util.format("public static async _defaultResponse(req: Request, res: Response) {\n");
+        code += tab + util.format("\tconst context = new Context(req);\n");
+        code += tab + util.format("\tcontext.requestStorageExpiration = %d;\n\n", Service.DEFAULT_REQ_STORAGE_EXPIRATION);
         
         if ( this._default.length > 0 ) {
 
             // Apply actions defined in mock definition
-            code += tab + util.format("\tconst context = new Context(req);\n\n");
             code += tab + util.format("\ttry {\n");
             this._default.forEach(action => {
                 code += action.generate(tab + "\t\t");
             });
             code += tab + util.format("\t} catch ( ex ) {\n");
+            code += tab + util.format("\t\twinston.error(\"%s - Internal error: \", ex);\n", this.controllerName);
             code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.controllerName);
             code += tab + util.format("\t}\n");
         } else {
 
             // Generate default method not allow response
-            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(res);\n");
+            code += tab + util.format("\tResponseHandler.sendMethodNotAllow(context, res);\n");
         }
         code += tab + util.format("}\n\n");
 
@@ -174,7 +185,7 @@ export class Mock {
         var body = this.sourceCode.replace(/\"/g, "\\\"").replace(/\r/g, "").replace(/\n/g, "\\n");
         body = body.replace(/\\\\"/g, "\\\"")
         code += tab + util.format("public static async _sendSourceCode(req: Request, res: Response) {\n");
-        code += tab + util.format("\tResponseHandler.sendYAMLCOntent(\"%s\", res);\n", body);
+        code += tab + util.format("\tResponseHandler.sendYAMLContent(\"%s\", res);\n", body);
         code += tab + util.format("}\n\n");
         return code;
     }
@@ -184,9 +195,8 @@ export class Mock {
         var code = "";
 
         // Use resolver to sort routes
-        this._services.forEach(s => {
-            const functionName = util.format("%s.%s", s.mockName, s.methodName);
-            RouteSolver.instance.addRoute(s.route.method, s.route.path, functionName);
+        this._serviceGroups.forEach(serviceGroup => {
+            serviceGroup.addRoute();
         });
         const routes = RouteSolver.instance.resolve();
 
@@ -210,10 +220,10 @@ export class Mock {
                 code += action.generate(tab + "\t\t");
             });
             code += tab + util.format("\t} catch ( ex ) {\n");
-            code += tab + util.format("\t\tResponseHandler.sendInternalError(res);\t\n");
+            code += tab + util.format("\t\tResponseHandler.sendInternalError(context, res);\t\n");
             code += tab + util.format("\t}\n");
         } else {
-            code += tab + util.format("\tResponseHandler.sendInternalError(res);\t\n");
+            code += tab + util.format("\tResponseHandler.sendInternalError(context, res);\t\n");
         }
         
         code += tab + util.format("}\n\n");
@@ -221,9 +231,9 @@ export class Mock {
         return code;
     }
 
-    public addService(service : Service) {
-        service.mockName = this.controllerName;
-        this._services.push(service);
+    public addServiceGroup(serviceGroup : ServiceGroup) {
+        serviceGroup.mockName = this.controllerName;
+        this._serviceGroups.push(serviceGroup);
     }
 
     public addDefaultAction(action: IServiceAction) {
@@ -240,7 +250,7 @@ export class Mock {
 
     public set name(value) {
         this._name = value;
-        this._services.forEach(service => { service.mockName = this.controllerName; });
+        this._serviceGroups.forEach(serviceGroup => { serviceGroup.mockName = this.controllerName; });
     }
 
     public get controllerName() {

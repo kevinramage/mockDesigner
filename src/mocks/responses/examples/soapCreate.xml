@@ -1,0 +1,9 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" >
+   <soap:Header/>
+   <soap:Body>
+      <soap:createOperation>
+        <soap:id>1</soap:id>
+        <soap:message>Created</soap:message>
+      </soap:createOperation>
+   </soap:Body>
+</soap:Envelope>
