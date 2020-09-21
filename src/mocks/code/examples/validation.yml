@@ -16,6 +16,26 @@ services:
       - type: message
         status: 400
         body: Mandatories fields missing %s
+    - type: validate
+      enumFields:
+      - field: "type"
+        values:
+        - "PERSONNAL"
+        - "PROFESSIONNAL"
+      actions:
+      - type: message
+        status: 400
+        body: Type is not valid
+    - type: validate
+      enumFields:
+      - field: "products.deliveryMode"
+        values:
+        - "IMMEDIATE"
+        - "SCHEDULED"
+      actions:
+      - type: message
+        status: 400
+        body: DeliveryMode is not valid
     - type: none
       actions:
       - type: message

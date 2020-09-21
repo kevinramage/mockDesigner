@@ -33,9 +33,10 @@ export class Mock {
         code += "import { Context } from \"../context\";\n";
         code += "import { XMLUtils } from \"../util/XMLUtils\";\n";
         code += "import { TimeUtils } from \"../util/TimeUtils\";\n";
-        code += "import { ValidationUtils } from \"../util/ValidationUtils\";\n";
+        code += "import { ValidationUtils } from \"../util/validationUtils\";\n";
         code += "import { Condition } from \"../condition\";\n";
         code += "import { ConditionEvaluator } from \"../manager/conditionEvaluator\";\n";
+        code += "import { EnumField } from \"../enumField\";\n";
         code += "\n";
         code += util.format("export class %s {\n\n", this.controllerName);
         this._serviceGroups.forEach(serviceGroup => {
@@ -154,7 +155,8 @@ export class Mock {
         winston.debug("Mock.generateDefaultResponseService");
         var code = "";
         code += tab + util.format("public static async _defaultResponse(req: Request, res: Response) {\n");
-        code += tab + util.format("\tconst context = new Context(req);\n\n");
+        code += tab + util.format("\tconst context = new Context(req);\n");
+        code += tab + util.format("\tcontext.requestStorageExpiration = %d;\n\n", Service.DEFAULT_REQ_STORAGE_EXPIRATION);
         
         if ( this._default.length > 0 ) {
 
@@ -164,6 +166,7 @@ export class Mock {
                 code += action.generate(tab + "\t\t");
             });
             code += tab + util.format("\t} catch ( ex ) {\n");
+            code += tab + util.format("\t\twinston.error(\"%s - Internal error: \", ex);\n", this.controllerName);
             code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.controllerName);
             code += tab + util.format("\t}\n");
         } else {

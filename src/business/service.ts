@@ -5,6 +5,9 @@ import { IAuthentication } from "./authentication/authentication";
 import { Behaviour } from "./behaviour";
 
 export class Service {
+
+    public static DEFAULT_REQ_STORAGE_EXPIRATION = 3600 * 48;
+
     private _mockName: string;
     private _name : string;
     private _soapAction : string | undefined;
@@ -21,7 +24,7 @@ export class Service {
         this._triggers = [];
         this._behaviours = [];
         this._requestStorageKeys = [];
-        this._requestStorageExpiration = 3600 * 48;
+        this._requestStorageExpiration = Service.DEFAULT_REQ_STORAGE_EXPIRATION;
     }
 
     public generate() {
@@ -94,6 +97,8 @@ export class Service {
 
         // Manage internal error
         code += tab + util.format("\t} catch ( ex ) {\n");
+        code += tab + util.format("\t\twinston.error(\"%s._%s - Internal error: \", ex);\n", this.mockName, this.methodName);
+        code += tab + util.format("\t\twinston.error(ex.stack);\n");
         code += tab + util.format("\t\t%s.__sendInternalError(context, res);\n", this.mockName);
         code += tab + util.format("\t}\n");
 
