@@ -157,7 +157,6 @@ export class MockDesigners {
         const codes : string[] = [];
         const imports : string[] = [];
         const instance = this;
-        console.info("InputDIR: " + this._inputDir);
         FileManagement.readDirectoryReccursively(instance.mockDirectory + "/functions").forEach(file => {
             var pathname = file.replace(/\\/g, "/").substring((instance.mockDirectory + "/functions/").length);
             pathname = pathname.substring(0, pathname.length - 3);
@@ -200,8 +199,7 @@ export class MockDesigners {
 
     public get mockDirectory() {
         const inputDirectory = this.inputDir.replace(/\\/g, "/").replace("./", "");
-        const codeDirectory = inputDirectory.substring(0, inputDirectory.lastIndexOf("/"));
-        const mockDirectory = path.join(codeDirectory, "../")
+        const mockDirectory = inputDirectory.substring(0, (inputDirectory.indexOf("/code")));
         return mockDirectory;
     }
 
