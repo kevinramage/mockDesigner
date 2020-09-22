@@ -5,6 +5,9 @@ export class SwaggerToMockDesigner {
 
     public async run() {
 
+        const generator = new Generator();
+        var errorMessage = "";
+
         // Configure program
         program
             .option('-n, --name <projectName>', 'project name', '')
@@ -13,17 +16,47 @@ export class SwaggerToMockDesigner {
             .option('-m, --microservice', 'declare microservice swagger', '');
         
         program.description("Tool to generate mock description from a swagger");
-        program.version("1.0.0");
+        program.version("1.0.1");
         program.parse(process.argv);
 
+        // Help
+        program.option('-h, --help', 'help').action(() => {
+            console.info(program.usage());
+            process.exit(0);
+        });
+
+        // Check the name argument presence
+        if ( program.name ) {
+            generator.name = program.name.toString();
+        } else {
+            errorMessage += "Name argument not found\n";
+        }
+
+        // Check the input argument presence
+        if ( program.input ) {
+            generator.inputFile = program.input;
+        } else {
+            errorMessage += "Input argument not found\n";
+        }
+
+        // Output directory
+        if ( program.output ) {
+            generator.outputDirectory = program.output;
+        } else {
+            generator.outputDirectory = "mockGenerated";
+        }
+
         // Run generator process
-        const generator = new Generator();
-        generator.name = "myMockSystem";
-        generator.inputFile = "swagger.json";
-        //generator.inputFile = "openAPI3.0.yml";
-        //generator.inputFile = "swagger2_example.yml";
-        generator.outputDirectory = "mockGenerated";
-        generator.run();
+        if ( errorMessage == "" ) {
+            console.info("INFO: Start generation ...");
+            generator.run();
+            console.info("INFO: Complete");
+        } else {
+            console.error('\x1b[31m', "ERROR: " + errorMessage);
+        }
+
+        // Reset color
+        console.info('\x1b[0m', '');
     }
 
 

@@ -6,37 +6,40 @@ import { format } from "util";
 
 export class GeneratorOpenAPIV2 {
 
-    public run(paths: OpenAPIV2.PathsObject) {
+    public run(paths: OpenAPIV2.PathsObject, definitions?: OpenAPIV2.DefinitionsObject) {
         const services : Service[] = [];
         Object.keys(paths).forEach(key => {
 
             // Initialize the service
-            const service = new Service();
-            service.path = this.transformPath(key);;
-            service.businessObject = this.computeBusinessObject(key);
-            service.endWithVariable = this.computeEndWithVariable(key);
+            //const service = new Service();
+            const path = this.transformPath(key);;
+            //service.businessObject = this.computeBusinessObject(key);
+            //service.endWithVariable = this.computeEndWithVariable(key);
 
             // Navigate through path item
             const pathItemObject = paths[key] as OpenAPIV2.PathItemObject;
             if ( pathItemObject ) {
-                this.runService(service, pathItemObject.get, service.path, HTTP_METHODS.GET);
-                this.runService(service, pathItemObject.post, service.path, HTTP_METHODS.POST);
-                this.runService(service, pathItemObject.put, service.path, HTTP_METHODS.PUT);
-                this.runService(service, pathItemObject.delete, service.path, HTTP_METHODS.DELETE);
-                this.runService(service, pathItemObject.patch, service.path, HTTP_METHODS.PATCH);
+                this.runService(services, pathItemObject.get, path, HTTP_METHODS.GET, definitions);
+                this.runService(services, pathItemObject.post, path, HTTP_METHODS.POST, definitions);
+                this.runService(services, pathItemObject.put, path, HTTP_METHODS.PUT, definitions);
+                this.runService(services, pathItemObject.delete, path, HTTP_METHODS.DELETE, definitions);
+                this.runService(services, pathItemObject.patch, path, HTTP_METHODS.PATCH, definitions);
             }
-
-            services.push(service);
         });
 
         // Identify microservice
-        this.identifyMicroservice(services);
+        //this.identifyMicroservice(services);
 
         return services;
     }
 
-    private runService(service: Service, operation: OpenAPIV2.OperationObject | undefined, path: string, methodName: string) {
+    private runService(services: Service[], operation: OpenAPIV2.OperationObject | undefined, path: string, methodName: string, definitions?: OpenAPIV2.DefinitionsObject) {
         if ( operation ) {
+            const service = new Service();
+
+            // Path and Method
+            service.path = path;
+            service.method = methodName;
 
             // Add information on service
             if ( operation.operationId ) {
@@ -46,30 +49,112 @@ export class GeneratorOpenAPIV2 {
             // Navigate through responses
             Object.keys(operation.responses).forEach(responseKey => {
                 const response = new Response();
-                //console.info(methodName + " " + path + "   - " + responseKey);
 
                 // Response code
                 const keyCode = Number.parseInt(responseKey);
-                if ( keyCode != NaN) {
+                if ( !isNaN(keyCode)) {
                     response.code = keyCode;
                 }
 
                 // Response content type
-                if ( operation.consumes && operation.consumes.length > 0 ) {
-                    response.contentType = operation.consumes[0];
-                }
+                response.contentType = this.identifyServiceContentType(operation);
 
                 // Response body
                 const responseObject = operation.responses[responseKey];
                 if ( responseObject.schema ) {
-                
+
+                    // Array
+                    if ( responseObject.schema.items ) {
+                        
+                        // Reference
+                        if ( responseObject.schema.items["$ref"] ) {
+                            const reference = responseObject.schema.items["$ref"] as string;
+                            if ( reference.includes("#/definitions/") ) {
+                                const definitionName = reference.substring(("#/definitions/").length);
+                                const body = this.generateResponseBodyFromReference(definitionName, definitions);
+                                response.content = [ body ];
+                            }
+                        }
+
+                    // Object
+                    } else {
+
+                        // Reference
+                        if ( responseObject.schema["$ref"] ) {
+                            const reference = responseObject.schema["$ref"] as string;
+                            if ( reference.includes("#/definitions/") ) {
+                                const definitionName = reference.substring(("#/definitions/").length);
+                                const body = this.generateResponseBodyFromReference(definitionName, definitions);
+                                response.content = body;
+                            }
+                        }
+                    }
                 }
 
                 service.addResponse(response);
             });
 
-            // Default
+            services.push(service);
         }
+    }
+
+    private identifyServiceContentType(operation: OpenAPIV2.OperationObject) {
+        if ( operation.produces && operation.produces.length > 0) {
+            if ( operation.produces.includes("application/json")) {
+                return "application/json";
+            } else {
+                return operation.produces[0];
+            }
+        } else {
+            return "application/txt";
+        }
+    }
+
+    private generateResponseBodyFromReference(definitionName: string, definitions?: OpenAPIV2.DefinitionsObject) {
+        const object : any = {};
+        const definition = this.getDefinitionFromName(definitionName, definitions);
+        if ( definition ) {
+            if ( definition.properties ) {
+                Object.keys(definition.properties).forEach(key => {
+                    const property = (definition.properties as any)[key] as OpenAPIV2.SchemaObject;
+                    if ( property.type && property.type == "integer" ) {
+                        object[key] = 0;
+                    } else if ( property.type && property.type == "string" ) {
+                        if ( property.example ) {
+                            object[key] = property.example;
+                        } else if ( property.enum && property.enum.length > 0 ) {
+                            object[key] = property.enum[0];
+                        } else {
+                            object[key] = "string";
+                        }
+                    } else if ( property["$ref"] && property["$ref"].includes("#/definitions/") ) {
+                        const definitionName = property["$ref"].substring(("#/definitions/").length);
+                        const subObject = this.generateResponseBodyFromReference(definitionName, definitions);
+                        object[key] = subObject;
+                    } else if ( property.type && property.items && property.type == "array" ) {
+                        const items = property.items as any;
+                        if ( items["$ref"] && items["$ref"].includes("#/definitions/") ) {
+                            const definitionName = items["$ref"].substring(("#/definitions/").length);
+                            const subObject = this.generateResponseBodyFromReference(definitionName, definitions);
+                            object[key] = [ subObject ];
+                        }
+                    }
+                });
+            }
+        }
+        return object;
+    }
+
+    private getDefinitionFromName(definitionName: string, definitions?: OpenAPIV2.DefinitionsObject) : OpenAPIV2.SchemaObject | null {
+        var definition : OpenAPIV2.SchemaObject | null = null;
+        if ( definitions ) {
+            Object.keys(definitions).forEach(key => {
+                if ( key == definitionName ) {
+                    definition = definitions[key];
+                }
+            });
+        }
+        return definition;
     }
 
     private identifyMicroservice(services: Service[]) {
@@ -137,7 +222,19 @@ export class GeneratorOpenAPIV2 {
 
     public generateMockDescription(name: string, services: Service[]) {
         const files : { [ path: string] : string } = {};
+
+        // Generate main code
         files["code/" + name + ".yml" ] = this.generateMainCode(name, services);
+
+        // Generate response code
+        services.forEach(service => {
+            service.responses.forEach(response => {
+                if ( response.isIncludedInExternalFile ) {
+                    const fileName = response.getExternalFileName(service.name);
+                    files["responses/" + fileName] = JSON.stringify(response.content, null, 4);
+                }
+            });
+        });
 
         return files;
     }
@@ -164,10 +261,7 @@ export class GeneratorOpenAPIV2 {
         content += format("  path: %s\n", service.path);
 
         // Response
-        content += "  response:\n";
-        content += "    triggers:\n";
-        this.generateResponse(service);
-
+        content += this.generateResponse(service);
         content += "\n";
 
         return content;
@@ -175,6 +269,33 @@ export class GeneratorOpenAPIV2 {
 
     private generateResponse(service: Service) {
 
+        var content = "";
+
+        if ( service.responses.length > 0 ) {
+
+            const defaultResponse = service.defaultResponse;
+            const response = defaultResponse || service.responses[0];
+            content += format("  response:\n");
+            content += format("    triggers:\n");
+            content += format("    - type: none\n");
+            content += format("      actions:\n");
+            content += format("      - type: message\n");
+            content += format("        status: %d \n", response.code);
+            if ( response.isIncludedInExternalFile ) {
+                content += format("        bodyFile: %s\n", response.getExternalFileName(service.name));
+            } else {
+                var body = "";
+                if ( response.content ) {
+                    body = format("\"%s\"", JSON.stringify(response.content).replace(/\"/g, "\\\""));
+                }
+                content += format("        body: %s\n", body)
+            }
+            if ( response.contentType != "") {
+                content += format("        headers: \n");
+                content += format("          Content-Type: %s\n", response.contentType);
+            }
+        }
+        /*
         const defaultService = service.defaultService;
         
         // Default service
@@ -187,6 +308,9 @@ export class GeneratorOpenAPIV2 {
                 this.generateDefaultResponse(defaultService);
             }
         }
+        */
+
+        return content;
     }
 
     private generateDefaultResponse(response: Response) {
