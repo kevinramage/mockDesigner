@@ -31,7 +31,7 @@ export class Main {
             .option('-m, --modules <modulesName>', 'modules name (separated by semi colon)')
         
         program.description("Tool to generate mocks from descriptions");
-        program.version("1.0.0");
+        program.version("1.0.1");
         program.parse(process.argv);
 
         // Help
