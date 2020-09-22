@@ -11,10 +11,14 @@ Docker and npm tools required to use Mock Designer.
 To use it describe your mock behaviour in yaml file and execute the tool to generate the code link.
 
 You can find bellow a command to execute the tool.
+
 `npm run start -- --input mocks/code/examples/basic.yml`
+
 Now, you can find a directory named "generated" that contains the source code of the mock system.
 You can run the mock system with the following command:
+
 `docker-compose -f generated/docker-compose.yml up -d --build`
+
 Now, you just have to do a GET request `http://localhost:7001/api/v1/myService` to test the service.
 
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/commandLine.md)
@@ -43,13 +47,25 @@ services:
 ## Documentation
 
 To use all features of Mock Designer, you must know some basics notions: trigger, action, behaviour...
+
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/mockDesigner.md)
 
 ## Tools
 
 ### Generate definition from Swagger
 
-This feature will come in future version
+Generate the mock definition directly from a swagger (JSON or YAML format).
+Copy the swagger file in swaggerToMockDesigner tool workspace and run the tool with the following command:
+
+`cd .\src\tools\swaggerToMockDesigner\`
+`npm run start -- --name myMockSystem --input swagger3.json`
+
+After the generation, a directory mockGenerated is present in tools workspace.
+This new directory contains the mock description and mock response, with this mock description, we can now run the code generation to 
+
+`cd ../../`
+`npm run start -- --input tools/swaggerToMockDesigner/mockGenerated/code/myMockSystem.yml`
+`docker-compose -f generated/docker-compose.yml up -d --build`
 
 ### Generate definition from WSDL
 
@@ -58,13 +74,15 @@ This feature will come in future version
 ## Use cases
 
 Some situations are complex to manage with classical mock system.
+
 [You can find examples here](https://github.com/kevinramage/mockDesigner/blob/master/doc/usecase.md)
 
 ## Integration
 
 Mock Designer use venom as integration test technology. You can run the integration tests with the following command:
+
 `.\venom.exe run --output-dir . .\integration\*.yml`
 
 ## Contribution
 
-This topic not ready now.
+[More informations ...](https://github.com/kevinramage/mockDesigner/blob/master/CONTRIBUTING.md)

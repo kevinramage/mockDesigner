@@ -86,7 +86,11 @@ export class Service {
         return this._microserviceAction;
     }
 
-    public get defaultService() {
+    public get responses() {
+        return this._responses;
+    }
+
+    public get defaultResponse() {
         if ( this._responses.length > 0 ) {
             if ( this._responses.length > 1 ) {
                 const searchResponse = this._responses.find(res => {

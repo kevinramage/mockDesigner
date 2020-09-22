@@ -20,7 +20,6 @@ export class Generator {
     }
 
     public async run() {
-        console.info("INFO - Start");
 
         // Parse content
         const document = await this.parseContent();
@@ -30,7 +29,8 @@ export class Generator {
         var services : Service[] = [];
         const pathsOpenAPIV2 = document.paths as OpenAPIV2.PathsObject;
         if ( pathsOpenAPIV2 ) {
-            services = generatorOpenAPIV2.run(document.paths as OpenAPIV2.PathsObject);
+            const documentV2 = document as OpenAPIV2.Document;
+            services = generatorOpenAPIV2.run(document.paths as OpenAPIV2.PathsObject, documentV2.definitions);
         } else {
             //new GeneratorOpenAPIV3().run(document.paths as OpenAPIV3.PathsObject);
         }
