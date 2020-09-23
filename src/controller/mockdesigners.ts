@@ -198,8 +198,9 @@ export class MockDesigners {
     }
 
     public get mockDirectory() {
-        const inputDir = this.inputDir.replace(/\\/g, "/").replace("./", "");
-        return inputDir.substring(0, inputDir.indexOf("/"));
+        const inputDirectory = this.inputDir.replace(/\\/g, "/").replace("./", "");
+        const mockDirectory = inputDirectory.substring(0, (inputDirectory.indexOf("/code")));
+        return mockDirectory;
     }
 
     public get modules() {

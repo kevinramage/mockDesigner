@@ -1,6 +1,6 @@
 import * as winston from "winston";
 import { expect } from "chai";
-import { NavigationUtils } from "../templates/util/NavigationUtils";
+import { NavigationUtils } from "../templates/util/navigationUtils";
 
 describe("navigationUtils - JSON navigation", () => {
 

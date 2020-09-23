@@ -1,5 +1,6 @@
 import { Response } from "./response";
 import { HTTP_METHODS } from "../constantes";
+import { Check } from "./check";
 
 export class Service {
     private _name : string;
@@ -9,18 +10,14 @@ export class Service {
     private _microserviceAction : string | undefined;
     private _endWithVariable : boolean;
     private _responses : Response[];
-    private _mandatoryHeaders : string[];
+    private _checks : Check[];
 
     constructor() {
         this._name = "";
         this._method = "GET";
-        this._mandatoryHeaders = [];
         this._responses = [];
         this._endWithVariable = false;
-    }
-
-    public addMandatoryHeader(header: string) {
-        this._mandatoryHeaders.push(header);
+        this._checks = [];
     }
 
     public addResponse(response: Response) {
@@ -45,6 +42,10 @@ export class Service {
                 this._microserviceAction = this.endWithVariable ? "delete" : "deleteall";
             break;
         }
+    }
+
+    public addCheck(check: Check) {
+        this._checks.push(check);
     }
 
     public get method() {
@@ -86,18 +87,65 @@ export class Service {
         return this._microserviceAction;
     }
 
-    public get defaultService() {
+    public get responses() {
+        return this._responses;
+    }
+
+    public set responses(value) {
+        this._responses = value;
+    }
+
+    public get defaultResponse() {
         if ( this._responses.length > 0 ) {
             if ( this._responses.length > 1 ) {
                 const searchResponse = this._responses.find(res => {
                     return res.code.toString().startsWith("2");
                 });
-                return searchResponse ? searchResponse : null;
+                return searchResponse ? searchResponse : this.responses[0];
             } else {
                 return this._responses[0];
             }
         } else {
             return null;
         }
+    }
+
+    public get errorsResponse() {
+        const responses : Response[] = [];
+        const defaultResponse = this.defaultResponse;
+        this._responses.forEach(res => {
+            if ( res.uuid != defaultResponse?.uuid && !res.code.toString().startsWith("2")) {
+                responses.push(res);
+            }
+        });
+        return responses;
+    }
+
+    public get validationErrorResponse() {
+        const defaultResponse = this.defaultResponse;
+        const validationErrorsResponse = this.responses.filter(res => { 
+            return res.code.toString().startsWith("4") && res.uuid != defaultResponse?.uuid;
+        });
+        if ( validationErrorsResponse.length > 0 ) {
+            const badRequestError = validationErrorsResponse.find(res => { return res.code == 400; });
+            const methodNotAllowError = validationErrorsResponse.find(res => { return res.code == 405; });
+            if ( badRequestError ) {
+                return badRequestError;
+            } else if ( methodNotAllowError ) {
+                return methodNotAllowError;
+            } else {
+                return validationErrorsResponse[0];
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public get checks() {
+        return this._checks;
+    }
+
+    public set checks(value) {
+        this._checks = value;
     }
 }
