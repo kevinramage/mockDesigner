@@ -22,6 +22,14 @@ You can define the output directory of the generated files with the following co
 `npm run start -- --input tests/*.yml --output mySuperProject`
 The default value of this attribute is the generated directory
 
+# Certificate
+You can define the certificate name to use to secure the communication with the following command:
+`npm run start -- --input mocks/code/examples/authentication.yml --port 7002 --output generated --certificate cert.pem --key key.pem`
+
+# Key
+You can define the certificate key to use to secure the communication with the following command:
+`npm run start -- --input mocks/code/examples/authentication.yml --port 7002 --output generated --certificate cert.pem --key key.pem`
+
 ## Next features
 
 [ ] - Add the possibility to disable redis

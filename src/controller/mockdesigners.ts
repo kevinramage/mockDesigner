@@ -19,6 +19,8 @@ export class MockDesigners {
     private _inputDir : string = "";
     private _outputDir : string = "generated";
     private _modules : string = "";
+    private _certificateName : string = "";
+    private _certificateKey : string = "";
 
     constructor() {
         this._mockProjectManagement = new MockProjectManagement();
@@ -87,6 +89,14 @@ export class MockDesigners {
         FileManagement.copyDirectory(this.mockDirectory + "/responses", this.outputDir + "/responses");
         FileManagement.copyDirectory(this.mockDirectory + "/scripts", this.outputDir + "/scripts");
 
+        // Certificate
+        if ( this.certificateName && this.certificateName != "" ) {
+            fs.copyFileSync(this.mockDirectory + "/" + this.certificateName, this.outputDir + "/" + this.certificateName);
+        }
+        if ( this.certificateKey && this.certificateKey != "" ) {
+            fs.copyFileSync(this.mockDirectory + "/" + this.certificateKey, this.outputDir + "/" + this.certificateKey);
+        }
+
         // Read files
         const files = this.readFiles(this.inputDir);
         if ( files.length == 0 ) {
@@ -122,10 +132,13 @@ export class MockDesigners {
         }
 
         // Variables
+        const HTTPS_LISTEN_CODE = util.format("https.createServer({ key: fs.readFileSync(\"%s\"), cert: fs.readFileSync(\"%s\") }, app).listen(port);", this.certificateKey, this.certificateName);
+        const HTTP_LISTEN_CODE = "app.listen(port,() => {  winston.info(\"Main.start - The {{.name}} server started on \" + port); });";
+        const LISTEN_CODE = (this.certificateName && this.certificateKey && this.certificateName != "" && this.certificateKey != "") ? HTTPS_LISTEN_CODE : HTTP_LISTEN_CODE;
         const dockerPort = "- \"" + this._port + ":" + this._port + "\"";
         const variables : {[key: string] : IKeyValue[]} = {};
         variables["package.json"] = [{key: KEYS.APPNAME, value: this._name.toLowerCase()}];
-        variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}];
+        variables["index.ts"] = [{key: KEYS.APPNAME, value: this._name}, { key: KEYS.APPPORT, value: this._port + ""}, { key: KEYS.APPLISTEN, value: LISTEN_CODE}];
         variables["docker-compose.yml"] = [ {key: KEYS.DOCKERPORT, value: dockerPort}, { key: KEYS.DOCU, value: docuMockValue }];
         
         // Update template code
@@ -209,5 +222,21 @@ export class MockDesigners {
 
     public set modules(value) {
         this._modules = value;
+    }
+
+    public get certificateName() {
+        return this._certificateName;
+    }
+
+    public set certificateName(value) {
+        this._certificateName = value;
+    }
+
+    public get certificateKey() {
+        return this._certificateKey;
+    }
+
+    public set certificateKey(value) {
+        this._certificateKey = value;
     }
 }

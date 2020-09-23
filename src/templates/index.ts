@@ -1,4 +1,6 @@
 import * as winston from "winston";
+import * as https from "https";
+import * as fs from "fs";
 import DailyRotateFile = require("winston-daily-rotate-file");
 import app from "./app";
 import { RedisManager } from "./manager/redisManager";
@@ -28,9 +30,7 @@ export class Main {
 
         // Listen
         const port = Number.parseInt("{{.port}}");
-        app.listen(port,() => {
-            winston.info("Main.start - The {{.name}} server started on " + port);
-        });
+        // {{.listen}}
     }
 }
 

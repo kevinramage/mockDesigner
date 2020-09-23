@@ -6,6 +6,7 @@ export module KEYS {
     export const REGISTER = "// {{.register}}";
     export const DOCKERPORT = "##PORTS";
     export const DOCU = "##DOCU";
+    export const APPLISTEN = "// {{.listen}}";
 }
 
 export module ERRORS {

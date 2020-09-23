@@ -29,6 +29,8 @@ export class Main {
             .option('-o, --output <directory>', 'output directory')
             .option('-p, --port <portNumber>', 'mock port')
             .option('-m, --modules <modulesName>', 'modules name (separated by semi colon)')
+            .option('-c, --certificate <certificate>', 'certificate name')
+            .option('-k, --key <key>', 'certificate key')
         
         program.description("Tool to generate mocks from descriptions");
         program.version("1.0.2");
@@ -76,6 +78,10 @@ export class Main {
         
         // Modules
         mockDesigners.modules = program.modules;
+
+        // Certificate
+        mockDesigners.certificateName = program.certificate;
+        mockDesigners.certificateKey = program.key;
 
         winston.info("MockDesigner - Start");
         if ( error == "" ) {

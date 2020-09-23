@@ -41,10 +41,11 @@ To secure the mock usage, you can override the default mock designer message (me
 [More informations](https://github.com/kevinramage/mockDesigner/blob/master/doc/error.md)
 
 ## Protocol
-**Functionnality not ready**
-Https, websocket...
-Proxy
-TODO
+
+### HTTPS
+HTTPS protocol is supported by MockDesigner, to use it provide to command line the certificate and the certificate key.
+Example:
+`npm run start -- --input mocks/code/examples/authentication.yml --port 7002 --output generated --certificate cert.pem --key key.pem`
 
 ## Extends the system
 **Functionnality not ready**
