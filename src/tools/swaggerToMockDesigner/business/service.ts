@@ -90,18 +90,33 @@ export class Service {
         return this._responses;
     }
 
+    public set responses(value) {
+        this._responses = value;
+    }
+
     public get defaultResponse() {
         if ( this._responses.length > 0 ) {
             if ( this._responses.length > 1 ) {
                 const searchResponse = this._responses.find(res => {
                     return res.code.toString().startsWith("2");
                 });
-                return searchResponse ? searchResponse : null;
+                return searchResponse ? searchResponse : this.responses[0];
             } else {
                 return this._responses[0];
             }
         } else {
             return null;
         }
+    }
+
+    public get errorsResponse() {
+        const responses : Response[] = [];
+        const defaultResponse = this.defaultResponse;
+        this._responses.forEach(res => {
+            if ( res.uuid != defaultResponse?.uuid && !res.code.toString().startsWith("2")) {
+                responses.push(res);
+            }
+        });
+        return responses;
     }
 }

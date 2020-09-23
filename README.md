@@ -58,12 +58,14 @@ Generate the mock definition directly from a swagger (JSON or YAML format).
 Copy the swagger file in swaggerToMockDesigner tool workspace and run the tool with the following command:
 
 `cd .\src\tools\swaggerToMockDesigner\`
+`npm install`
 `npm run start -- --name myMockSystem --input swagger3.json`
 
 After the generation, a directory mockGenerated is present in tools workspace.
 This new directory contains the mock description and mock response, with this mock description, we can now run the code generation to 
 
 `cd ../../`
+`npm install`
 `npm run start -- --input tools/swaggerToMockDesigner/mockGenerated/code/myMockSystem.yml`
 `docker-compose -f generated/docker-compose.yml up -d --build`
 
