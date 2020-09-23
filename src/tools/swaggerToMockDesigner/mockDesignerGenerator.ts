@@ -153,11 +153,26 @@ export class MockDesignerGenerator {
     private generateValidationErrorResponse(tab: string, service: Service, response: Response) {
         var content = "";
 
+        const mandatoryChecks = service.checks.filter(chk => { return chk.isRequired; });
+        const enumChecks = service.checks.filter(chk => { return !chk.isRequired; });
+
         content += format("%s- type: validate\n", tab);
-        content += format("%s  mandatoriesFields:\n", tab);
-        service.checks.forEach(check => {
-            content += format("%s  - \"%s\"\n", tab, check.path);
-        });
+        if ( mandatoryChecks.length > 0 ) {
+            content += format("%s  mandatoriesFields:\n", tab);
+            mandatoryChecks.forEach(check => {
+                content += format("%s  - \"%s\"\n", tab, check.path);
+            });
+        }
+        if ( enumChecks.length > 0 ) {
+            content += format("%s  enumFields:\n", tab);
+            enumChecks.forEach(check => {
+                content += format("%s  - field: \"%s\"\n", tab, check.path);
+                content += format("%s    values:\n", tab);
+                check.enumValues.forEach(value => {
+                    content += format("%s    - \"%s\"\n", tab, value);
+                });
+            });
+        }
         content += format("%s  actions:\n", tab);
         content += this.generateResponseMessage(tab + "  ", service, response);
 
