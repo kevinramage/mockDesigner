@@ -26,6 +26,9 @@ export class Generator {
         this._outputDirectory = "";
     }
 
+    /**
+     * Run the generator
+     */
     public async run() {
 
         // Parse content
@@ -44,6 +47,9 @@ export class Generator {
         console.info("INFO - Completed");
     }
 
+    /**
+     * Create directories
+     */
     private async generateDirectories() {
         return new Promise<void>(async (resolve) => {
             console.info("Output: " + this.outputDirectory);
@@ -57,6 +63,10 @@ export class Generator {
         });
     }
 
+    /**
+     * Create files
+     * @param files files to generate
+     */
     private generateFiles(files: {[id: string]: string}) {
         Object.keys(files).forEach(key => {
             const filePath = path.join(this.outputDirectory, key);
@@ -65,6 +75,9 @@ export class Generator {
     }
 
 
+    /**
+     * Parse swagger file
+     */
     private parseContent() {
         return parse(this.inputFile);
     }

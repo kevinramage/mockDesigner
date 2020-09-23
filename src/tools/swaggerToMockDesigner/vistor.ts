@@ -122,6 +122,9 @@ export class Visitor {
             response.code = statusCode;
         }
 
+        // Description
+        response.description = responseObject.description;
+
         // Response content type
         response.contentType = this.identifyServiceContentType(operation);
 

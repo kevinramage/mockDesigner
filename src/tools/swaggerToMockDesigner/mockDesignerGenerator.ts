@@ -39,7 +39,7 @@ export class MockDesignerGenerator {
         var content = "";
 
         content += format("name: %s\n", name);
-        content += "services:\n";
+        content += format("services:\n");
         services.forEach(service => {
             content += instance.generateService(service);
         });
@@ -60,17 +60,63 @@ export class MockDesignerGenerator {
         content += format("  path: %s\n", service.path);
 
         // Response
-        content += this.generateResponse(service);
+        content += this.generateResponses("  ", service);
         content += "\n";
 
         return content;
     }
 
     /**
-     * Generate response from mock designer code
+     * Generate mock designer code for responses from a service
+     * @param tab tabulation to apply
      * @param service service to generate
      */
-    private generateResponse(service: Service) {
+    private generateResponses(tab: string, service: Service) {
+        var content = "";
+
+        // Response
+        content += format("%sresponse:\n", tab);
+
+        // Generate errors responses
+        content += this.generateErrorResponses(tab + "  ", service);
+
+        // Generate default response
+        content += this.generateDefaultResponse(tab + "  ", service);
+
+        return content;
+    }
+
+    private generateErrorResponses(tab: string, service: Service) {
+        const instance = this;
+        var content = "";
+
+        const errorResponses = service.errorsResponse;
+        if ( errorResponses.length > 0 ) {
+            content += format("%sbehaviours:\n", tab);
+            errorResponses.forEach(res => {
+                content += instance.generateErrorResponse(tab, service, res);
+            });
+        }
+
+        return content;
+    }
+
+    private generateErrorResponse(tab : string, service: Service, response: Response) {
+        var content = "";
+
+        content += format("%s- name: ERROR_%d\n", tab, response.code);
+        content += format("%s  actions:\n", tab);
+        content += this.generateResponseMessage(tab + "  ", service, response);
+
+        return content;
+    }
+
+    /**
+     * Generate mock designer code for response from a service
+     * @param tab tabulation to apply
+     * @param service service to generate
+     */
+    private generateDefaultResponse(tab: string, service: Service) {
 
         var content = "";
 
@@ -78,25 +124,40 @@ export class MockDesignerGenerator {
 
             const defaultResponse = service.defaultResponse;
             const response = defaultResponse || service.responses[0];
-            content += format("  response:\n");
-            content += format("    triggers:\n");
-            content += format("    - type: none\n");
-            content += format("      actions:\n");
-            content += format("      - type: message\n");
-            content += format("        status: %d \n", response.code);
-            if ( response.isIncludedInExternalFile ) {
-                content += format("        bodyFile: %s\n", response.getExternalFileName(service.name));
-            } else {
-                var body = "";
-                if ( response.content ) {
-                    body = format("\"%s\"", JSON.stringify(response.content).replace(/\"/g, "\\\""));
-                }
-                content += format("        body: %s\n", body)
+            content += format("%striggers:\n", tab);
+            content += format("%s- type: none\n", tab);
+            content += format("%s  actions:\n", tab);
+            content += this.generateResponseMessage(tab + "  ", service, response);
+        }
+
+        return content;
+    }
+
+    private generateResponseMessage(tab: string, service: Service, response: Response) {
+        var content = "";
+
+        content += format("%s- type: message\n", tab);
+        content += format("%s  status: %d \n", tab, response.code);
+        content += this.generateResponseMessageBody(tab + "  ", service, response);
+        if ( response.contentType != "") {
+            content += format("%s  headers: \n", tab);
+            content += format("%s    Content-Type: %s\n", tab, response.contentType);
+        }
+
+        return content;
+    }
+
+    private generateResponseMessageBody(tab: string, service: Service, response: Response) {
+        var content = "";
+
+        if ( response.isIncludedInExternalFile ) {
+            content += format("%sbodyFile: %s\n", tab, response.getExternalFileName(service.name));
+        } else {
+            var body = "";
+            if ( response.content ) {
+                body = format("\"%s\"", JSON.stringify(response.content).replace(/\"/g, "\\\""));
             }
-            if ( response.contentType != "") {
-                content += format("        headers: \n");
-                content += format("          Content-Type: %s\n", response.contentType);
-            }
+            content += format("%sbody: %s\n", tab, body)
         }
 
         return content;

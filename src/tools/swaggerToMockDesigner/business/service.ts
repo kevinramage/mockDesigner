@@ -100,12 +100,23 @@ export class Service {
                 const searchResponse = this._responses.find(res => {
                     return res.code.toString().startsWith("2");
                 });
-                return searchResponse ? searchResponse : null;
+                return searchResponse ? searchResponse : this.responses[0];
             } else {
                 return this._responses[0];
             }
         } else {
             return null;
         }
+    }
+
+    public get errorsResponse() {
+        const responses : Response[] = [];
+        const defaultResponse = this.defaultResponse;
+        this._responses.forEach(res => {
+            if ( res.uuid != defaultResponse?.uuid && !res.code.toString().startsWith("2")) {
+                responses.push(res);
+            }
+        });
+        return responses;
     }
 }
