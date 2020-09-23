@@ -16,7 +16,7 @@ export class SwaggerToMockDesigner {
             .option('-m, --microservice', 'declare microservice swagger', '');
         
         program.description("Tool to generate mock description from a swagger");
-        program.version("1.0.1");
+        program.version("1.0.2");
         program.parse(process.argv);
 
         // Help
