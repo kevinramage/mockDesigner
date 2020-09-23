@@ -49,6 +49,10 @@ export class SwaggerToMockDesigner {
         // Run generator process
         if ( errorMessage == "" ) {
             console.info("INFO: Start generation ...");
+            console.info("INFO: - Name: " + generator.name);
+            console.info("INFO: - Input: " + generator.inputFile);
+            console.info("INFO: - Output: " + generator.outputDirectory);
+            console.info("");
             generator.run();
             console.info("INFO: Complete");
         } else {

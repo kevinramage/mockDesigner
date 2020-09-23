@@ -3,8 +3,9 @@ import * as path from "path";
 import { parse } from "@apidevtools/swagger-parser";
 import { OpenAPIV2 } from "openapi-types";
 import { FileManagement } from "./utils/fileManagement";
-import { Visitor } from "./vistor";
+import { Visitor } from "./visitor";
 import { MockDesignerGenerator } from "./mockDesignerGenerator";
+import { VisitorCheck } from "./visitorCheck";
 
 /**
  * Generate the source code from a swagger file
@@ -34,17 +35,15 @@ export class Generator {
         // Parse content
         const document = await this.parseContent();
         
-        // Generate mock description
+        // Visit the swagger content
         const documentV2 = document as OpenAPIV2.Document;
         const services = new Visitor().visit(documentV2);
+        new VisitorCheck(services).visit(documentV2);
 
-        // Generate output
+        // Generate mock description
         await this.generateDirectories();
         const files = new MockDesignerGenerator().generate(this.name, services);
         this.generateFiles(files);
-
-        // Completed
-        console.info("INFO - Completed");
     }
 
     /**
@@ -52,7 +51,6 @@ export class Generator {
      */
     private async generateDirectories() {
         return new Promise<void>(async (resolve) => {
-            console.info("Output: " + this.outputDirectory);
             await FileManagement.createDirectory(this.outputDirectory);
             fs.mkdirSync(path.join(this.outputDirectory, "code"));
             fs.mkdirSync(path.join(this.outputDirectory, "data"));

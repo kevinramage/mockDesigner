@@ -172,6 +172,10 @@ export class Visitor {
         } else if ( schemaObject.type && schemaObject.type == "string" ) {
             return this.visitStringObject(schemaObject);
 
+        // Boolean
+        } else if ( schemaObject.type && schemaObject.type == "boolean" ) {
+            return false;
+
         // Items
         } else if ( schemaObject.items ) {
             return this.visitItemsObject(schemaObject.items);
@@ -215,6 +219,10 @@ export class Visitor {
         } else if ( items.type && items.type == "string" ) {
             const stringObject = this.visitStringObject(items);
             return [ stringObject ];
+
+        // Boolean
+        } else if ( items.type && items.type == "boolean" ) {
+            return [ false ];
 
         // Items
         } else if ( items.items ) {
