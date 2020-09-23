@@ -85,6 +85,24 @@ Mock Designer use venom as integration test technology. You can run the integrat
 
 `.\venom.exe run --output-dir . .\integration\*.yml`
 
+## Others tools
+
+Features  | Soap     | Postman  | Fortress | VRest    | Nock     | Beeceptor | Mockoon | WireMock | MockDesigner
+------------------------------|----------|----------|----------|----------|----------|----------|----------|----------|----------|
+Free | :x: | :x: | :x: | :x: | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Data Stored in cloud | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x: | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Scripting | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark: | :heavy_check_mark:
+Dynamic mock response | :heavy_check_mark: | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Conditionnal execution | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Delay response | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Error handling | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark:
+Data storage | :x: | :x: | :x: | :x: | :x: | :x: | :x: | :x: | :heavy_check_mark:
+Generate from WSDL | :heavy_check_mark: | :x: | :x: | :x: | :x: | :x: | :x: | :x: | :x:
+Generate from Swagger | :x: | :x: | :x: | :x: | :x: | :x: | :x: | :x: | :heavy_check_mark:
+Low code | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: | :x: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark:
+GUI Interface | :heavy_check_mark: | :heavy_check_mark: | :heavy_check_mark: | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: | :x: | :x:
+Monitor requests | :x: | :heavy_check_mark: | :x: | :x: | :x: | :heavy_check_mark: | :heavy_check_mark: | :x: | :heavy_check_mark:
+
 ## Contribution
 
 [More informations ...](https://github.com/kevinramage/mockDesigner/blob/master/CONTRIBUTING.md)
