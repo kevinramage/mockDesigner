@@ -3,7 +3,7 @@ import * as path from "path";
 import { parse } from "@apidevtools/swagger-parser";
 import { OpenAPIV2 } from "openapi-types";
 import { FileManagement } from "./utils/fileManagement";
-import { Visitor } from "./vistor";
+import { Visitor } from "./visitor";
 import { MockDesignerGenerator } from "./mockDesignerGenerator";
 
 /**
