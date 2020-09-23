@@ -2,9 +2,9 @@ import * as fs from "fs";
 import * as path from "path";
 import { parse } from "@apidevtools/swagger-parser";
 import { OpenAPIV2 } from "openapi-types";
-import { GeneratorOpenAPIV2 } from "./generatorOpenAPIV2";
 import { FileManagement } from "./utils/fileManagement";
 import { Visitor } from "./vistor";
+import { MockDesignerGenerator } from "./mockDesignerGenerator";
 
 /**
  * Generate the source code from a swagger file
@@ -32,13 +32,12 @@ export class Generator {
         const document = await this.parseContent();
         
         // Generate mock description
-        const generatorOpenAPIV2 = new GeneratorOpenAPIV2();
         const documentV2 = document as OpenAPIV2.Document;
         const services = new Visitor().visit(documentV2);
 
         // Generate output
         await this.generateDirectories();
-        const files = generatorOpenAPIV2.generateMockDescription(this.name, services);
+        const files = new MockDesignerGenerator().generate(this.name, services);
         this.generateFiles(files);
 
         // Completed
