@@ -80,12 +80,22 @@ export class MockDesignerGenerator {
         // Generate errors responses
         content += this.generateErrorResponses(tab + "  ", service);
 
+        content += format("%s  triggers:\n", tab);
+
+        // Generate validation errors responses
+        content += this.generateValidationErrorsResponse(tab + "  ", service);
+
         // Generate default response
         content += this.generateDefaultResponse(tab + "  ", service);
 
         return content;
     }
 
+    /**
+     * Generate mock designer code for error responses from a service
+     * @param tab tabulation to apply
+     * @param service service to generate
+     */
     private generateErrorResponses(tab: string, service: Service) {
         const instance = this;
         var content = "";
@@ -101,10 +111,53 @@ export class MockDesignerGenerator {
         return content;
     }
 
+    /**
+     * Generate mock designer code for response from a service
+     * @param tab tabulation to use
+     * @param service service to generate
+     * @param response response to generate
+     */
     private generateErrorResponse(tab : string, service: Service, response: Response) {
         var content = "";
 
         content += format("%s- name: ERROR_%d\n", tab, response.code);
+        content += format("%s  actions:\n", tab);
+        content += this.generateResponseMessage(tab + "  ", service, response);
+
+        return content;
+    }
+
+    /**
+     * Generate mock designer code for validation errors from a service
+     * @param tab tabulation to use
+     * @param service service to generate
+     */
+    private generateValidationErrorsResponse(tab: string, service: Service) {
+        const instance = this;
+        var content = "";
+
+        const validationErrorResponses = service.validationErrorResponse;
+        if ( validationErrorResponses && service.checks.length > 0 ) {
+            content += instance.generateValidationErrorResponse(tab, service, validationErrorResponses);
+        }
+
+        return content;
+    }
+
+    /**
+     * Generate mock designer code for validation error from a service
+     * @param tab tabulation to apply
+     * @param service service to generate
+     * @param response response to generate
+     */
+    private generateValidationErrorResponse(tab: string, service: Service, response: Response) {
+        var content = "";
+
+        content += format("%s- type: validate\n", tab);
+        content += format("%s  mandatoriesFields:\n", tab);
+        service.checks.forEach(check => {
+            content += format("%s  - \"%s\"\n", tab, check.path);
+        });
         content += format("%s  actions:\n", tab);
         content += this.generateResponseMessage(tab + "  ", service, response);
 
@@ -124,7 +177,6 @@ export class MockDesignerGenerator {
 
             const defaultResponse = service.defaultResponse;
             const response = defaultResponse || service.responses[0];
-            content += format("%striggers:\n", tab);
             content += format("%s- type: none\n", tab);
             content += format("%s  actions:\n", tab);
             content += this.generateResponseMessage(tab + "  ", service, response);
@@ -133,6 +185,12 @@ export class MockDesignerGenerator {
         return content;
     }
 
+    /**
+     * Generate mock designer code for response from a service
+     * @param tab tabulation to use
+     * @param service service to generate
+     * @param response response to generate
+     */
     private generateResponseMessage(tab: string, service: Service, response: Response) {
         var content = "";
 
@@ -147,6 +205,12 @@ export class MockDesignerGenerator {
         return content;
     }
 
+    /**
+     * Generate mock designer code for response message body from a service
+     * @param tab tabulation to apply
+     * @param service service to generate
+     * @param response response to generate
+     */
     private generateResponseMessageBody(tab: string, service: Service, response: Response) {
         var content = "";
 
