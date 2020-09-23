@@ -201,17 +201,26 @@ export class VisitorCheck {
             if ( schemaObject.required ) {
                 checks.push(new Check(this.concatenatePath(path, schemaObject.id)))
             }
+            if ( schemaObject.enum ) {
+                checks.push(new Check(path, schemaObject.enum as string[]));
+            }
 
         // String
         } else if ( schemaObject.type && schemaObject.type == "string" ) {
             if ( schemaObject.required ) {
                 checks.push(new Check(this.concatenatePath(path, schemaObject.id)))
             }
+            if ( schemaObject.enum ) {
+                checks.push(new Check(path, schemaObject.enum as string[]));
+            }
 
         // Boolean
         } else if ( schemaObject.type && schemaObject.type == "boolean" ) {
             if ( schemaObject.required ) {
                 checks.push(new Check(this.concatenatePath(path, schemaObject.id)))
+            }
+            if ( schemaObject.enum ) {
+                checks.push(new Check(path, schemaObject.enum as string[]));
             }
 
         // Items
@@ -261,15 +270,21 @@ export class VisitorCheck {
         
         // Integer
         if ( items.type && items.type == "integer" ) {
-            // Nothing to do 
+            if ( items.enum ) {
+                checks.push(new Check(path, items.enum as string[]));
+            }
 
         // String
         } else if ( items.type && items.type == "string" ) {
-            // Nothing to do
+            if ( items.enum ) {
+                checks.push(new Check(path, items.enum as string[]));
+            }
 
         // Boolean
         } else if ( items.type && items.type == "boolean" ) {
-            // Nothing to do
+            if ( items.enum ) {
+                checks.push(new Check(path, items.enum as string[]));
+            }
 
         // Items
         } else if ( items.items ) {

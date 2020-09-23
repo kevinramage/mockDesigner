@@ -5,10 +5,15 @@ export class Check {
     private _required: boolean;
     private _enumValues: string[];
 
-    constructor(path: string) {
+    constructor(path: string, enumValues?: string[]) {
         this._path = path;
-        this._required = true;
-        this._enumValues = [];
+        if ( enumValues ) {
+            this._required = false;
+            this._enumValues = enumValues;
+        } else {
+            this._required = true;
+            this._enumValues = [];
+        }
     }
 
     public addEnumValue(value: string) {
@@ -16,16 +21,14 @@ export class Check {
     }
 
     public toString() {
-        return format("required - %s\n", this.path);
+        if ( this.isRequired ) {
+            return format("required - %s\n", this.path);
+        } else {
+            return format("enum - %s (%s)\n", this.path, this.enumValues.join(", "));
+        }
     }
 
     public static toString(checks: Check[]) {
-        /*
-        const buffer = Buffer.alloc(checks.length * 100);
-        checks.forEach(check => {
-            buffer.write(check.toString(), "utf8");
-        });
-        return buffer.toString();*/
         var result = "";
         checks.forEach(check => { result += check.toString(); })
         return result;
