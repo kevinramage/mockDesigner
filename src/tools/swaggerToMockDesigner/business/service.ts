@@ -90,6 +90,10 @@ export class Service {
         return this._responses;
     }
 
+    public set responses(value) {
+        this._responses = value;
+    }
+
     public get defaultResponse() {
         if ( this._responses.length > 0 ) {
             if ( this._responses.length > 1 ) {

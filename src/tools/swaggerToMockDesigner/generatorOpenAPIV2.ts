@@ -12,19 +12,12 @@ export class GeneratorOpenAPIV2 {
 
             // Initialize the service
             //const service = new Service();
-            const path = this.transformPath(key);;
+            
             //service.businessObject = this.computeBusinessObject(key);
             //service.endWithVariable = this.computeEndWithVariable(key);
 
             // Navigate through path item
-            const pathItemObject = paths[key] as OpenAPIV2.PathItemObject;
-            if ( pathItemObject ) {
-                this.runService(services, pathItemObject.get, path, HTTP_METHODS.GET, definitions);
-                this.runService(services, pathItemObject.post, path, HTTP_METHODS.POST, definitions);
-                this.runService(services, pathItemObject.put, path, HTTP_METHODS.PUT, definitions);
-                this.runService(services, pathItemObject.delete, path, HTTP_METHODS.DELETE, definitions);
-                this.runService(services, pathItemObject.patch, path, HTTP_METHODS.PATCH, definitions);
-            }
+
         });
 
         // Identify microservice
@@ -34,81 +27,10 @@ export class GeneratorOpenAPIV2 {
     }
 
     private runService(services: Service[], operation: OpenAPIV2.OperationObject | undefined, path: string, methodName: string, definitions?: OpenAPIV2.DefinitionsObject) {
-        if ( operation ) {
-            const service = new Service();
 
-            // Path and Method
-            service.path = path;
-            service.method = methodName;
-
-            // Add information on service
-            if ( operation.operationId ) {
-                service.name = operation.operationId;
-            }
-
-            // Navigate through responses
-            Object.keys(operation.responses).forEach(responseKey => {
-                const response = new Response();
-
-                // Response code
-                const keyCode = Number.parseInt(responseKey);
-                if ( !isNaN(keyCode)) {
-                    response.code = keyCode;
-                }
-
-                // Response content type
-                response.contentType = this.identifyServiceContentType(operation);
-
-                // Response body
-                const responseObject = operation.responses[responseKey];
-                if ( responseObject.schema ) {
-
-                    // Array
-                    if ( responseObject.schema.items ) {
-                        
-                        // Reference
-                        if ( responseObject.schema.items["$ref"] ) {
-                            const reference = responseObject.schema.items["$ref"] as string;
-                            if ( reference.includes("#/definitions/") ) {
-                                const definitionName = reference.substring(("#/definitions/").length);
-                                const body = this.generateResponseBodyFromReference(definitionName, definitions);
-                                response.content = [ body ];
-                            }
-                        }
-
-                    // Object
-                    } else {
-
-                        // Reference
-                        if ( responseObject.schema["$ref"] ) {
-                            const reference = responseObject.schema["$ref"] as string;
-                            if ( reference.includes("#/definitions/") ) {
-                                const definitionName = reference.substring(("#/definitions/").length);
-                                const body = this.generateResponseBodyFromReference(definitionName, definitions);
-                                response.content = body;
-                            }
-                        }
-                    }
-                }
-
-                service.addResponse(response);
-            });
-
-            services.push(service);
-        }
     }
 
-    private identifyServiceContentType(operation: OpenAPIV2.OperationObject) {
-        if ( operation.produces && operation.produces.length > 0) {
-            if ( operation.produces.includes("application/json")) {
-                return "application/json";
-            } else {
-                return operation.produces[0];
-            }
-        } else {
-            return "application/txt";
-        }
-    }
+
 
     private generateResponseBodyFromReference(definitionName: string, definitions?: OpenAPIV2.DefinitionsObject) {
         const object : any = {};
@@ -186,16 +108,7 @@ export class GeneratorOpenAPIV2 {
         });
     }
 
-    private transformPath(path: string) : string {
-        const regex = /{\s*([a-zA-Z0-9]+)\s*}/g;
-        const match = regex.exec(path);
-        if ( match && match.length > 1) {
-            const result = path.replace(match[0], ":" + match[1]);
-            return this.transformPath(result);
-        } else {
-            return path;
-        }
-    }
+    
 
     private computeBusinessObject(path: string) {
         const subPaths = path.split("/");
