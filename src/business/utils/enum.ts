@@ -8,6 +8,7 @@ export module METHODS {
 export module TRIGGERS {
     export const NONE = "NONE";
     export const DATA = "DATA";
+    export const SEQUENTIAL = "SEQUENTIAL";
 }
 
 export module ACTIONS {

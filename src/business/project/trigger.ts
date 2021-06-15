@@ -16,7 +16,7 @@ export class Trigger {
     }
 
     public execute(context: Context) {
-        this._actions.forEach(a => { a.execute(context); })
+        this._actions.forEach(a => { a.execute(context); });
     }
 
     public addAction(action: Action) { 
