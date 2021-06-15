@@ -1,4 +1,0 @@
-name: includeMock
-services:
-  ##INCLUDE include.yml.part1##
-##INCLUDE include.yml.part2##

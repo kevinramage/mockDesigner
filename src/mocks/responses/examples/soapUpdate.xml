@@ -1,9 +1,0 @@
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" >
-   <soap:Header/>
-   <soap:Body>
-      <soap:updateOperation>
-        <soap:id>1</soap:id>
-        <soap:message>Updated</soap:message>
-      </soap:updateOperation>
-   </soap:Body>
-</soap:Envelope>

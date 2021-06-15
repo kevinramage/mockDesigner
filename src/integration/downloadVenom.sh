@@ -1,1 +1,0 @@
-wget https://github.com/ovh/venom/releases/download/v0.27.0/venom.linux-amd64 -o venom

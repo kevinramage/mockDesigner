@@ -1,9 +1,0 @@
-<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" >
-   <soap:Header/>
-   <soap:Body>
-      <soap:deleteOperation>
-        <soap:id>1</soap:id>
-        <soap:message>Deleted</soap:message>
-      </soap:deleteOperation>
-   </soap:Body>
-</soap:Envelope>

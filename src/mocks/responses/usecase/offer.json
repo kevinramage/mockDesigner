@@ -1,7 +1,0 @@
-{
-    "id": "{{.data.offers.id}}",
-    "name": "{{.data.offers.name}}",
-    "product": "{{.data.offers.product}}",
-    "startDate": "{{.data.offers.startDate}}",
-    "expiredDate": "{{.data.offers.expiredDate}}"
-}

@@ -1,7 +1,0 @@
-/src/node_modules
-/src/dist
-/src/generated
-/src/generated*
-/src/logs
-/src/*.dump
-/src/test_results.xml
