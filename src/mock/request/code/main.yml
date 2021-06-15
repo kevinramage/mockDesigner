@@ -1,0 +1,15 @@
+name: requestMock
+services:
+  - name: requestService
+    method: POST
+    path: /api/v1/requestService/:id/subItem/:subId
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          headers:
+            content-type: application/json
+          bodyFile: ./request.json
+          template: true

@@ -1,0 +1,59 @@
+name: authenticationMock
+services: 
+- name: basicAuthenticationService
+  method: POST
+  path: /api/v1/basicAuthentication
+  authentication:
+    type: basic
+    username: myUserName
+    password: myPassword
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK
+- name: apiKeyHeaderAuthenticationService
+  method: POST
+  path: /api/v1/apiKeyHeaderAuthentication
+  authentication:
+    type: apikey
+    source: header
+    key: api-key
+    value: 123456
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK
+- name: apiKeyQueryAuthenticationService
+  method: POST
+  path: /api/v1/apiKeyQueryAuthentication
+  authentication:
+    type: apikey
+    source: query
+    key: api-key
+    value: 123456
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK
+- name: tokenAuthenticationService
+  method: POST
+  path: /api/v1/tokenAuthentication
+  authentication:
+    type: token
+    token: 123456
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK

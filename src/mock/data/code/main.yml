@@ -1,0 +1,15 @@
+name: dataMock
+services:
+  - name: dataService
+    method: POST
+    path: /api/v1/dataService
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          headers:
+            Content-Type: application/json
+          template: true
+          bodyFile: ./data.json

@@ -1,0 +1,10 @@
+{
+    "id":1234,
+    "searchQuery": {{.request.query.search}},
+    "strictQuery": {{.request.query.strict}},
+    "idParam": {{.request.params.id}},
+    "subIdParam": {{.request.params.subId}},
+    "contentTypeHeader": {{.request.headers.content-type}},
+    "userName": {{.request.body.userName}},
+    "password": {{.request.body.password}}
+}

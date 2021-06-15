@@ -1,0 +1,63 @@
+name: dataTrigger
+services:
+- name: dataTriggerService
+  method: POST
+  path: /api/v1/dataTrigger/:id
+  response:
+    triggers:
+    - type: data
+      conditions:
+      - leftOperand: "{{.request.params.id}}"
+        operation: EQUALS
+        rightOperand: "99999"
+      - leftOperand: "{{.request.body.name}}"
+        operation: EQUALS
+        rightOperand: "ERROR_500"
+      actions:
+      - type: message
+        status: 500
+        body: "Internal error"
+    - type: data
+      conditions:
+      - leftOperand: "{{.request.params.id}}"
+        operation: EQUALS
+        rightOperand: "99999"
+      - leftOperand: "{{.request.body.name}}"
+        operation: EQUALS
+        rightOperand: "ERROR_400"
+      actions:
+      - type: message
+        status: 400
+        body: "Invalid request"
+    - type: data
+      conditions:
+      - leftOperand: "{{.request.params.id}}"
+        operation: MATCHES
+        rightOperand: "coucou[a-z]*"
+      actions:
+      - type: message
+        status: 200
+        body: "Coucou"
+    - type: data
+      conditions:
+      - leftOperand: "{{.request.params.id}}"
+        operation: IN
+        rightOperand: "1000;1001;1005"
+      actions:
+      - type: message
+        status: 200
+        body: "Ohhh good id ..."
+    - type: data
+      conditions:
+      - leftOperand: "{{.request.params.id}}"
+        operation: RANGE
+        rightOperand: "2000...2021"
+      actions:
+      - type: message
+        status: 200
+        body: "Ahh ok, it's works too"
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK
