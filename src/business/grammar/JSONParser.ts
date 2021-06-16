@@ -37,13 +37,14 @@ export class JSONParser extends Parser {
 	public static readonly T__6 = 7;
 	public static readonly T__7 = 8;
 	public static readonly T__8 = 9;
-	public static readonly DOT = 10;
-	public static readonly OPEN_EXP = 11;
-	public static readonly CLOSE_EXP = 12;
-	public static readonly NUMBER = 13;
-	public static readonly IDENT = 14;
-	public static readonly STRING = 15;
-	public static readonly WS = 16;
+	public static readonly T__9 = 10;
+	public static readonly DOT = 11;
+	public static readonly OPEN_EXP = 12;
+	public static readonly CLOSE_EXP = 13;
+	public static readonly NUMBER = 14;
+	public static readonly IDENT = 15;
+	public static readonly STRING = 16;
+	public static readonly WS = 17;
 	public static readonly RULE_json = 0;
 	public static readonly RULE_obj = 1;
 	public static readonly RULE_pair = 2;
@@ -56,13 +57,13 @@ export class JSONParser extends Parser {
 	];
 
 	private static readonly _LITERAL_NAMES: Array<string | undefined> = [
-		undefined, "'{'", "','", "'}'", "':'", "'['", "']'", "'true'", "'false'", 
-		"'null'", "'.'", "'{{'", "'}}'",
+		undefined, "'{'", "','", "'}'", "':'", "'['", "']'", "'data'", "'true'", 
+		"'false'", "'null'", "'.'", "'{{'", "'}}'",
 	];
 	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
 		undefined, undefined, undefined, undefined, undefined, undefined, undefined, 
-		undefined, undefined, undefined, "DOT", "OPEN_EXP", "CLOSE_EXP", "NUMBER", 
-		"IDENT", "STRING", "WS",
+		undefined, undefined, undefined, undefined, "DOT", "OPEN_EXP", "CLOSE_EXP", 
+		"NUMBER", "IDENT", "STRING", "WS",
 	];
 	public static readonly VOCABULARY: Vocabulary = new VocabularyImpl(JSONParser._LITERAL_NAMES, JSONParser._SYMBOLIC_NAMES, []);
 
@@ -272,33 +273,74 @@ export class JSONParser extends Parser {
 		this.enterRule(_localctx, 8, JSONParser.RULE_expression);
 		let _la: number;
 		try {
-			this.enterOuterAlt(_localctx, 1);
-			{
-			this.state = 48;
-			this.match(JSONParser.OPEN_EXP);
-			this.state = 49;
-			this.match(JSONParser.DOT);
-			this.state = 50;
-			_localctx._id1 = this.match(JSONParser.IDENT);
-			this.state = 55;
+			this.state = 72;
 			this._errHandler.sync(this);
-			_la = this._input.LA(1);
-			while (_la === JSONParser.DOT) {
+			switch ( this.interpreter.adaptivePredict(this._input, 6, this._ctx) ) {
+			case 1:
+				this.enterOuterAlt(_localctx, 1);
 				{
-				{
+				this.state = 48;
+				this.match(JSONParser.OPEN_EXP);
+				this.state = 49;
+				this.match(JSONParser.DOT);
+				this.state = 50;
+				this.match(JSONParser.T__6);
 				this.state = 51;
 				this.match(JSONParser.DOT);
 				this.state = 52;
-				_localctx._IDENT = this.match(JSONParser.IDENT);
-				_localctx._idRemaining.push(_localctx._IDENT);
-				}
-				}
+				_localctx._idData1 = this.match(JSONParser.IDENT);
 				this.state = 57;
 				this._errHandler.sync(this);
 				_la = this._input.LA(1);
-			}
-			this.state = 58;
-			this.match(JSONParser.CLOSE_EXP);
+				while (_la === JSONParser.DOT) {
+					{
+					{
+					this.state = 53;
+					this.match(JSONParser.DOT);
+					this.state = 54;
+					_localctx._IDENT = this.match(JSONParser.IDENT);
+					_localctx._idDataRemaining.push(_localctx._IDENT);
+					}
+					}
+					this.state = 59;
+					this._errHandler.sync(this);
+					_la = this._input.LA(1);
+				}
+				this.state = 60;
+				this.match(JSONParser.CLOSE_EXP);
+				}
+				break;
+
+			case 2:
+				this.enterOuterAlt(_localctx, 2);
+				{
+				this.state = 61;
+				this.match(JSONParser.OPEN_EXP);
+				this.state = 62;
+				this.match(JSONParser.DOT);
+				this.state = 63;
+				_localctx._id1 = this.match(JSONParser.IDENT);
+				this.state = 68;
+				this._errHandler.sync(this);
+				_la = this._input.LA(1);
+				while (_la === JSONParser.DOT) {
+					{
+					{
+					this.state = 64;
+					this.match(JSONParser.DOT);
+					this.state = 65;
+					_localctx._IDENT = this.match(JSONParser.IDENT);
+					_localctx._idRemaining.push(_localctx._IDENT);
+					}
+					}
+					this.state = 70;
+					this._errHandler.sync(this);
+					_la = this._input.LA(1);
+				}
+				this.state = 71;
+				this.match(JSONParser.CLOSE_EXP);
+				}
+				break;
 			}
 		}
 		catch (re) {
@@ -320,63 +362,63 @@ export class JSONParser extends Parser {
 		let _localctx: ValueContext = new ValueContext(this._ctx, this.state);
 		this.enterRule(_localctx, 10, JSONParser.RULE_value);
 		try {
-			this.state = 68;
+			this.state = 82;
 			this._errHandler.sync(this);
 			switch (this._input.LA(1)) {
 			case JSONParser.STRING:
 				this.enterOuterAlt(_localctx, 1);
 				{
-				this.state = 60;
+				this.state = 74;
 				_localctx._string = this.match(JSONParser.STRING);
 				}
 				break;
 			case JSONParser.NUMBER:
 				this.enterOuterAlt(_localctx, 2);
 				{
-				this.state = 61;
+				this.state = 75;
 				_localctx._number = this.match(JSONParser.NUMBER);
 				}
 				break;
 			case JSONParser.OPEN_EXP:
 				this.enterOuterAlt(_localctx, 3);
 				{
-				this.state = 62;
+				this.state = 76;
 				_localctx._exp = this.expression();
 				}
 				break;
 			case JSONParser.T__0:
 				this.enterOuterAlt(_localctx, 4);
 				{
-				this.state = 63;
+				this.state = 77;
 				_localctx._object = this.obj();
 				}
 				break;
 			case JSONParser.T__4:
 				this.enterOuterAlt(_localctx, 5);
 				{
-				this.state = 64;
+				this.state = 78;
 				_localctx._array = this.arr();
 				}
 				break;
-			case JSONParser.T__6:
+			case JSONParser.T__7:
 				this.enterOuterAlt(_localctx, 6);
 				{
-				this.state = 65;
-				_localctx._true = this.match(JSONParser.T__6);
-				}
-				break;
-			case JSONParser.T__7:
-				this.enterOuterAlt(_localctx, 7);
-				{
-				this.state = 66;
-				_localctx._false = this.match(JSONParser.T__7);
+				this.state = 79;
+				_localctx._true = this.match(JSONParser.T__7);
 				}
 				break;
 			case JSONParser.T__8:
+				this.enterOuterAlt(_localctx, 7);
+				{
+				this.state = 80;
+				_localctx._false = this.match(JSONParser.T__8);
+				}
+				break;
+			case JSONParser.T__9:
 				this.enterOuterAlt(_localctx, 8);
 				{
-				this.state = 67;
-				_localctx._null = this.match(JSONParser.T__8);
+				this.state = 81;
+				_localctx._null = this.match(JSONParser.T__9);
 				}
 				break;
 			default:
@@ -399,37 +441,43 @@ export class JSONParser extends Parser {
 	}
 
 	public static readonly _serializedATN: string =
-		"\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03\x12I\x04\x02" +
+		"\x03\uAF6F\u8320\u479D\uB75C\u4880\u1605\u191C\uAB37\x03\x13W\x04\x02" +
 		"\t\x02\x04\x03\t\x03\x04\x04\t\x04\x04\x05\t\x05\x04\x06\t\x06\x04\x07" +
 		"\t\x07\x03\x02\x03\x02\x03\x03\x03\x03\x03\x03\x03\x03\x07\x03\x15\n\x03" +
 		"\f\x03\x0E\x03\x18\v\x03\x03\x03\x03\x03\x03\x03\x03\x03\x05\x03\x1E\n" +
 		"\x03\x03\x04\x03\x04\x03\x04\x03\x04\x03\x05\x03\x05\x03\x05\x03\x05\x07" +
 		"\x05(\n\x05\f\x05\x0E\x05+\v\x05\x03\x05\x03\x05\x03\x05\x03\x05\x05\x05" +
-		"1\n\x05\x03\x06\x03\x06\x03\x06\x03\x06\x03\x06\x07\x068\n\x06\f\x06\x0E" +
-		"\x06;\v\x06\x03\x06\x03\x06\x03\x07\x03\x07\x03\x07\x03\x07\x03\x07\x03" +
-		"\x07\x03\x07\x03\x07\x05\x07G\n\x07\x03\x07\x02\x02\x02\b\x02\x02\x04" +
-		"\x02\x06\x02\b\x02\n\x02\f\x02\x02\x02N\x02\x0E\x03\x02\x02\x02\x04\x1D" +
-		"\x03\x02\x02\x02\x06\x1F\x03\x02\x02\x02\b0\x03\x02\x02\x02\n2\x03\x02" +
-		"\x02\x02\fF\x03\x02\x02\x02\x0E\x0F\x05\f\x07\x02\x0F\x03\x03\x02\x02" +
-		"\x02\x10\x11\x07\x03\x02\x02\x11\x16\x05\x06\x04\x02\x12\x13\x07\x04\x02" +
-		"\x02\x13\x15\x05\x06\x04\x02\x14\x12\x03\x02\x02\x02\x15\x18\x03\x02\x02" +
-		"\x02\x16\x14\x03\x02\x02\x02\x16\x17\x03\x02\x02\x02\x17\x19\x03\x02\x02" +
-		"\x02\x18\x16\x03\x02\x02\x02\x19\x1A\x07\x05\x02\x02\x1A\x1E\x03\x02\x02" +
-		"\x02\x1B\x1C\x07\x03\x02\x02\x1C\x1E\x07\x05\x02\x02\x1D\x10\x03\x02\x02" +
-		"\x02\x1D\x1B\x03\x02\x02\x02\x1E\x05\x03\x02\x02\x02\x1F \x07\x11\x02" +
-		"\x02 !\x07\x06\x02\x02!\"\x05\f\x07\x02\"\x07\x03\x02\x02\x02#$\x07\x07" +
-		"\x02\x02$)\x05\f\x07\x02%&\x07\x04\x02\x02&(\x05\f\x07\x02\'%\x03\x02" +
-		"\x02\x02(+\x03\x02\x02\x02)\'\x03\x02\x02\x02)*\x03\x02\x02\x02*,\x03" +
-		"\x02\x02\x02+)\x03\x02\x02\x02,-\x07\b\x02\x02-1\x03\x02\x02\x02./\x07" +
-		"\x07\x02\x02/1\x07\b\x02\x020#\x03\x02\x02\x020.\x03\x02\x02\x021\t\x03" +
-		"\x02\x02\x0223\x07\r\x02\x0234\x07\f\x02\x0249\x07\x10\x02\x0256\x07\f" +
-		"\x02\x0268\x07\x10\x02\x0275\x03\x02\x02\x028;\x03\x02\x02\x0297\x03\x02" +
-		"\x02\x029:\x03\x02\x02\x02:<\x03\x02\x02\x02;9\x03\x02\x02\x02<=\x07\x0E" +
-		"\x02\x02=\v\x03\x02\x02\x02>G\x07\x11\x02\x02?G\x07\x0F\x02\x02@G\x05" +
-		"\n\x06\x02AG\x05\x04\x03\x02BG\x05\b\x05\x02CG\x07\t\x02\x02DG\x07\n\x02" +
-		"\x02EG\x07\v\x02\x02F>\x03\x02\x02\x02F?\x03\x02\x02\x02F@\x03\x02\x02" +
-		"\x02FA\x03\x02\x02\x02FB\x03\x02\x02\x02FC\x03\x02\x02\x02FD\x03\x02\x02" +
-		"\x02FE\x03\x02\x02\x02G\r\x03\x02\x02\x02\b\x16\x1D)09F";
+		"1\n\x05\x03\x06\x03\x06\x03\x06\x03\x06\x03\x06\x03\x06\x03\x06\x07\x06" +
+		":\n\x06\f\x06\x0E\x06=\v\x06\x03\x06\x03\x06\x03\x06\x03\x06\x03\x06\x03" +
+		"\x06\x07\x06E\n\x06\f\x06\x0E\x06H\v\x06\x03\x06\x05\x06K\n\x06\x03\x07" +
+		"\x03\x07\x03\x07\x03\x07\x03\x07\x03\x07\x03\x07\x03\x07\x05\x07U\n\x07" +
+		"\x03\x07\x02\x02\x02\b\x02\x02\x04\x02\x06\x02\b\x02\n\x02\f\x02\x02\x02" +
+		"^\x02\x0E\x03\x02\x02\x02\x04\x1D\x03\x02\x02\x02\x06\x1F\x03\x02\x02" +
+		"\x02\b0\x03\x02\x02\x02\nJ\x03\x02\x02\x02\fT\x03\x02\x02\x02\x0E\x0F" +
+		"\x05\f\x07\x02\x0F\x03\x03\x02\x02\x02\x10\x11\x07\x03\x02\x02\x11\x16" +
+		"\x05\x06\x04\x02\x12\x13\x07\x04\x02\x02\x13\x15\x05\x06\x04\x02\x14\x12" +
+		"\x03\x02\x02\x02\x15\x18\x03\x02\x02\x02\x16\x14\x03\x02\x02\x02\x16\x17" +
+		"\x03\x02\x02\x02\x17\x19\x03\x02\x02\x02\x18\x16\x03\x02\x02\x02\x19\x1A" +
+		"\x07\x05\x02\x02\x1A\x1E\x03\x02\x02\x02\x1B\x1C\x07\x03\x02\x02\x1C\x1E" +
+		"\x07\x05\x02\x02\x1D\x10\x03\x02\x02\x02\x1D\x1B\x03\x02\x02\x02\x1E\x05" +
+		"\x03\x02\x02\x02\x1F \x07\x12\x02\x02 !\x07\x06\x02\x02!\"\x05\f\x07\x02" +
+		"\"\x07\x03\x02\x02\x02#$\x07\x07\x02\x02$)\x05\f\x07\x02%&\x07\x04\x02" +
+		"\x02&(\x05\f\x07\x02\'%\x03\x02\x02\x02(+\x03\x02\x02\x02)\'\x03\x02\x02" +
+		"\x02)*\x03\x02\x02\x02*,\x03\x02\x02\x02+)\x03\x02\x02\x02,-\x07\b\x02" +
+		"\x02-1\x03\x02\x02\x02./\x07\x07\x02\x02/1\x07\b\x02\x020#\x03\x02\x02" +
+		"\x020.\x03\x02\x02\x021\t\x03\x02\x02\x0223\x07\x0E\x02\x0234\x07\r\x02" +
+		"\x0245\x07\t\x02\x0256\x07\r\x02\x026;\x07\x11\x02\x0278\x07\r\x02\x02" +
+		"8:\x07\x11\x02\x0297\x03\x02\x02\x02:=\x03\x02\x02\x02;9\x03\x02\x02\x02" +
+		";<\x03\x02\x02\x02<>\x03\x02\x02\x02=;\x03\x02\x02\x02>K\x07\x0F\x02\x02" +
+		"?@\x07\x0E\x02\x02@A\x07\r\x02\x02AF\x07\x11\x02\x02BC\x07\r\x02\x02C" +
+		"E\x07\x11\x02\x02DB\x03\x02\x02\x02EH\x03\x02\x02\x02FD\x03\x02\x02\x02" +
+		"FG\x03\x02\x02\x02GI\x03\x02\x02\x02HF\x03\x02\x02\x02IK\x07\x0F\x02\x02" +
+		"J2\x03\x02\x02\x02J?\x03\x02\x02\x02K\v\x03\x02\x02\x02LU\x07\x12\x02" +
+		"\x02MU\x07\x10\x02\x02NU\x05\n\x06\x02OU\x05\x04\x03\x02PU\x05\b\x05\x02" +
+		"QU\x07\n\x02\x02RU\x07\v\x02\x02SU\x07\f\x02\x02TL\x03\x02\x02\x02TM\x03" +
+		"\x02\x02\x02TN\x03\x02\x02\x02TO\x03\x02\x02\x02TP\x03\x02\x02\x02TQ\x03" +
+		"\x02\x02\x02TR\x03\x02\x02\x02TS\x03\x02\x02\x02U\r\x03\x02\x02\x02\n" +
+		"\x16\x1D)0;FJT";
 	public static __ATN: ATN;
 	public static get _ATN(): ATN {
 		if (!JSONParser.__ATN) {
@@ -591,8 +639,10 @@ export class ArrContext extends ParserRuleContext {
 
 
 export class ExpressionContext extends ParserRuleContext {
-	public _id1?: Token;
+	public _idData1?: Token;
 	public _IDENT?: Token;
+	public _idDataRemaining: Token[] = [];
+	public _id1?: Token;
 	public _idRemaining: Token[] = [];
 	public OPEN_EXP(): TerminalNode { return this.getToken(JSONParser.OPEN_EXP, 0); }
 	public DOT(): TerminalNode[];

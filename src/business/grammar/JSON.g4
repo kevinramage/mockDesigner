@@ -23,7 +23,8 @@ arr
    ;
 
 expression
-   : OPEN_EXP DOT id1=IDENT (DOT idRemaining+=IDENT)* CLOSE_EXP
+   : OPEN_EXP DOT 'data' DOT idData1=IDENT (DOT idDataRemaining+=IDENT)* CLOSE_EXP
+   | OPEN_EXP DOT id1=IDENT (DOT idRemaining+=IDENT)* CLOSE_EXP
    ;
 
 value

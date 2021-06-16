@@ -6,7 +6,7 @@ import { ResponseFactory } from "./response";
 export class ServiceFactory {
 
     public static build (serviceData : IService, workspace: string) {
-        const service = new Service();
+        const service = new Service(workspace);
 
         if (serviceData.method) { service.method = serviceData.method }
         if (serviceData.name) { service.name = serviceData.name; }

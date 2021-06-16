@@ -21,7 +21,6 @@ export class SequentialTrigger extends Trigger {
             if (this.count >= current && this.count < current + message.repeat) {
                 message.execute(context);
                 this.count = (this.count + 1) % this.max;
-                console.info("count: " + this.count);
                 break;
             }
             current += message.repeat;

@@ -24,6 +24,7 @@ export class ActionFactory {
         }
         if (actionData.body) { action.bodyText = actionData.body; }
         if (actionData.bodyFile) { action.bodyFile = actionData.bodyFile; }
+        if (actionData.template) { action.template = actionData.template; }
 
         return action;
     }

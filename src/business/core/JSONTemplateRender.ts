@@ -98,12 +98,31 @@ export class JSONTemplateRender implements JSONVisitor<string> {
                 }
             }
             return this.evaluateExpression(expression, this.context);
+        } else if (ctx._idData1) {
+            const dataSource = ctx._idData1.text || "";
+            let expression = "";
+            for (var key in ctx._idDataRemaining) {
+                expression += format("%s.", ctx._idDataRemaining[key].text);
+            }
+            if (expression.length > 0) {
+                expression = expression.substr(0, expression.length - 1);
+            }
+            return this.evaluateDataSource(dataSource, expression, this.context);
         }
         return "";
     }
 
     evaluateExpression(variableName: string, context: Context) {
         const value = context.variables[variableName] || null;
+        return this.evaluateVariale(value);
+    }
+
+    evaluateDataSource(dataSource: string, expression: string, context: Context) {
+        const value = context.evaluateDataSource(dataSource, expression);
+        return this.evaluateVariale(value);
+    }
+
+    evaluateVariale(value: any) {
         if (typeof value === "string") {
             return format("\"%s\"", value);
         } else if (typeof value === "number" || typeof value === "boolean") {

@@ -4,4 +4,5 @@ export interface IMessageAction {
     headers: {[key: string]: string};
     body: string;
     bodyFile: string;
+    template: boolean;
 }

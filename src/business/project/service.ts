@@ -1,27 +1,59 @@
+import { DataManager } from "../core/dataManager";
 import { Context } from "../core/context";
 import { METHODS } from "../utils/enum";
 import { Authentication } from "./authentication";
 import { Response } from "./response";
+import { join } from "path";
+import { access, exists, existsSync, fstat, readdir } from "fs";
 
 export class Service {
+    private _workspace : string;
     private _name : string;
     private _method : string;
     private _path : string;
     private _response : Response;
     private _authentication : Authentication;
+    private _dataManager : DataManager;
 
-    constructor() {
+    constructor(workspace: string) {
+        this._workspace = workspace;
         this._name = "";
         this._method = METHODS.GET;
         this._path = "/";
         this._authentication = new Authentication();
         this._response = new Response();
+        this._dataManager = new DataManager();
+        this.updateDataManager(workspace);
     }
 
     public execute(context: Context) {
+        context.dataManager = this._dataManager;
         if (this.authentication.authenticate(context)) {
             this.response.execute(context);
         }
+    }
+
+    public updateDataManager(workspace: string) {
+        return new Promise<void>((resolve) =>  {
+            const path = join(workspace, "data");
+            access(path, (err) => {
+                if (!err) {
+                    readdir(path, (err, files) => {
+                        if (!err) {
+                            const dataSources = files.filter(f => { return f.endsWith(".json") })
+                                .map(f => { return f.substr(0, f.length - (".json").length); });
+                            dataSources.forEach(d => {
+                                this._dataManager.registerDataSource(d, workspace);
+                            });
+                        } else {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve()
+                }
+            });
+        });
     }
 
     public get name() {
@@ -66,5 +98,9 @@ export class Service {
 
     public set authentication(value) {
         this._authentication = value;
+    }
+
+    public get workspace() {
+        return this._workspace;
     }
 }
