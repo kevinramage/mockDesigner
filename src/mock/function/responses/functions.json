@@ -1,0 +1,18 @@
+{
+    "id": 1,
+	"Hello": {{ Hello() }},
+	"HelloWorld": {{HelloWorld("Kevin")}},
+	"Concat": {{ String.Concat("test", " ", "concat") }},
+    "increment": {{ Math.Increment("USER") }},
+	"increment2": {{ Math.Increment("TEST", true) }},
+    "uniqueString": {{ Math.UUID() }},
+    "uniqueValue": {{Math.UniqueID()}},
+    "currentDate": {{Date.CurrentDate()}},
+    "randomInteger": {{Math.RandomInteger(100)}},
+    "randomString": {{String.RandomString()}},
+    "upperCaseConstant": {{String.UpperCase("test")}},
+    "upperCaseRequest": {{String.UpperCase({{.request.body.username}})}},
+    "lowerCaseConstant": {{String.LowerCase("Test")}},
+    "lowerCaseRequest": {{String.LowerCase({{.request.body.username}})}},
+	"RequestId": {{Business.RequestId() }}
+}

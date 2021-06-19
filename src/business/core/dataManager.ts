@@ -1,4 +1,4 @@
-import { readFile, readFileSync } from "fs";
+import { readFile } from "fs";
 import { join } from "path";
 
 export class DataManager {
@@ -31,7 +31,7 @@ export class DataManager {
         });
     }
 
-    public async registerDataSourceFromPath(name: string, path: string) {
+    private async registerDataSourceFromPath(name: string, path: string) {
         return new Promise<boolean>((resolve) => {
             readFile(path, (err, data) => {
                 if (!err) {

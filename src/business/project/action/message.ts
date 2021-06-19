@@ -34,15 +34,21 @@ export class ActionMessage extends Action {
         } else {
             this.sendText(this.bodyText, context)
         }
-        context.response.end();
     }
 
     private sendText(input: string, context: Context) {
-        let result : string = input;
         if (this.template) {
-            result = new JSONTemplateRender(context).render(input);
+            new JSONTemplateRender(context).render(input).then((value) => {
+                context.response.send(value);
+                context.response.end();
+            }).catch((err) => {
+                context.response.send("Internal error: " + err);
+                context.response.end();
+            });
+        } else {
+            context.response.send(input);
+            context.response.end();
         }
-        context.response.send(result);
     }
 
     public addHeader(name: string, value: string) {

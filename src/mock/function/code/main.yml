@@ -1,0 +1,15 @@
+name: functionMock
+services:
+  - name: functionService
+    method: POST
+    path: /api/v1/functionService
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          headers:
+            content-type: application/json
+          bodyFile: ./functions.json
+          template: true

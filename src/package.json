@@ -5,8 +5,10 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "start": "tsc && node --unhandled-rejections=strict dist/index.js",
+    "start": "npm run functions && npm run main",
+    "main": "tsc && node --unhandled-rejections=strict dist/index.js",
     "antlr4ts": "antlr4ts -visitor -o business/grammar business/grammar/JSON.g4",
+    "functions": "node compileCode.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kevin RAMAGE",

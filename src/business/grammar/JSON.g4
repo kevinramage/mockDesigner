@@ -25,6 +25,7 @@ arr
 expression
    : OPEN_EXP DOT 'data' DOT idData1=IDENT (DOT idDataRemaining+=IDENT)* CLOSE_EXP
    | OPEN_EXP DOT id1=IDENT (DOT idRemaining+=IDENT)* CLOSE_EXP
+   | OPEN_EXP idClass=IDENT (DOT idFunc=IDENT)? LPARENTHESIS arg=value? (COMMA argRemaining+=value)* RPARENTHESIS CLOSE_EXP
    ;
 
 value
@@ -39,8 +40,11 @@ value
    ;
 
 DOT: '.';
+COMMA: ',';
 OPEN_EXP: '{{';
 CLOSE_EXP: '}}';
+LPARENTHESIS: '(';
+RPARENTHESIS: ')';
 
 NUMBER: '-'? INT ('.' [0-9] +)? EXP?;
 fragment INT: '0' | [1-9] [0-9]*;

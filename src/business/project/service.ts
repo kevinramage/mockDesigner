@@ -5,6 +5,7 @@ import { Authentication } from "./authentication";
 import { Response } from "./response";
 import { join } from "path";
 import { access, exists, existsSync, fstat, readdir } from "fs";
+import { FunctionManager } from "../core/functionManager";
 
 export class Service {
     private _workspace : string;
@@ -14,6 +15,7 @@ export class Service {
     private _response : Response;
     private _authentication : Authentication;
     private _dataManager : DataManager;
+    private _functionManager : FunctionManager;
 
     constructor(workspace: string) {
         this._workspace = workspace;
@@ -22,12 +24,16 @@ export class Service {
         this._path = "/";
         this._authentication = new Authentication();
         this._response = new Response();
+
         this._dataManager = new DataManager();
         this.updateDataManager(workspace);
+        this._functionManager = new FunctionManager();
+        this.updateFunctionManager(workspace);
     }
 
     public execute(context: Context) {
         context.dataManager = this._dataManager;
+        context.functionManager = this._functionManager;
         if (this.authentication.authenticate(context)) {
             this.response.execute(context);
         }
@@ -44,6 +50,29 @@ export class Service {
                                 .map(f => { return f.substr(0, f.length - (".json").length); });
                             dataSources.forEach(d => {
                                 this._dataManager.registerDataSource(d, workspace);
+                            });
+                        } else {
+                            resolve();
+                        }
+                    });
+                } else {
+                    resolve()
+                }
+            });
+        });
+    }
+
+    public updateFunctionManager(workspace: string) {
+        return new Promise<void>((resolve) =>  {
+            const path = join(workspace, "functions");
+            access(path, (err) => {
+                if (!err) {
+                    readdir(path, (err, files) => {
+                        if (!err) {
+                            const functions = files.filter(f => { return f.endsWith(".js") })
+                                .map(f => { return f.substr(0, f.length - (".js").length); });
+                            functions.forEach(f => {
+                                this._functionManager.registerFunction(f, workspace);
                             });
                         } else {
                             resolve();

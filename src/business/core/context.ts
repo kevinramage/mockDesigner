@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { DataManager } from "./dataManager";
+import { FunctionManager } from "./functionManager";
 
 export class Context {
 
@@ -7,6 +8,7 @@ export class Context {
     private _response : Response;
     private _variables : {[name: string]: any};
     private _dataManager ?: DataManager;
+    private _functionManager ?: FunctionManager;
 
     constructor(request: Request, response: Response) {
         this._request = request;
@@ -82,8 +84,6 @@ export class Context {
         const index = Math.round(Math.random() * dataSource.length - 1);
         let result = source[index];
         let currentExp = expression;
-        console.info(result);
-        console.info(currentExp);
         while (currentExp != "") {
             let extract = currentExp;
             const index = extract.indexOf(".");
@@ -92,6 +92,35 @@ export class Context {
             currentExp = currentExp.substr((extract).length);
         }
         return result;
+    }
+
+    public evaluateFunction(functionName: string, args: string[]) {
+        return new Promise<string>((resolve, reject) => {
+            const func = this.functionManager.functions[functionName];
+            const argsUpdated = this.evaluateFunctionArguments(args);
+            if (func) {
+                let allArgs : any[] = [this];
+                allArgs = allArgs.concat(argsUpdated);
+                const result : string | Promise<string> = func.call(this, allArgs);
+                if ( result instanceof Promise) {
+                    resolve(Promise.resolve(result))
+                } else {
+                    resolve(result);
+                }
+            } else {
+                reject(new Error("Function not registered: " + functionName))
+            }
+        });
+    }
+
+    private evaluateFunctionArguments(args: string[]) {
+        return args.map(a => { 
+            if (a.startsWith("\"") && a.endsWith("\"")) {
+                return a.substr(1, a.length - 2);
+            } else {
+                return a;
+            }
+        });
     }
 
     public get request() {
@@ -112,5 +141,13 @@ export class Context {
 
     public set dataManager(value) {
         this._dataManager = value;
+    }
+
+    public get functionManager() {
+        return this._functionManager as FunctionManager;
+    }
+
+    public set functionManager(value) {
+        this._functionManager = value;
     }
 }
