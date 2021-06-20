@@ -1,0 +1,23 @@
+name: wait
+services:
+- name: waitService
+  method: POST
+  path: /api/v1/timeout/:id
+  response:
+    triggers:
+    - type: data
+      conditions: 
+      - leftOperand: "{{.request.params.id}}"
+        operation: EQUALS
+        rightOperand: "99999"
+      actions:
+      - type: wait
+        time: 10000
+      - type: message
+        status: 200
+        body: Timeout after 10000 ms
+    - type: none
+      actions:
+      - type: message
+        status: 200
+        body: OK

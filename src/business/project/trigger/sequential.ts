@@ -14,17 +14,18 @@ export class SequentialTrigger extends Trigger {
     }
 
     public execute(context: Context) {
-        let current = 0;
-        console.info("before: " + this.count);
-        for (var key in this.messages) {
-            const message = this.messages[key];
-            if (this.count >= current && this.count < current + message.repeat) {
-                message.execute(context);
-                this.count = (this.count + 1) % this.max;
-                break;
+        return new Promise<void>(resolve => {
+            let current = 0;
+            for (var key in this.messages) {
+                const message = this.messages[key];
+                if (this.count >= current && this.count < current + message.repeat) {
+                    message.execute(context);
+                    this.count = (this.count + 1) % this.max;
+                    break;
+                }
+                current += message.repeat;
             }
-            current += message.repeat;
-        }
+        });
     }
 
     public addMessage(message: SequentialMessageTrigger) {

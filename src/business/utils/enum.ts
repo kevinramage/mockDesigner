@@ -13,6 +13,7 @@ export module TRIGGERS {
 
 export module ACTIONS {
     export const MESSAGE = "MESSAGE";
+    export const WAIT = "WAIT";
 }
 
 export module AUTHENTICATIONS {

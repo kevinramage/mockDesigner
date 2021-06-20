@@ -19,29 +19,32 @@ export class Response {
         this._behaviours.push(behaviour);
     }
 
-    public async execute(context: Context, serviceName: string) {
+    public execute(context: Context, serviceName: string) {
+        return new Promise<void>(async resolve => {
+            let behaviourFound = false;
 
-        let behaviourFound = false;
-
-        // Run behaviours
-        for (var index in this.behaviours) {
-            const behaviour = this.behaviours[index];
-            const result = await behaviour.check(context, serviceName);
-            if (result) {
-                behaviourFound = true;
-                behaviour.execute(context);
-            }
-        }
-
-        // Run triggers
-        if (!behaviourFound) {
-            for (var index in this.triggers ) {
-                const trigger = this.triggers[index];
-                if (trigger.check(context)) {
-                    trigger.execute(context);
+            // Run behaviours
+            for (var index in this.behaviours) {
+                const behaviour = this.behaviours[index];
+                const result = await behaviour.check(context, serviceName);
+                if (result) {
+                    behaviourFound = true;
+                    behaviour.execute(context);
                 }
             }
-        }
+    
+            // Run triggers
+            if (!behaviourFound) {
+                for (var index in this.triggers ) {
+                    const trigger = this.triggers[index];
+                    if (trigger.check(context)) {
+                        await trigger.execute(context);
+                    }
+                }
+            }
+
+            resolve();
+        });
     }
 
     public get triggers() {

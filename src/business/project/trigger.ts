@@ -16,7 +16,13 @@ export class Trigger {
     }
 
     public execute(context: Context) {
-        this._actions.forEach(a => { a.execute(context); });
+        return new Promise<void>(async resolve => {
+            for(var key in this.actions) {
+                const action = this.actions[key];
+                await action.execute(context);
+            }
+            resolve();
+        });
     }
 
     public addAction(action: Action) { 

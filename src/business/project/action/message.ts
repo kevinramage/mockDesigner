@@ -23,32 +23,43 @@ export class ActionMessage extends Action {
     }
 
     public execute(context: Context) {
-        context.response.status(this.status);
-        Object.entries(this.headers).forEach((values) => {
-            context.response.setHeader(values[0], values[1]);
+        return new Promise<void>(resolve => {
+            context.response.status(this.status);
+            Object.entries(this.headers).forEach((values) => {
+                context.response.setHeader(values[0], values[1]);
+            });
+            if (this.bodyFile) {
+                const path = join(this._workspace, "responses", this.bodyFile);
+                const content = readFileSync(path);
+                this.sendText(content.toString(), context);
+                resolve();
+            } else {
+                this.sendText(this.bodyText, context);
+                resolve();
+            }
         });
-        if (this.bodyFile) {
-            const path = join(this._workspace, "responses", this.bodyFile);
-            const content = readFileSync(path);
-            this.sendText(content.toString(), context);
-        } else {
-            this.sendText(this.bodyText, context)
-        }
+
     }
 
     private sendText(input: string, context: Context) {
-        if (this.template) {
-            new JSONTemplateRender(context).render(input).then((value) => {
-                context.response.send(value);
+        return new Promise<void>(resolve => {
+            if (this.template) {
+                new JSONTemplateRender(context).render(input).then((value) => {
+                    context.response.send(value);
+                    context.response.end();
+                    resolve();
+
+                }).catch((err) => {
+                    context.response.send("Internal error: " + err);
+                    context.response.end();
+                    resolve();
+                });
+            } else {
+                context.response.send(input);
                 context.response.end();
-            }).catch((err) => {
-                context.response.send("Internal error: " + err);
-                context.response.end();
-            });
-        } else {
-            context.response.send(input);
-            context.response.end();
-        }
+                resolve();
+            }
+        });
     }
 
     public addHeader(name: string, value: string) {
