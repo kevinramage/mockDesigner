@@ -35,7 +35,7 @@ export class Service {
         context.dataManager = this._dataManager;
         context.functionManager = this._functionManager;
         if (this.authentication.authenticate(context)) {
-            this.response.execute(context);
+            this.response.execute(context, this.name);
         }
     }
 

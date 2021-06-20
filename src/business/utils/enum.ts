@@ -26,7 +26,7 @@ export module APIKEY_SOURCES {
     export const QUERY = "QUERY";
 }
 
-export module DATATRIGGER_OPERATION {
+export module OPERATION {
     export const EQUALS = "EQUALS";
     export const NOT_EQUALS = "NOT_EQUALS";
     export const MATCHES = "MATCHES";

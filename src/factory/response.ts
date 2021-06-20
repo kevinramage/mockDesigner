@@ -1,5 +1,6 @@
 import { Response } from "../business/project/response";
 import { IResponse } from "../interface/response";
+import { BehaviourFactory } from "./behaviour";
 import { TriggerFactory } from "./trigger";
 
 export class ResponseFactory {
@@ -12,6 +13,12 @@ export class ResponseFactory {
                 if (trigger) {
                     response.addTrigger(trigger);
                 }
+            });
+        }
+        if (responseData.behaviours) {
+            responseData.behaviours.forEach(behaviourData => {
+                const behaviour = BehaviourFactory.build(behaviourData, workspace);
+                response.addBehaviour(behaviour);
             });
         }
         return response;

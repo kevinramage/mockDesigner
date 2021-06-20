@@ -3,9 +3,11 @@ import { Trigger } from "../business/project/trigger";
 import { ITrigger } from "../interface/trigger";
 import { ActionFactory } from "./action";
 import { IDataTrigger } from "../interface/triggers/dataTrigger";
-import { DataTrigger, DataTriggerCondition } from "../business/project/trigger/data";
+import { DataTrigger } from "../business/project/trigger/data";
 import { ISequentialTrigger } from "../interface/triggers/sequentialTrigger";
 import { SequentialMessageTrigger, SequentialTrigger } from "../business/project/trigger/sequential";
+import { Condition } from "../business/core/condition";
+import { ConditionFactory } from "./conditionFactory";
 
 export class TriggerFactory {
     
@@ -38,10 +40,7 @@ export class TriggerFactory {
         const trigger = new DataTrigger();
         if (triggerData.conditions) {
             triggerData.conditions.forEach(c => {
-                const condition = new DataTriggerCondition();
-                if (c.leftOperand) { condition.left = c.leftOperand; }
-                if (c.rightOperand) { condition.right = c.rightOperand; }
-                if (c.operation) { condition.operation = c.operation; }
+                const condition = ConditionFactory.build(c, workspace);
                 trigger.addCondition(condition);
             });
         }

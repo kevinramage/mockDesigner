@@ -1,13 +1,8 @@
 import { IAction } from "../action";
+import { ICondition } from "../condition";
 
 export interface IDataTrigger {
     type: "DATA" | "data" 
-    conditions: IDataTriggerCondition[];
+    conditions: ICondition[];
     actions: IAction[];
-}
-
-export interface IDataTriggerCondition {
-    leftOperand: string;
-    rightOperand: string;
-    operation: string;
 }

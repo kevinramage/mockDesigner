@@ -1,0 +1,26 @@
+name: behaviourMock
+services:
+  - name: behaviourService
+    method: POST
+    path: /api/v1/behaviourService
+    response:
+      behaviours:
+      - name: ERROR_500
+        repeat: 3
+        conditions:
+        - leftOperand: "{{.request.body.name}}"
+          operation: EQUALS
+          rightOperand: MyName
+        - leftOperand: "{{.request.body.description}}"
+          operation: EQUALS
+          rightOperand: myDescription
+        actions:
+        - type: message
+          status: 500
+          body: An internal error occured
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          body: Operation completed successfully

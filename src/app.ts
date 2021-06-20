@@ -8,6 +8,8 @@ import { Context } from "./business/core/context";
 import { Service } from "./business/project/service";
 import * as winston from "winston";
 import { format } from "util";
+import { METHODS } from "./business/utils/enum";
+import { BehaviourService } from "./behaviourService";
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 
@@ -59,6 +61,18 @@ export class App {
             service.execute(context);
         };
         DefaultRoute.addRoute(service.path, service.method, handler);
+        this.addBehaviours(service);
+    }
+
+    private addBehaviours(service: Service) {
+        const getBehavioursPath = format("%s/behaviours/:name", service.path);
+        const getBehaviourPath = format("%s/behaviours/:name/:code", service.path);
+        const createBehaviourPath = format("%s/behaviours", service.path);
+        const deleteBehaviourPath = format("%s/behaviours/:name/:code", service.path);
+        DefaultRoute.addRoute(getBehaviourPath, METHODS.GET, BehaviourService.getBehaviour);
+        DefaultRoute.addRoute(getBehavioursPath, METHODS.GET, BehaviourService.getBehaviours);
+        DefaultRoute.addRoute(createBehaviourPath, METHODS.POST, BehaviourService.createBehaviour);
+        DefaultRoute.addRoute(deleteBehaviourPath, METHODS.DELETE, BehaviourService.deleteBehaviour);
     }
 }
 
