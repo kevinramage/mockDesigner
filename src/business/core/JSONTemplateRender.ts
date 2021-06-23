@@ -9,6 +9,8 @@ import { JSONLexer } from "../grammar/JSONLexer";
 import { JsonContext, ObjContext, PairContext, ArrContext, ValueContext, JSONParser, ExpressionContext } from "../grammar/JSONParser";
 import { JSONVisitor } from "../grammar/JSONVisitor";
 import { Context } from "./context";
+import { ExpressionManager } from "./expressionManager";
+import { StorageManager } from "./storageManager";
 
 export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
@@ -102,9 +104,15 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
     visitExpression(ctx: ExpressionContext) {
         return new Promise<string>(async(resolve) => {
+            
             // Expression
             if (ctx._id1) {
                 const evaluation = this.visitClassicalExpression(ctx._id1, ctx._idRemaining);
+                resolve(evaluation);
+
+            // Storage
+            } else if (ctx._idKey) {
+                const evaluation = await this.visitStorage(ctx._idKey, ctx._exp1 as Token);
                 resolve(evaluation);
 
             // Data source
@@ -112,6 +120,7 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
                 const evaluation = this.visitDataSourceExpression(ctx._idData1, ctx._idDataRemaining);
                 resolve(evaluation);
 
+            // Function
             } else if (ctx._idClass) {
                 const evalation = await this.visitFunctionExpression(ctx._idClass, ctx._idFunc, ctx._arg, ctx._argRemaining);
                 resolve(evalation);
@@ -126,7 +135,7 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
                 expression += format(".%s", idRemaining[key].text);
             }
         }
-        return this.evaluateExpression(expression, this.context);
+        return ExpressionManager.instance.evaluateVariableExpression(expression, this.context);
     }
 
     visitDataSourceExpression(id: Token, idRemaining: Token[]) {
@@ -138,7 +147,7 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
         if (expression.length > 0) {
             expression = expression.substr(0, expression.length - 1);
         }
-        return this.evaluateDataSource(dataSource, expression, this.context);
+        return ExpressionManager.instance.evaluateDataSource(dataSource, expression, this.context);
     } 
 
     visitFunctionExpression(idClass: Token, idFunc?: Token, arg ?: ValueContext, argRemaining ?: ValueContext[]) {
@@ -158,40 +167,14 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
                     }
                 }
             }
-            const result = await this.evaluateFunction(functionName, expressions, this.context);
+            const result = await ExpressionManager.instance.evaluateFunction(functionName, expressions, this.context);
             resolve(result);
         });
         
     }
 
-    evaluateExpression(variableName: string, context: Context) {
-        const value = context.variables[variableName] || null;
-        return this.evaluateVariable(value);
-    }
-
-    evaluateDataSource(dataSource: string, expression: string, context: Context) {
-        const value = context.evaluateDataSource(dataSource, expression);
-        return this.evaluateVariable(value);
-    }
-
-    async evaluateFunction(functionName: string, expressions: string[], context: Context) {
-        return new Promise<string>(async (resolve) => {
-            const value = await context.evaluateFunction(functionName, expressions);
-            resolve(this.evaluateVariable(value));
-        });
-
-    }
-
-    evaluateVariable(value: any) {
-        if (typeof value === "string") {
-            return format("\"%s\"", value);
-        } else if (typeof value === "number" || typeof value === "boolean") {
-            return value.toString();
-        } else if (value === null) {
-            return "null";
-        } else {
-            return "\"undefined\"";
-        }
+    visitStorage(storageKey: Token, member: Token) {
+        return StorageManager.instance.getValue(storageKey.text as string, member.text as string);
     }
 
     async visit(tree: ParseTree) {

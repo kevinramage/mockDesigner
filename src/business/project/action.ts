@@ -8,8 +8,10 @@ export class Action {
         this._type = ACTIONS.MESSAGE;
     }
 
-    public execute(context: Context) {
-        
+    public execute(context: Context) : Promise<void> {
+        return new Promise<void>(resolve => {
+            resolve();
+        });
     }
 
     public get type() {

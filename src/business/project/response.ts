@@ -39,6 +39,7 @@ export class Response {
                     const trigger = this.triggers[index];
                     if (trigger.check(context)) {
                         await trigger.execute(context);
+                        break;
                     }
                 }
             }

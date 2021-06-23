@@ -123,6 +123,42 @@ export class RedisManager {
         });
     }
 
+    public hget(key: string, member: string) {
+        return new Promise<string>(async (resolve, reject) => {
+            this.client.hget(key, member, (err, reply) => {
+                if (!err) {
+                    resolve(reply);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    public hset(key: string, member: string, value: string) {
+        return new Promise<boolean>(async (resolve, reject) => {
+            this.client.hset(key, member, value, (err, reply) => {
+                if (!err) {
+                    resolve(reply == 1);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
+    public hdel(key: string, member: string) {
+        return new Promise<boolean>(async (resolve, reject) => {
+            this.client.hdel(key, member, (err, reply) => {
+                if (!err) {
+                    resolve(reply == 1);
+                } else {
+                    reject(err);
+                }
+            });
+        });
+    }
+
     private get client() {
         return this._client as RedisClient;
     }

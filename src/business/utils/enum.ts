@@ -14,6 +14,7 @@ export module TRIGGERS {
 export module ACTIONS {
     export const MESSAGE = "MESSAGE";
     export const WAIT = "WAIT";
+    export const SAVE = "SAVE";
 }
 
 export module AUTHENTICATIONS {

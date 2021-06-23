@@ -1,9 +1,11 @@
 import { Action } from "../business/project/action";
 import { ActionMessage } from "../business/project/action/message";
+import { SaveAction, SaveExpression } from "../business/project/action/save";
 import { WaitAction } from "../business/project/action/wait";
 import { ACTIONS } from "../business/utils/enum";
 import { IAction } from "../interface/action";
 import { IMessageAction } from "../interface/actions/messageAction";
+import { ISaveAction, ISaveExpression } from "../interface/actions/saveAction";
 import { IWaitAction } from "../interface/actions/waitAction";
 
 export class ActionFactory {
@@ -13,6 +15,8 @@ export class ActionFactory {
             return ActionFactory.buildMessageAction(actionData as IMessageAction, workspace);
         } else if ( actionData.type.toUpperCase() == ACTIONS.WAIT ) {
             return ActionFactory.buildWaitAction(actionData as IWaitAction, workspace);
+        } else if ( actionData.type.toUpperCase() == ACTIONS.SAVE ) {
+            return ActionFactory.buildSaveAction(actionData as ISaveAction, workspace);
         } else {
             return null;
         }
@@ -40,5 +44,28 @@ export class ActionFactory {
         if (actionData.time) { action.time = actionData.time; }
 
         return action;
+    }
+
+    private static buildSaveAction(actionData: ISaveAction, workspace: string) {
+        const action = new SaveAction();
+
+        if (actionData.key) { action.key = actionData.key; }
+        if (actionData.expressions) {
+            actionData.expressions.forEach((exp) => {
+                const expression = ActionFactory.buildSaveExpression(exp, workspace);
+                action.addExpression(expression);
+            });
+        }
+
+        return action;
+    }
+
+    private static buildSaveExpression(expressionData: ISaveExpression, workspace: string) {
+        const expression = new SaveExpression();
+
+        if (expressionData.key) { expression.key = expressionData.key; }
+        if (expressionData.value) { expression.value = expressionData.value; }
+
+        return expression;
     }
 }

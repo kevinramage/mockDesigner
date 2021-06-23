@@ -1,3 +1,4 @@
+import { format } from "util";
 import { OPERATION } from "../utils/enum";
 import { Condition } from "./condition";
 import { Context } from "./context";
@@ -8,10 +9,36 @@ export class ExpressionManager {
     public evaluateExpression(context: Context, expression: string) : string{
         if (expression.startsWith("{{") && expression.endsWith("}}")) {
             const expressionComputed = expression.substr(2, expression.length - 4);
+            
+            // Data
+
+            // Storage
+
+            // Function
+
+            // Expression
+
             return context.variables[expressionComputed] || null;
         } else {
             return expression;
         }
+    }
+
+    public evaluateVariableExpression(variableName: string, context: Context) {
+        const value = context.variables[variableName] || null;
+        return ExpressionManager.expressionToString(value);
+    }
+
+    public evaluateDataSource(dataSource: string, expression: string, context: Context) {
+        const value = context.evaluateDataSource(dataSource, expression);
+        return ExpressionManager.expressionToString(value);
+    }
+
+    public evaluateFunction(functionName: string, expressions: string[], context: Context) {
+        return new Promise<string>(async (resolve) => {
+            const value = await context.evaluateFunction(functionName, expressions);
+            resolve(ExpressionManager.expressionToString(value));
+        });
     }
 
     public evaluateCondition(context: Context, condition: Condition) : boolean {
@@ -51,6 +78,18 @@ export class ExpressionManager {
 
             default:
                 throw new Error("Invalid operation: " + condition.operation)
+        }
+    }
+
+    static expressionToString(value: any) {
+        if (typeof value === "string") {
+            return format("\"%s\"", value);
+        } else if (typeof value === "number" || typeof value === "boolean") {
+            return value.toString();
+        } else if (value === null) {
+            return "null";
+        } else {
+            return "\"undefined\"";
         }
     }
 

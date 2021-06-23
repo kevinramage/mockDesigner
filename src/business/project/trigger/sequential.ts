@@ -14,17 +14,18 @@ export class SequentialTrigger extends Trigger {
     }
 
     public execute(context: Context) {
-        return new Promise<void>(resolve => {
+        return new Promise<void>(async resolve => {
             let current = 0;
             for (var key in this.messages) {
                 const message = this.messages[key];
                 if (this.count >= current && this.count < current + message.repeat) {
-                    message.execute(context);
+                    await message.execute(context);
                     this.count = (this.count + 1) % this.max;
                     break;
                 }
                 current += message.repeat;
             }
+            resolve();
         });
     }
 
@@ -56,7 +57,12 @@ export class SequentialMessageTrigger {
     }
 
     public execute(context: Context) {
-        this._actions.forEach(a => { a.execute(context); });
+        return new Promise<void>(async (resolve) => {
+            for (var key in this.actions) {
+                await this.actions[key].execute(context);
+            }
+            resolve();
+        });
     }
 
     public addAction(action: Action) {

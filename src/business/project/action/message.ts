@@ -23,7 +23,7 @@ export class ActionMessage extends Action {
     }
 
     public execute(context: Context) {
-        return new Promise<void>(resolve => {
+        return new Promise<void>(async resolve => {
             context.response.status(this.status);
             Object.entries(this.headers).forEach((values) => {
                 context.response.setHeader(values[0], values[1]);
@@ -31,10 +31,10 @@ export class ActionMessage extends Action {
             if (this.bodyFile) {
                 const path = join(this._workspace, "responses", this.bodyFile);
                 const content = readFileSync(path);
-                this.sendText(content.toString(), context);
+                await this.sendText(content.toString(), context);
                 resolve();
             } else {
-                this.sendText(this.bodyText, context);
+                await this.sendText(this.bodyText, context);
                 resolve();
             }
         });
