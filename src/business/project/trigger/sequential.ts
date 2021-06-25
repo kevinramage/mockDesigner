@@ -14,18 +14,22 @@ export class SequentialTrigger extends Trigger {
     }
 
     public execute(context: Context) {
-        return new Promise<void>(async resolve => {
-            let current = 0;
-            for (var key in this.messages) {
-                const message = this.messages[key];
-                if (this.count >= current && this.count < current + message.repeat) {
-                    await message.execute(context);
-                    this.count = (this.count + 1) % this.max;
-                    break;
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                let current = 0;
+                for (var key in this.messages) {
+                    const message = this.messages[key];
+                    if (this.count >= current && this.count < current + message.repeat) {
+                        await message.execute(context);
+                        this.count = (this.count + 1) % this.max;
+                        break;
+                    }
+                    current += message.repeat;
                 }
-                current += message.repeat;
+                resolve();
+            } catch (err) {
+                reject(err);
             }
-            resolve();
         });
     }
 

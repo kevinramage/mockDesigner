@@ -20,21 +20,50 @@ export class Response {
     }
 
     public execute(context: Context, serviceName: string) {
-        return new Promise<void>(async resolve => {
-            let behaviourFound = false;
+        return new Promise<void>(async (resolve, reject) => {
 
-            // Run behaviours
-            for (var index in this.behaviours) {
-                const behaviour = this.behaviours[index];
-                const result = await behaviour.check(context, serviceName);
-                if (result) {
-                    behaviourFound = true;
-                    behaviour.execute(context);
+            try {
+                // Run behaviours
+                let behaviourFound = await this.runBehaviours(context, serviceName);
+
+                // Run triggers
+                if (!behaviourFound) {
+                    await this.runTriggers(context);
                 }
+                resolve();
+                
+            } catch (err) {
+                reject(err);
             }
-    
-            // Run triggers
-            if (!behaviourFound) {
+            
+        });
+    }
+
+    private runBehaviours(context: Context, serviceName: string) {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                let behaviourFound = false;
+
+                // Run behaviours
+                for (var index in this.behaviours) {
+                    const behaviour = this.behaviours[index];
+                    const result = await behaviour.check(context, serviceName);
+                    if (result) {
+                        behaviourFound = true;
+                        behaviour.execute(context);
+                    }
+                }
+                resolve(behaviourFound);
+
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    private runTriggers(context: Context) {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
                 for (var index in this.triggers ) {
                     const trigger = this.triggers[index];
                     if (trigger.check(context)) {
@@ -42,9 +71,11 @@ export class Response {
                         break;
                     }
                 }
-            }
+                resolve();
 
-            resolve();
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 

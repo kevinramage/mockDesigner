@@ -16,12 +16,17 @@ export class Trigger {
     }
 
     public execute(context: Context) {
-        return new Promise<void>(async resolve => {
-            for(var key in this.actions) {
-                const action = this.actions[key];
-                await action.execute(context);
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                for(var key in this.actions) {
+                    const action = this.actions[key];
+                    await action.execute(context);
+                }
+                resolve();
+                
+            } catch (err) {
+                reject(err);
             }
-            resolve();
         });
     }
 

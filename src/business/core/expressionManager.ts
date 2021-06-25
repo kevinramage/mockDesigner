@@ -26,18 +26,18 @@ export class ExpressionManager {
 
     public evaluateVariableExpression(variableName: string, context: Context) {
         const value = context.variables[variableName] || null;
-        return ExpressionManager.expressionToString(value);
+        return this.expressionToString(value);
     }
 
     public evaluateDataSource(dataSource: string, expression: string, context: Context) {
         const value = context.evaluateDataSource(dataSource, expression);
-        return ExpressionManager.expressionToString(value);
+        return this.expressionToString(value);
     }
 
     public evaluateFunction(functionName: string, expressions: string[], context: Context) {
         return new Promise<string>(async (resolve) => {
             const value = await context.evaluateFunction(functionName, expressions);
-            resolve(ExpressionManager.expressionToString(value));
+            resolve(this.expressionToString(value));
         });
     }
 
@@ -81,7 +81,7 @@ export class ExpressionManager {
         }
     }
 
-    static expressionToString(value: any) {
+    public expressionToString(value: any) {
         if (typeof value === "string") {
             return format("\"%s\"", value);
         } else if (typeof value === "number" || typeof value === "boolean") {

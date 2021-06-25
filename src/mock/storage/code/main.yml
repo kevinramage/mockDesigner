@@ -1,0 +1,22 @@
+name: storageMock
+services:
+- name: storageService
+  method: POST
+  path: /api/v1/storageService
+  response:
+    triggers:
+    - type: none
+      actions:
+      - type: save
+        expressions:
+        - key: name
+          value: "{{.request.body.name}}"
+        - key: description
+          value: "{{.request.body.description}}"
+        key: "command"
+      - type: message
+        status: 200
+        headers:
+          Content-Type: application/json
+        bodyFile: ./storage.json
+        template: true

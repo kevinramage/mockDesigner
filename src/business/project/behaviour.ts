@@ -16,9 +16,24 @@ export class Behaviour {
     }
 
     public check(context: Context, serviceName: string) {
-        return new Promise<boolean>(async (resolve) => {
-            const behaviour = await BehaviourManager.instance.getBehaviour(serviceName, this.name);
-            if (behaviour) {
+        return new Promise<boolean>(async (resolve, reject) => {
+            try {
+                const behaviour = await BehaviourManager.instance.getBehaviour(serviceName, this.name);
+                if (behaviour) {
+                    const result = await this.evaluateConditions(context);
+                    resolve(result);
+                } else {
+                    resolve(false);
+                }
+            } catch (err) {
+                reject(err);
+            } 
+        });
+    }
+
+    private evaluateConditions(context: Context){
+        return new Promise<boolean>((resolve, reject) => {
+            try {
                 let result = true;
                 this.conditions.forEach(c => {
                     const res = ExpressionManager.instance.evaluateCondition(context, c);
@@ -27,8 +42,9 @@ export class Behaviour {
                     }
                 });
                 resolve(result);
-            } else {
-                resolve(false);
+
+            } catch (err) {
+                reject(err);
             }
         });
     }

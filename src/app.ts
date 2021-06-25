@@ -10,14 +10,17 @@ import * as winston from "winston";
 import { format } from "util";
 import { METHODS } from "./business/utils/enum";
 import { BehaviourService } from "./behaviourService";
+import { OptionsManager } from "./business/core/optionsManager";
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 
 export class App {
 
     public app : express.Application;
+    private _listeners : string[];
 
     constructor() {
+        this._listeners = [];
         this.app = express();
         this.run();
     }
@@ -30,8 +33,25 @@ export class App {
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.xml());
         this.app.use(bodyParser.urlencoded({ extended: true }));
-        this.app.use(errorHandler());
         this.app.use("/", DefaultRoute.router);
+        this.app.use((err, req, res, next) => {
+
+            // Error handling
+            res.status(500);
+            const data : any = { code: 500, message: "Internal error: " + err.message || "" };
+
+            // Add debug informations
+            if (OptionsManager.instance.debug) {
+                data.stack = err.stack;
+            }
+
+            // Log informations
+            winston.error("App.run - Internal error occured: " + err.message);
+            winston.error(err.stack);
+
+            res.send(data);
+            res.end();
+        });
 
         // Read project
         const projects = await this.readProjects();
@@ -52,16 +72,23 @@ export class App {
                 this.addListener(service);
             });
         });
+        DefaultRoute.addDefaultRoute(this._listeners);
     }
 
     private addListener(service: Service){
         winston.info(format("App.addListener - Add a listener for path %s %s", service.method, service.path));
-        const handler = (req : Request, res: Response) => {
-            const context = new Context(req, res);
-            service.execute(context);
+        this._listeners.push(service.path);
+        const handler = async(req : Request, res: Response, next: any) => {
+            try {
+                const context = new Context(req, res);
+                await service.execute(context);
+
+            } catch (err) {
+                next(err);
+            }
         };
-        DefaultRoute.addRoute(service.path, service.method, handler);
         this.addBehaviours(service);
+        DefaultRoute.addRoute(service.path, service.method, handler);
     }
 
     private addBehaviours(service: Service) {

@@ -32,11 +32,15 @@ export class Service {
     }
 
     public execute(context: Context) {
-        context.dataManager = this._dataManager;
-        context.functionManager = this._functionManager;
-        if (this.authentication.authenticate(context)) {
-            this.response.execute(context, this.name);
-        }
+        return new Promise<void>(async (resolve, reject) => {
+            context.dataManager = this._dataManager;
+            context.functionManager = this._functionManager;
+            if (this.authentication.authenticate(context)) {
+                this.response.execute(context, this.name).then(resolve).catch(reject);
+            } else {
+                resolve();
+            }
+        });
     }
 
     public updateDataManager(workspace: string) {

@@ -37,3 +37,8 @@ export module OPERATION {
     export const NOT_IN = "NOT_IN";
     export const RANGE = "RANGE";
 }
+
+export module OPTIONS {
+    export const DEBUG = "DEBUG";
+    export const VERSION = "VERSION";
+}
