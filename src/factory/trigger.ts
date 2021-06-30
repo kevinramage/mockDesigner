@@ -6,8 +6,9 @@ import { IDataTrigger } from "../interface/triggers/dataTrigger";
 import { DataTrigger } from "../business/project/trigger/data";
 import { ISequentialTrigger } from "../interface/triggers/sequentialTrigger";
 import { SequentialMessageTrigger, SequentialTrigger } from "../business/project/trigger/sequential";
-import { Condition } from "../business/core/condition";
 import { ConditionFactory } from "./conditionFactory";
+import { IRandomTrigger } from "../interface/triggers/randomTrigger";
+import { RandomMessageTrigger, RandomTrigger } from "../business/project/trigger/random";
 
 export class TriggerFactory {
     
@@ -18,6 +19,8 @@ export class TriggerFactory {
             return TriggerFactory.buildDataTrigger(triggerData as IDataTrigger, workspace);
         } else if (triggerData.type.toUpperCase() === TRIGGERS.SEQUENTIAL) {
             return TriggerFactory.buildSequentialTrigger(triggerData as ISequentialTrigger, workspace);
+        } else if (triggerData.type.toUpperCase() === TRIGGERS.RANDOM) {
+            return TriggerFactory.buildRandomTrigger(triggerData as IRandomTrigger, workspace);
         } else {
             return null;
         }
@@ -78,6 +81,26 @@ export class TriggerFactory {
                 if (action) {
                     trigger.addAction(action);
                 }
+            });
+        }
+        return trigger;
+    }
+
+    private static buildRandomTrigger(randomData : IRandomTrigger, workspace: string) {
+        const trigger = new RandomTrigger();
+        if (randomData.messages) {
+            randomData.messages.forEach(m => {
+                const message = new RandomMessageTrigger();
+                if (m.probability) { message.probability = m.probability; }
+                if (m.actions) {
+                    m.actions.forEach(a => {
+                        const action = ActionFactory.build(a, workspace);
+                        if (action != null) {
+                            message.addAction(action);
+                        }
+                    });
+                }
+                trigger.addMessage(message);
             });
         }
         return trigger;

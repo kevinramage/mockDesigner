@@ -9,6 +9,7 @@ export module TRIGGERS {
     export const NONE = "NONE";
     export const DATA = "DATA";
     export const SEQUENTIAL = "SEQUENTIAL";
+    export const RANDOM = "RANDOM";
 }
 
 export module ACTIONS {

@@ -2,3 +2,7 @@
 /src/dist
 /src/logs
 /src/node_modules
+/src/default/functions/date.js
+/src/default/functions/math.js
+/src/default/functions/string.js
+/src/mock/function/functions/business.js
