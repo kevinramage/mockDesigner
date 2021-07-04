@@ -1,25 +1,18 @@
 import { METHODS } from "../business/utils/enum";
-import { Router, Response } from "express";
+import { Router } from "express";
 import { OptionsManager } from "../business/core/optionsManager";
+import { MonitoringManager } from "../business/core/monitoringManager";
+
+import * as express from "express";
+import * as winston from "winston";
 
 class DefaultRoute {
     public router: Router;
+    public listeners: string[];
 
     public constructor() {
       this.router = Router();
-      this.init();
-    }
-
-    private init() {
-
-        // Default header
-        this.router.use("/", (req, res: Response, next) => {
-            res.setHeader('Access-Control-Allow-Origin', '*');
-            res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-            res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-            res.setHeader('Access-Control-Allow-Credentials', 'true');
-            next();
-        });
+      this.listeners = [];
     }
 
     public addRoute(path: string, method: string, handler: ((req: any, res: any, next: any) => void )) {
@@ -58,27 +51,91 @@ class DefaultRoute {
         this.router.delete(path, handler);
     }
 
-    public addDefaultRoute(listeners: string[]) {
-        this.router.use((err: Error, req: any, res: Response, next: Function) => {
-            
-            // Error hanling
-            if (err) { next(err); return; }
+    public middleware(req: express.Request, res: express.Response, next: Function) {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+        res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
 
-            // Manage error handling
-            res.status(404);
-            const data : any = { code: 404, message: "Ressource not found" };
+        // Save the request
+        if (!req.path.startsWith("/mockdesigner/")) {
+            MonitoringManager.instance.saveRequest(req);
+        }
 
-            // Add debug informations
-            if (OptionsManager.instance.debug) {
-                data.requestPath = req.path;
-                data.listenersRegistered = listeners;
-                data.version = "Mock Designer v" + OptionsManager.instance.version;
-            }
-            
-            res.setHeader("Content-Type", "application/json");
-            res.send(JSON.stringify(data));
-            res.end();
-        });
+        next();
+    }
+
+    public sendResourceNotFound(req: express.Request, res: express.Response, next: Function) {
+
+        // Manage error handling
+        res.status(404);
+        const data : any = { code: 404, message: "Ressource not found" };
+
+        // Add debug informations
+        if (OptionsManager.instance.debug) {
+            data.requestPath = req.path;
+            data.listenersRegistered = this.listeners;
+            data.version = "Mock Designer v" + OptionsManager.instance.version;
+        }
+        
+        // Send response
+        const message = JSON.stringify(data);
+        res.setHeader("Content-Type", "application/json");
+        res.send(message);
+        res.end();
+
+        // Save response
+        const headers = { ["Content-Type"]: "application/json" };
+        MonitoringManager.instance.saveResponse(404, headers, message, res);
+    }
+
+    public sendInternalError(err: Error, req: express.Request, res: express.Response, next: Function) {
+
+        // Error handling
+        res.status(500);
+        const data : any = { code: 500, message: "Internal error: " + err.message || "" };
+
+        // Add debug informations
+        if (OptionsManager.instance.debug) {
+            data.stack = err.stack;
+        }
+
+        // Log informations
+        winston.error("App.run - Internal error occured: " + err.message);
+        winston.error(err.stack);
+
+        // Send response
+        res.setHeader("Content-Type", "application/json");
+        res.send(data);
+        res.end();
+
+        // Save response
+        const headers = { ["Content-Type"]: "application/json" };
+        MonitoringManager.instance.saveResponse(500, headers, data, res);
+    }
+
+    public getRequests(req: any, res: any, next: any) {
+        const filterKey = req.query.filterKey || "";
+        const filterValue = req.query.filterValue || "";
+        const limit = req.query.limit || 10;
+        const requests = MonitoringManager.instance.getRequests(filterKey, filterValue, limit);
+        const data : any = { code: 200, message: "Operation succeed", data: requests };
+        res.status(200);
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(data));
+        res.end();
+    }
+
+    public getResponses(req: any, res: any, next: any) {
+        const filterKey = req.query.filterKey || "";
+        const filterValue = req.query.filterValue || "";
+        const limit = req.query.limit || 10;
+        const responses = MonitoringManager.instance.getResponses(filterKey, filterValue, limit);
+        const data : any = { code: 200, message: "Operation succeed", data: responses };
+        res.status(200);
+        res.setHeader("Content-Type", "application/json");
+        res.send(JSON.stringify(data));
+        res.end();
     }
 }
   

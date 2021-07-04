@@ -11,6 +11,7 @@ import { format } from "util";
 import { METHODS } from "./business/utils/enum";
 import { BehaviourService } from "./behaviourService";
 import { OptionsManager } from "./business/core/optionsManager";
+import { MonitoringManager } from "./business/core/monitoringManager";
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 
@@ -33,29 +34,22 @@ export class App {
         this.app.use(bodyParser.json());
         this.app.use(bodyParser.xml());
         this.app.use(bodyParser.urlencoded({ extended: true }));
-        this.app.use("/", DefaultRoute.router);
-        this.app.use((err, req, res, next) => {
 
-            // Error handling
-            res.status(500);
-            const data : any = { code: 500, message: "Internal error: " + err.message || "" };
+        // Middleware
+        this.app.use(DefaultRoute.middleware);
 
-            // Add debug informations
-            if (OptionsManager.instance.debug) {
-                data.stack = err.stack;
-            }
-
-            // Log informations
-            winston.error("App.run - Internal error occured: " + err.message);
-            winston.error(err.stack);
-
-            res.send(data);
-            res.end();
-        });
-
-        // Read project
+        // Add project listeners
         const projects = await this.readProjects();
         this.addListeners(projects);
+        this.app.use("/", DefaultRoute.router);
+
+        // Monitoring
+        this.app.get("/mockdesigner/monitoring/requests", DefaultRoute.getRequests);
+        this.app.get("/mockdesigner/monitoring/responses", DefaultRoute.getResponses);
+
+        // Error handling
+        this.app.use(DefaultRoute.sendResourceNotFound.bind(DefaultRoute));
+        this.app.use(DefaultRoute.sendInternalError);
     }
 
     private readProjects() {
@@ -67,12 +61,13 @@ export class App {
     }
 
     private addListeners(projects: Project[]) {
-        projects.forEach((project) => {
-            Object.values(project.services).forEach(service => {
-                this.addListener(service);
-            });
-        });
-        DefaultRoute.addDefaultRoute(this._listeners);
+        for (const key in projects) {
+            const services = Object.values(projects[key].services);
+            for (const keyService in services) {
+                this.addListener(services[keyService]);
+            }
+        }
+        DefaultRoute.listeners = this._listeners;
     }
 
     private addListener(service: Service){

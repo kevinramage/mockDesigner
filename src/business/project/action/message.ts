@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { Context } from "../../core/context";
 import { Action } from "../action";
+import { MonitoringManager } from "../../core/monitoringManager";
 
 export class ActionMessage extends Action {
     private _workspace : string;
@@ -45,18 +46,37 @@ export class ActionMessage extends Action {
         return new Promise<void>(resolve => {
             if (this.template) {
                 new JSONTemplateRender(context).render(input).then((value) => {
+
+                    // Send response
                     context.response.send(value);
                     context.response.end();
+
+                    // Save response
+                    MonitoringManager.instance.saveResponse(this.status, this.headers, value, context.response);
+
                     resolve();
 
                 }).catch((err) => {
-                    context.response.send("Internal error: " + err);
+
+                    // Send response
+                    const value = "Internal error: " + err;
+                    context.response.send(value);
                     context.response.end();
+
+                    // Save response
+                    MonitoringManager.instance.saveResponse(this.status, this.headers, value, context.response);
+
                     resolve();
                 });
             } else {
+
+                // Send response
                 context.response.send(input);
                 context.response.end();
+
+                // Save response
+                MonitoringManager.instance.saveResponse(this.status, this.headers, input, context.response);
+
                 resolve();
             }
         });
