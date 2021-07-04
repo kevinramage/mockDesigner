@@ -1,3 +1,4 @@
+import { OptionsManager } from "./business/core/optionsManager";
 import * as winston from "winston";
 import DailyRotateFile = require("winston-daily-rotate-file");
 import app from "./app";
@@ -22,7 +23,7 @@ export class Main {
         });
 
         // Listen
-        const port = process.env.PORT || 7001;
+        const port = OptionsManager.instance.port;
         app.listen(port,() => {
             winston.info("Main.start - Mock server started on " + port);
         });

@@ -21,6 +21,12 @@ export class OptionsManager {
         return option ? option.split(",") : undefined;
     }
 
+    public getNumber(key: string) {
+        const option = this._options[key];
+        const number = option ? Number.parseInt(option) : undefined;
+        return number ? (!isNaN(number) ? number : undefined) : undefined;
+    }
+
     public get debug() {
         return this.getBoolean(OPTIONS.DEBUG) || true;
     }
@@ -35,6 +41,10 @@ export class OptionsManager {
 
     public get authorizedMethods() {
         return this.getStringArray(OPTIONS.AUTHORIZED_METHODS) || ["GET", "POST", "PUT", "DELETE"]
+    }
+
+    public get port() {
+        return this.getNumber(OPTIONS.PORT) || 7001;
     }
 
     public get options() {

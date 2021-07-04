@@ -35,8 +35,8 @@ export class App {
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
         // Middleware
-        //this.app.use(DefaultRoute.sendMethodNotAllow);
         this.app.use(DefaultRoute.middleware);
+        this.app.use(DefaultRoute.sendMethodNotAllow);
 
         // Add project listeners
         const projects = await this.readProjects();
