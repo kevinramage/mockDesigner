@@ -24,6 +24,10 @@ export class OptionsManager {
         return this.getString(OPTIONS.VERSION) || "1.0.0";
     }
 
+    public get mockWorkingDirectory() {
+        return this.getString(OPTIONS.MOCK_WORKDIR) || "mock";
+    }
+
     public get options() {
         return this._options;
     }

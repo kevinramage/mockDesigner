@@ -17,4 +17,8 @@ export class Authentication {
         context.response.send("Access forbidden");
         context.response.end();
     }
+
+    public toObject() {
+        return {};
+    }
 }

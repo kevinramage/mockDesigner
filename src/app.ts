@@ -1,5 +1,4 @@
 import { Projects } from "./business/project/projects";
-import errorHandler from "errorhandler";
 import express, { Request, Response } from "express";
 import morgan from "morgan";
 import DefaultRoute from "./routes";
@@ -11,7 +10,7 @@ import { format } from "util";
 import { METHODS } from "./business/utils/enum";
 import { BehaviourService } from "./behaviourService";
 import { OptionsManager } from "./business/core/optionsManager";
-import { MonitoringManager } from "./business/core/monitoringManager";
+import { ProjectService } from "./business/services/project";
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 
@@ -47,6 +46,10 @@ export class App {
         this.app.get("/mockdesigner/monitoring/requests", DefaultRoute.getRequests);
         this.app.get("/mockdesigner/monitoring/responses", DefaultRoute.getResponses);
 
+        // API
+        this.app.get("/mockdesigner/api/project/:pjname", ProjectService.getProject);
+        this.app.get("/mockdesigner/api/project", ProjectService.getAllProjects);
+
         // Error handling
         this.app.use(DefaultRoute.sendResourceNotFound.bind(DefaultRoute));
         this.app.use(DefaultRoute.sendInternalError);
@@ -54,7 +57,7 @@ export class App {
 
     private readProjects() {
         return new Promise<Project[]>(async (resolve) => {
-            const projects = await Projects.readProjects("mock");
+            const projects = await Projects.buildProjects(OptionsManager.instance.mockWorkingDirectory);
             winston.info(format("App.readProjects - %d project(s) loaded", projects.length));
             resolve(projects);
         });

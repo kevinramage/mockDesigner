@@ -14,6 +14,10 @@ export class Action {
         });
     }
 
+    public toObject() {
+        return {}
+    }
+
     public get type() {
         return this._type;
     }

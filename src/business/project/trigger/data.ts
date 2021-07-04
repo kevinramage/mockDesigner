@@ -1,6 +1,7 @@
 import { Context } from "../../core/context";
 import { Trigger } from "../trigger";
 import { Condition } from "../../core/condition";
+import { TRIGGERS } from "../../utils/enum";
 
 export class DataTrigger extends Trigger {
     private _conditions: Condition[];
@@ -22,6 +23,14 @@ export class DataTrigger extends Trigger {
 
     public addCondition(condition: Condition) {
         this._conditions.push(condition);
+    }
+
+    public toObject() {
+        return {
+            type: TRIGGERS.DATA,
+            conditions: this.conditions.map(c => { return c.toObject() }),
+            actions: this.actions.map(a => { return a.toObject() })
+        }
     }
 
     public get conditions() {

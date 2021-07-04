@@ -63,6 +63,14 @@ export class Behaviour {
         this._actions.push(action);
     }
 
+    public toObject() {
+        return {
+            name: this.name,
+            conditions: this.conditions.map(c => { return c.toObject() }),
+            actions: this.actions.map(a => { return a.toObject() })
+        }
+    }
+
     public get name() {
         return this._name;
     }

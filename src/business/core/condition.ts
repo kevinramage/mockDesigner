@@ -16,6 +16,14 @@ export class Condition {
         return ExpressionManager.instance.evaluateCondition(context, this);
     }
 
+    public toObject() {
+        return {
+            left: this.left,
+            operation: this.operation,
+            right: this.right
+        }
+    }
+
     public get left() {
         return this._left;
     }

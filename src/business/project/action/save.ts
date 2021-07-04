@@ -1,3 +1,4 @@
+import { ACTIONS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { ExpressionManager } from "../../core/expressionManager";
 import { StorageManager } from "../../core/storageManager";
@@ -31,6 +32,13 @@ export class SaveAction extends Action {
                 reject(err)
             }
         });
+    }
+
+    public toObject() {
+        return {
+            type: ACTIONS.SAVE,
+            key: this.key
+        }
     }
 
     public get key() {

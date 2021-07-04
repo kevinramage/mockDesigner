@@ -1,4 +1,5 @@
 
+import { TRIGGERS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { Action } from "../action";
 import { Trigger } from "../trigger";
@@ -44,6 +45,13 @@ export class RandomTrigger extends Trigger {
             currentValue += this.messages[i].probability;
         }
         return message;
+    }
+
+    public toObject() {
+        return {
+            type: TRIGGERS.RANDOM,
+            actions: this.actions.map(a => { return a.toObject() })
+        }
     }
 
     public get messages() {

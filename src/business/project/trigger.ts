@@ -34,6 +34,13 @@ export class Trigger {
         this._actions.push(action);
     }
 
+    public toObject() {
+        return {
+            type: TRIGGERS.NONE,
+            actions: this.actions.map(a => { return a.toObject(); })
+        };
+    }
+
     public get type() {
         return this._type;
     }

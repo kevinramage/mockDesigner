@@ -79,6 +79,13 @@ export class Response {
         });
     }
 
+    public toObject() {
+        return {
+            behaviours: this.behaviours.map(b => { return b.toObject(); }),
+            triggers: this.triggers.map(t => { return t.toObject(); }),
+        }
+    }
+
     public get triggers() {
         return this._triggers;
     }

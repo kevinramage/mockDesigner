@@ -1,4 +1,4 @@
-import { APIKEY_SOURCES } from "../../utils/enum";
+import { APIKEY_SOURCES, AUTHENTICATIONS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { Authentication } from "../authentication";
 
@@ -44,6 +44,15 @@ export class ApiKeyAuthentication extends Authentication {
         } else {
             this.sendAuthenticationRequired(context);
             return false;
+        }
+    }
+
+    public toObject() {
+        return {
+            type: AUTHENTICATIONS.APIKEY,
+            source: this.source,
+            key: this.key,
+            value: this.value
         }
     }
 

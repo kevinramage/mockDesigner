@@ -7,20 +7,23 @@ import { parse } from "yaml";
 import { ProjectFactory } from "../../factory/project";
 
 export class Project {
+    private _folderPath : string;
     private _name : string;
     private _services : { [ name: string] : Service };
 
     constructor() {
+        this._folderPath = "";
         this._name = "";
         this._services = {};
     }
 
-    public static buildFromFile(folderPath: string) {
+    public static buildFromFile(folderPath: string, folderName: string) {
         return new Promise<Project>((resolve, reject) => {
             const path = join(folderPath, "code", "main.yml");
             readFile(path, (err, data) => {
                 if (!err) {
                     const project = Project.loadFromContent(data.toString(), folderPath);
+                    project.folderName = folderName;
                     resolve(project);
                 } else {
                     reject(err);
@@ -46,6 +49,26 @@ export class Project {
 
     public isExistingService(serviceName: string) {
         return (!!this._services[serviceName]);
+    }
+
+    public toObject() {
+        const keys = Object.keys(this.services);
+        const services = keys.map(k => { return this.services[k].toObject() });
+        return { name: this.folderName, applicationName: this.name, services: services};
+    }
+
+    public toObjectFull() {
+        const keys = Object.keys(this.services);
+        const services = keys.map(k => { return this.services[k].toObjectFull() });
+        return { name: this.folderName, applicationName: this.name, services: services};
+    }
+
+    public get folderName() {
+        return this._folderPath;
+    }
+
+    public set folderName(value) {
+        this._folderPath = value;
     }
 
     public get name() {

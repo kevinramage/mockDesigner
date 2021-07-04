@@ -1,24 +1,27 @@
-import { readdir } from "fs";
+import { lstatSync, readdirSync } from "fs";
 import { join } from "path";
 import { Project } from "./project";
 
 
 export class Projects {
-    public static readProjects(folderPath: string) {
-        return new Promise<Project[]>((resolve, reject) => {
-            readdir(folderPath, async (err, files) => {
-                if (!err) {
-                    const projects : Project[] = [];
-                    for (var index in files) {
-                        const path = join(folderPath, files[index]);
-                        const project = await Project.buildFromFile(path);
+
+    public static buildProjects(folderPath: string) {
+        return new Promise<Project[]>(async(resolve, reject) => {
+            try {
+                const projects : Project[] = [];
+                const files = readdirSync(folderPath);
+                for (var key in files) {
+                    const path = join(folderPath, files[key]);
+                    const isDirectory = lstatSync(path);
+                    if (isDirectory) {
+                        const project = await Project.buildFromFile(path, files[key]);
                         projects.push(project);
                     }
-                    resolve(projects);
-                } else {
-                    reject(err);
                 }
-            });
+                resolve(projects);
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 }

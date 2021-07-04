@@ -4,7 +4,7 @@ import { METHODS } from "../utils/enum";
 import { Authentication } from "./authentication";
 import { Response } from "./response";
 import { join } from "path";
-import { access, exists, existsSync, fstat, readdir } from "fs";
+import { access, readdir } from "fs";
 import { FunctionManager } from "../core/functionManager";
 
 export class Service {
@@ -13,7 +13,7 @@ export class Service {
     private _method : string;
     private _path : string;
     private _response : Response;
-    private _authentication : Authentication;
+    private _authentication : Authentication | null;
     private _dataManager : DataManager;
     private _functionManager : FunctionManager;
 
@@ -22,7 +22,7 @@ export class Service {
         this._name = "";
         this._method = METHODS.GET;
         this._path = "/";
-        this._authentication = new Authentication();
+        this._authentication = null;
         this._response = new Response();
 
         this._dataManager = new DataManager();
@@ -35,7 +35,7 @@ export class Service {
         return new Promise<void>(async (resolve, reject) => {
             context.dataManager = this._dataManager;
             context.functionManager = this._functionManager;
-            if (this.authentication.authenticate(context)) {
+            if (this.authentication && this.authentication.authenticate(context)) {
                 this.response.execute(context, this.name).then(resolve).catch(reject);
             } else {
                 resolve();
@@ -87,6 +87,26 @@ export class Service {
                 }
             });
         });
+    }
+
+    public toObject() {
+        return {
+            name: this.name,
+            method: this.method,
+            path: this.path,
+            workspace: this.workspace
+        }
+    }
+
+    public toObjectFull() {
+        return {
+            name: this.name,
+            method: this.method,
+            path: this.path,
+            workspace: this.workspace,
+            authentication: this.authentication ? this.authentication.toObject() : null,
+            response: this.response.toObject()
+        }
     }
 
     public get name() {

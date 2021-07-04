@@ -4,6 +4,7 @@ import { join } from "path";
 import { Context } from "../../core/context";
 import { Action } from "../action";
 import { MonitoringManager } from "../../core/monitoringManager";
+import { ACTIONS } from "../../utils/enum";
 
 export class ActionMessage extends Action {
     private _workspace : string;
@@ -94,6 +95,14 @@ export class ActionMessage extends Action {
 
     public addHeader(name: string, value: string) {
         this._headers[name] = value;
+    }
+
+    public toObject() {
+        return {
+            type: ACTIONS.MESSAGE,
+            status: this.status,
+            body: this.bodyFile != "" ? "File: " + this.bodyFile : this.bodyText
+        }
     }
 
     public get status() {

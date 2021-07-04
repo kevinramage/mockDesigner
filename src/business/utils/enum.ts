@@ -42,4 +42,5 @@ export module OPERATION {
 export module OPTIONS {
     export const DEBUG = "DEBUG";
     export const VERSION = "VERSION";
+    export const MOCK_WORKDIR = "MOCK_WORKDIR";
 }

@@ -1,3 +1,4 @@
+import { AUTHENTICATIONS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { Authentication } from "../authentication";
 
@@ -34,6 +35,14 @@ export class BasicAuthentication extends Authentication {
         } else {
             this.sendAuthenticationRequired(context);
             return false;
+        }
+    }
+
+    public toObject() {
+        return {
+            type: AUTHENTICATIONS.BASIC,
+            username: this.username,
+            password: this.password
         }
     }
 
