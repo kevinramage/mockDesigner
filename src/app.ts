@@ -35,6 +35,7 @@ export class App {
         this.app.use(bodyParser.urlencoded({ extended: true }));
 
         // Middleware
+        //this.app.use(DefaultRoute.sendMethodNotAllow);
         this.app.use(DefaultRoute.middleware);
 
         // Add project listeners
@@ -78,8 +79,13 @@ export class App {
         this._listeners.push(service.path);
         const handler = async(req : Request, res: Response, next: any) => {
             try {
+
+                // Execute the service
                 const context = new Context(req, res);
                 await service.execute(context);
+
+                // Execute the default response if no response provided by the system
+                context.sendNoResponseMessage();
 
             } catch (err) {
                 next(err);

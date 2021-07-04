@@ -3,6 +3,7 @@ import { Condition } from "../core/condition";
 import { Context } from "../core/context";
 import { ExpressionManager } from "../core/expressionManager";
 import { Action } from "./action";
+import * as winston from "winston";
 
 export class Behaviour {
     private _name: string;
@@ -50,6 +51,7 @@ export class Behaviour {
     }
 
     public execute(context: Context) {
+        winston.debug("Behaviour.execute - Execute behaviour: " + this.name);
         for (var index in this.actions) {
             this.actions[index].execute(context);
         }

@@ -1,6 +1,7 @@
 import { ACTIONS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { Action } from "../action";
+import * as winston from "winston";
 
 export class WaitAction extends Action {
     private _time : number;
@@ -11,6 +12,7 @@ export class WaitAction extends Action {
     }
 
     public execute(context: Context) {
+        winston.debug("WaitAction.execute - Execute action: " + this.type);
         return new Promise<void>(resolve => {
             setTimeout(resolve, this.time);
         });

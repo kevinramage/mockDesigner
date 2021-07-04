@@ -16,6 +16,11 @@ export class OptionsManager {
         return this._options[key] && (this._options[key].toLowerCase() == "true" || this._options[key]== "1");
     }
 
+    public getStringArray(key: string) {
+        const option = this._options[key];
+        return option ? option.split(",") : undefined;
+    }
+
     public get debug() {
         return this.getBoolean(OPTIONS.DEBUG) || true;
     }
@@ -26,6 +31,10 @@ export class OptionsManager {
 
     public get mockWorkingDirectory() {
         return this.getString(OPTIONS.MOCK_WORKDIR) || "mock";
+    }
+
+    public get authorizedMethods() {
+        return this.getStringArray(OPTIONS.AUTHORIZED_METHODS) || ["GET", "POST", "PUT", "DELETE"]
     }
 
     public get options() {

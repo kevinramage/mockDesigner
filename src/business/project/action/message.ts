@@ -5,6 +5,7 @@ import { Context } from "../../core/context";
 import { Action } from "../action";
 import { MonitoringManager } from "../../core/monitoringManager";
 import { ACTIONS } from "../../utils/enum";
+import * as winston from "winston";
 
 export class ActionMessage extends Action {
     private _workspace : string;
@@ -25,6 +26,7 @@ export class ActionMessage extends Action {
     }
 
     public execute(context: Context) {
+        winston.debug("MessageAction.execute - Execute action: " + this.type);
         return new Promise<void>(async resolve => {
             if (!context.response.writableEnded) {
 

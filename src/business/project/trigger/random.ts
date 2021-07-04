@@ -3,6 +3,7 @@ import { TRIGGERS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { Action } from "../action";
 import { Trigger } from "../trigger";
+import * as winston from "winston";
 
 export class RandomTrigger extends Trigger {
     private _messages : RandomMessageTrigger[];
@@ -17,6 +18,7 @@ export class RandomTrigger extends Trigger {
     }
 
     public execute(context: Context) {
+        winston.debug("RandomTrigger.execute - Execute trigger: " + this.type);
         return new Promise<void>(async (resolve, reject) => {
             try {
                 let score = Math.trunc(Math.random() * (this.maxProbability - 1));

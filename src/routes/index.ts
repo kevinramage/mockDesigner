@@ -65,6 +65,35 @@ class DefaultRoute {
         next();
     }
 
+    public sendMethodNotAllow(req: express.Request, res: express.Response, next: Function) {
+        if (!OptionsManager.instance.authorizedMethods.includes(req.method.toUpperCase())) {
+
+            // Manage error handling
+            res.status(405);
+            const data : any = { code: 405, message: "Method not allowed" };
+
+            // Add debug informations
+            if (OptionsManager.instance.debug) {
+                data.method = req.method;
+                data.autorizedMethods = OptionsManager.instance.authorizedMethods;
+                data.version = "Mock Designer v" + OptionsManager.instance.version;
+            }
+            
+            // Send response
+            const message = JSON.stringify(data);
+            res.setHeader("Content-Type", "application/json");
+            res.send(message);
+            res.end();
+
+            // Save response
+            const headers = { ["Content-Type"]: "application/json" };
+            MonitoringManager.instance.saveResponse(405, headers, message, res);
+
+        } else {
+            next();
+        }
+    }
+
     public sendResourceNotFound(req: express.Request, res: express.Response, next: Function) {
 
         // Manage error handling
@@ -98,6 +127,7 @@ class DefaultRoute {
         // Add debug informations
         if (OptionsManager.instance.debug) {
             data.stack = err.stack;
+            data.version = "Mock Designer v" + OptionsManager.instance.version;
         }
 
         // Log informations

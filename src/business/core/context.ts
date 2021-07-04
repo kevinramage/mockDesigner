@@ -123,6 +123,16 @@ export class Context {
         });
     }
 
+    public sendNoResponseMessage() {
+        if (!this.response.writableEnded) {
+            const data = { code: 500, message: "Internal error", error: "No response provided by Mock Designer"};
+            this.response.status(500);
+            this.response.setHeader("content-type", "application/json");
+            this.response.send(JSON.stringify(data));
+            this.response.end();
+        }
+    }
+
     public get request() {
         return this._request;
     }

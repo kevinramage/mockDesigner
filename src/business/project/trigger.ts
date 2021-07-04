@@ -1,6 +1,7 @@
 import { Context } from "../../business/core/context";
 import { TRIGGERS } from "../utils/enum";
 import { Action } from "./action";
+import * as winston from "winston";
 
 export class Trigger {
     private _type : string;
@@ -16,6 +17,7 @@ export class Trigger {
     }
 
     public execute(context: Context) {
+        winston.debug("Trigger.execute - Execute trigger: " + this.type);
         return new Promise<void>(async (resolve, reject) => {
             try {
                 for(var key in this.actions) {

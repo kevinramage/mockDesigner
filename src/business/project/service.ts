@@ -6,6 +6,7 @@ import { Response } from "./response";
 import { join } from "path";
 import { access, readdir } from "fs";
 import { FunctionManager } from "../core/functionManager";
+import * as winston from "winston";
 
 export class Service {
     private _workspace : string;
@@ -32,10 +33,11 @@ export class Service {
     }
 
     public execute(context: Context) {
+        winston.debug("Service.execute - Execute service: " + this.method + " " + this.path);
         return new Promise<void>(async (resolve, reject) => {
             context.dataManager = this._dataManager;
             context.functionManager = this._functionManager;
-            if (this.authentication && this.authentication.authenticate(context)) {
+            if (!this.authentication || this.authentication.authenticate(context)) {
                 this.response.execute(context, this.name).then(resolve).catch(reject);
             } else {
                 resolve();

@@ -3,6 +3,7 @@ import { Context } from "../../core/context";
 import { ExpressionManager } from "../../core/expressionManager";
 import { StorageManager } from "../../core/storageManager";
 import { Action } from "../action";
+import * as winston from "winston";
 
 export class SaveAction extends Action {
     private _key: string;
@@ -19,6 +20,7 @@ export class SaveAction extends Action {
     }
 
     public execute(context: Context) {
+        winston.debug("SaveAction.execute - Execute action: " + this.type);
         return new Promise<void>(async (resolve, reject) => {
             try {
                 for (var key in this.expressions) {

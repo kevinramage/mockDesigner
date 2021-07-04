@@ -2,6 +2,7 @@ import { TRIGGERS } from "../../utils/enum";
 import { Context } from "../../core/context";
 import { Action } from "../action";
 import { Trigger } from "../trigger";
+import * as winston from "winston";
 
 export class SequentialTrigger extends Trigger {
 
@@ -15,6 +16,7 @@ export class SequentialTrigger extends Trigger {
     }
 
     public execute(context: Context) {
+        winston.debug("SequentialTrigger.execute - Execute trigger: " + this.type);
         return new Promise<void>(async (resolve, reject) => {
             try {
                 let current = 0;
