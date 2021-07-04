@@ -65,9 +65,6 @@ export class MonitoringManager {
     }
 
     public getRequests(filterKey: string, filterValue: string, limit: number) {
-        console.info(filterKey);
-        console.info(filterValue);
-        console.info(limit);
         const sortByDate = (a, b) => { return a.sentDate.getTime() > b.sentDate.getTime() ? -1 : 1};
         let requests = this._requests.sort(sortByDate);
         if (filterKey != "") {

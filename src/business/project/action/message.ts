@@ -25,17 +25,27 @@ export class ActionMessage extends Action {
 
     public execute(context: Context) {
         return new Promise<void>(async resolve => {
-            context.response.status(this.status);
-            Object.entries(this.headers).forEach((values) => {
-                context.response.setHeader(values[0], values[1]);
-            });
-            if (this.bodyFile) {
-                const path = join(this._workspace, "responses", this.bodyFile);
-                const content = readFileSync(path);
-                await this.sendText(content.toString(), context);
-                resolve();
+            if (!context.response.writableEnded) {
+
+                // Status
+                context.response.status(this.status);
+
+                // Headers
+                Object.entries(this.headers).forEach((values) => {
+                    context.response.setHeader(values[0], values[1]);
+                });
+            
+                // Body
+                if (this.bodyFile) {
+                    const path = join(this._workspace, "responses", this.bodyFile);
+                    const content = readFileSync(path);
+                    await this.sendText(content.toString(), context);
+                    resolve();
+                } else {
+                    await this.sendText(this.bodyText, context);
+                    resolve();
+                }
             } else {
-                await this.sendText(this.bodyText, context);
                 resolve();
             }
         });
