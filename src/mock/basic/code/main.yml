@@ -4,9 +4,7 @@ services:
     method: GET
     path: /api/v1/basicService
     response:
-      triggers:
-      - type: none
-        actions:
-        - type: message
-          status: 200
-          body: OK
+      actions:
+      - type: message
+        status: 200
+        body: OK

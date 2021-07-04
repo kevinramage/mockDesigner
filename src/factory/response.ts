@@ -1,5 +1,7 @@
+import { Trigger } from "../business/project/trigger";
 import { Response } from "../business/project/response";
 import { IResponse } from "../interface/response";
+import { ActionFactory } from "./action";
 import { BehaviourFactory } from "./behaviour";
 import { TriggerFactory } from "./trigger";
 
@@ -20,6 +22,16 @@ export class ResponseFactory {
                 const behaviour = BehaviourFactory.build(behaviourData, workspace);
                 response.addBehaviour(behaviour);
             });
+        }
+        if (!responseData.triggers && responseData.actions) {
+            const noTrigger = new Trigger();
+            responseData.actions.forEach(actionData => {
+                const action = ActionFactory.build(actionData, workspace);
+                if (action) {
+                    noTrigger.addAction(action);
+                }
+            });
+            response.addTrigger(noTrigger);
         }
         return response;
     }
