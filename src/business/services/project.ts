@@ -30,10 +30,17 @@ export class ProjectService {
         const projectName = req.params.pjname || "";
         const path = join(OptionsManager.instance.mockWorkingDirectory, projectName);
         Project.buildFromFile(path, projectName).then((project) => {
-            res.status(200);
-            res.setHeader("content-type", "application/json");
-            res.send(JSON.stringify(project.toObjectFull()));
-            res.end();
+            if (project) {
+                res.status(200);
+                res.setHeader("content-type", "application/json");
+                res.send(JSON.stringify(project.toObjectFull()));
+                res.end();
+            } else {
+                res.status(404);
+                res.setHeader("content-type", "application/json");
+                res.send(JSON.stringify({code: 404, message: "Project not found", error: "Invalid project content"}));
+                res.end();
+            }
         }).catch((err) => {
             const data = { code: "500", message: "Internal error", error: err.message };
             if (OptionsManager.instance.debug) {

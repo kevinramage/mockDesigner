@@ -5,6 +5,7 @@ import { format } from "util";
 import { Service } from "./service";
 import { parse } from "yaml";
 import { ProjectFactory } from "../../factory/project";
+import * as winston from "winston";
 
 export class Project {
     private _folderPath : string;
@@ -18,12 +19,14 @@ export class Project {
     }
 
     public static buildFromFile(folderPath: string, folderName: string) {
-        return new Promise<Project>((resolve, reject) => {
+        return new Promise<Project|null>((resolve, reject) => {
             const path = join(folderPath, "code", "main.yml");
             readFile(path, (err, data) => {
                 if (!err) {
                     const project = Project.loadFromContent(data.toString(), folderPath);
-                    project.folderName = folderName;
+                    if (project) {
+                        project.folderName = folderName;
+                    }
                     resolve(project);
                 } else {
                     reject(err);
@@ -33,8 +36,13 @@ export class Project {
     }
 
     public static loadFromContent(data: string, workspace: string) {
-        const content = parse(data) as IProject;
-        return ProjectFactory.build(content, workspace);
+        try {
+            const content = parse(data, { prettyErrors: true}) as IProject;
+            return ProjectFactory.build(content, workspace);
+        } catch (err) {
+            winston.error("Projects.loadFromContent - Error during project loading: ", err);
+            return null;
+        }
     }
 
     public addService(service: Service) {

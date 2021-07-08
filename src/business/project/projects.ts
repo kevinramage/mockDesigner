@@ -1,7 +1,8 @@
 import { lstatSync, readdirSync } from "fs";
 import { join } from "path";
+import { format } from "util";
 import { Project } from "./project";
-
+import * as winston from "winston";
 
 export class Projects {
 
@@ -15,7 +16,11 @@ export class Projects {
                     const isDirectory = lstatSync(path);
                     if (isDirectory) {
                         const project = await Project.buildFromFile(path, files[key]);
-                        projects.push(project);
+                        if (project) {
+                            projects.push(project);
+                        } else {
+                            winston.error(format("Projects.buildProjects - project '%s' ignored due previous errors", files[key]))
+                        }
                     }
                 }
                 resolve(projects);
