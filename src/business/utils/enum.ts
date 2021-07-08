@@ -44,5 +44,6 @@ export module OPTIONS {
     export const VERSION = "VERSION";
     export const MOCK_WORKDIR = "MOCK_WORKDIR";
     export const AUTHORIZED_METHODS = "AUTHORIZED_METHODS";
+    export const CONTENTTYPE_DETECTION_ENABLED = "CONTENTTYPE_DETECTION_ENABLED";
     export const PORT = "PORT";
 }

@@ -6,8 +6,11 @@ import { Action } from "../action";
 import { MonitoringManager } from "../../core/monitoringManager";
 import { ACTIONS } from "../../utils/enum";
 import * as winston from "winston";
+import { ContentTypeDetection } from "../../utils/contentTypeDetection";
+import { OptionsManager } from "../../core/optionsManager";
 
 export class ActionMessage extends Action {
+
     private _workspace : string;
     private _status : number;
     private _headers : { [key: string]: string};
@@ -27,70 +30,78 @@ export class ActionMessage extends Action {
 
     public execute(context: Context) {
         winston.debug("MessageAction.execute - Execute action: " + this.type);
-        return new Promise<void>(async resolve => {
-            if (!context.response.writableEnded) {
-
-                // Status
-                context.response.status(this.status);
-
-                // Headers
-                Object.entries(this.headers).forEach((values) => {
-                    context.response.setHeader(values[0], values[1]);
-                });
-            
-                // Body
-                if (this.bodyFile) {
-                    const path = join(this._workspace, "responses", this.bodyFile);
-                    const content = readFileSync(path);
-                    await this.sendText(content.toString(), context);
-                    resolve();
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                if (!context.response.writableEnded) {
+                    await this.sendResponse(context);
                 } else {
-                    await this.sendText(this.bodyText, context);
                     resolve();
                 }
-            } else {
-                resolve();
+
+            } catch (err) {
+                reject(err);
             }
         });
 
     }
 
-    private sendText(input: string, context: Context) {
-        return new Promise<void>(resolve => {
-            if (this.template) {
-                new JSONTemplateRender(context).render(input).then((value) => {
-
-                    // Send response
-                    context.response.send(value);
-                    context.response.end();
-
-                    // Save response
-                    MonitoringManager.instance.saveResponse(this.status, this.headers, value, context.response);
-
-                    resolve();
-
-                }).catch((err) => {
-
-                    // Send response
-                    const value = "Internal error: " + err;
-                    context.response.send(value);
-                    context.response.end();
-
-                    // Save response
-                    MonitoringManager.instance.saveResponse(this.status, this.headers, value, context.response);
-
-                    resolve();
-                });
-            } else {
+    private sendResponse(context: Context) {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+                // Get content
+                const content = await this.getContent(context);
+                this.detectContentType(context, content);
 
                 // Send response
-                context.response.send(input);
+                context.response.status(this.status);
+                Object.entries(this.headers).forEach((values) => {
+                    context.response.setHeader(values[0], values[1]);
+                });
+                context.response.send(content);
                 context.response.end();
 
                 // Save response
-                MonitoringManager.instance.saveResponse(this.status, this.headers, input, context.response);
+                MonitoringManager.instance.saveResponse(this.status, this.headers, content, context.response);
 
-                resolve();
+            } catch (err)  {
+                reject(err);
+            }
+        });
+    }
+
+    private detectContentType(context: Context, content: string) {
+        if (!this.headers["content-type"] && OptionsManager.instance.isContentTypeDetectionEnabled) {
+            this.headers["content-type"] = ContentTypeDetection.detect(content);
+        }
+    }
+
+    private getContent(context: Context) {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                if (this.bodyFile) {
+                    const path = join(this._workspace, "responses", this.bodyFile);
+                    const content = readFileSync(path);
+                    const text = await this.getText(content.toString(), context);
+                    resolve(text);
+                } else {
+                    resolve(this.bodyText);
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    private getText(input: string, context: Context) {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                let value = input;
+                if (this.template) {
+                    value = await new JSONTemplateRender(context).render(input);
+                }
+                resolve(value);
+            } catch (err) {
+                reject(err);
             }
         });
     }

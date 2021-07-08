@@ -13,7 +13,8 @@ export class OptionsManager {
     }
 
     public getBoolean(key: string) {
-        return this._options[key] && (this._options[key].toLowerCase() == "true" || this._options[key]== "1");
+        const option = this._options[key];
+        return option ? option.toLowerCase() == "true" || option == "1" : undefined;
     }
 
     public getStringArray(key: string) {
@@ -45,6 +46,10 @@ export class OptionsManager {
 
     public get port() {
         return this.getNumber(OPTIONS.PORT) || 7001;
+    }
+
+    public get isContentTypeDetectionEnabled() {
+        return  this.getBoolean(OPTIONS.CONTENTTYPE_DETECTION_ENABLED) || true;
     }
 
     public get options() {
