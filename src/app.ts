@@ -11,6 +11,7 @@ import { METHODS } from "./business/utils/enum";
 import { BehaviourService } from "./behaviourService";
 import { OptionsManager } from "./business/core/optionsManager";
 import { ProjectService } from "./business/services/project";
+import { OptionService } from "./business/services/options";
 const bodyParser = require('body-parser');
 require('body-parser-xml')(bodyParser);
 
@@ -50,6 +51,10 @@ export class App {
         // API
         this.app.get("/mockdesigner/api/project/:pjname", ProjectService.getProject);
         this.app.get("/mockdesigner/api/project", ProjectService.getAllProjects);
+        this.app.get("/mockdesigner/api/option/:key", OptionService.getAllOptions);
+        this.app.get("/mockdesigner/api/option", OptionService.getAllOptions);
+        this.app.put("/mockdesigner/api/option", OptionService.updateOption);
+        this.app.post("/mockdesigner/api/option/reset", OptionService.resetOption);
 
         // Error handling
         this.app.use(DefaultRoute.sendResourceNotFound.bind(DefaultRoute));

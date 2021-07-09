@@ -40,10 +40,10 @@ export module OPERATION {
 }
 
 export module OPTIONS {
-    export const DEBUG = "DEBUG";
-    export const VERSION = "VERSION";
-    export const MOCK_WORKDIR = "MOCK_WORKDIR";
-    export const AUTHORIZED_METHODS = "AUTHORIZED_METHODS";
-    export const CONTENTTYPE_DETECTION_ENABLED = "CONTENTTYPE_DETECTION_ENABLED";
-    export const PORT = "PORT";
+    export const DEBUG = "system.debug";
+    export const VERSION = "system.version";
+    export const MOCK_WORKDIR = "system.workingDirectory";
+    export const AUTHORIZED_METHODS = "app.authorizedMethods";
+    export const CONTENTTYPE_DETECTION_ENABLED = "app.contentTypeDetection.enabled";
+    export const PORT = "system.port";
 }

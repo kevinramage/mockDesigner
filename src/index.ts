@@ -22,6 +22,9 @@ export class Main {
             winston.error(err.stack);
         });
 
+        // Load options
+        OptionsManager.instance.loadOptions();
+
         // Listen
         const port = OptionsManager.instance.port;
         app.listen(port,() => {
