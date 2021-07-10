@@ -36,10 +36,10 @@ function compileLibrary(dir, file) {
             readFile(jsFile, (err, buffer) => {
                 if (!err) {
                     let data = buffer.toString();
-                    data = data.replace("require(\"types/Context\");", "require(\"./Context\");");
-                    data = data.replace("require(\"types/RedisManager\");", "require(\"./RedisManager\");");
-                    data = data.replace("require(\"types/DataManager\");", "require(\"./DataManager\");");
-                    data = data.replace("require(\"types/FunctionManager\");", "require(\"./FunctionManager\");");
+                    data = data.replace("require(\"types/Context\");", "require(\"./context\");");
+                    data = data.replace("require(\"types/RedisManager\");", "require(\"./redisManager\");");
+                    data = data.replace("require(\"types/DataManager\");", "require(\"./dataManager\");");
+                    data = data.replace("require(\"types/FunctionManager\");", "require(\"./functionManager\");");
                     writeFile(jsFile, data, (err)=> {});
                 }
             });

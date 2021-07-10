@@ -1,0 +1,20 @@
+version: '3.2'
+services:
+  redis:
+    image: "redis:alpine"
+    hostname: redis
+    networks:
+    - md_network
+  was:
+    build:
+      context: .
+    ports:
+    - 7001
+    links:
+    - redis
+    environment:
+    - REDIS_URL=redis
+    networks:
+    - md_network
+networks:
+  md_network:

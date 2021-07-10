@@ -1,4 +1,4 @@
-import { readFile, readFileSync, writeFile, writeFileSync } from "fs";
+import { readFile, readFileSync } from "fs";
 import { IProject } from "../../interface/project";
 import { join } from "path";
 import { format } from "util";
