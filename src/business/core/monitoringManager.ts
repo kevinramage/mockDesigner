@@ -29,8 +29,8 @@ export class MonitoringManager {
             response.request = requestIdentified;
             requestIdentified.response = response;
 
-        }).catch(() => {
-            // Avoid crash, error will be ignored
+        }).catch((err) => {
+            // Avoid crash, error will be ignored (already log)
             // Link between request and response will be not set
         });
     }

@@ -138,6 +138,7 @@ export class RequestReceived {
 
     public get hashableRequest() {
         const object = JSON.parse(JSON.stringify(this));
+        object._params = {};
         object._sentDate = null;
         object._response = null;
         return object;
