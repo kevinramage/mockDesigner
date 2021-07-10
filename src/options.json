@@ -1,0 +1,1 @@
+{"system.debug":true,"system.version":"1.0.0","system.workingDirectory":"mock","app.authorizedMethods":["GET","POST","PUT","DELETE"],"app.contentTypeDetection.enabled":true,"system.port":7001}
