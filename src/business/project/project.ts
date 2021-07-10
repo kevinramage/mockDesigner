@@ -1,4 +1,4 @@
-import { readFile } from "fs";
+import { readFile, readFileSync, writeFile, writeFileSync } from "fs";
 import { IProject } from "../../interface/project";
 import { join } from "path";
 import { format } from "util";
@@ -23,7 +23,8 @@ export class Project {
             const path = join(folderPath, "code", "main.yml");
             readFile(path, (err, data) => {
                 if (!err) {
-                    const project = Project.loadFromContent(data.toString(), folderPath);
+                    const content = Project.readData(data, folderPath);
+                    const project = Project.loadFromContent(content, folderPath);
                     if (project) {
                         project.folderName = folderName;
                     }
@@ -33,6 +34,23 @@ export class Project {
                 }
             });
         });
+    }
+
+    public static readData(data: Buffer, folder: string) {
+        let content = data.toString();
+        const regex = /(?<space> *)##INCLUDE\s*(?<filename>[0-9a-zA-Z|\.]+)\s*##/g;
+        let match = regex.exec(content);
+        while (match) {
+            if (match.groups && match.groups.filename) {
+                const path = join(folder, "code", match.groups.filename);
+                const space = match.groups.space || "";
+                const buffer = readFileSync(path);
+                const contentToInclude = space + buffer.toString().replace(/\n/g, "\n" + space);
+                content = content.replace(match[0], contentToInclude);
+            }
+            match = regex.exec(content);
+        }
+        return content;
     }
 
     public static loadFromContent(data: string, workspace: string) {

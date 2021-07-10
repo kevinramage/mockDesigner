@@ -1,0 +1,10 @@
+  - name: includeServiceGetAll
+    method: GET
+    path: /api/v1/myService
+    response:
+      triggers:
+      - type: none
+        actions:
+        - type: message
+          status: 200
+          body: "OK2"
