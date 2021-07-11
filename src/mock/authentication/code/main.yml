@@ -8,12 +8,10 @@ services:
     username: myUserName
     password: myPassword
   response:
-    triggers:
-    - type: none
-      actions:
-      - type: message
-        status: 200
-        body: OK
+    actions:
+    - type: message
+      status: 200
+      body: OK
 - name: apiKeyHeaderAuthenticationService
   method: POST
   path: /api/v1/apiKeyHeaderAuthentication
@@ -23,12 +21,10 @@ services:
     key: api-key
     value: 123456
   response:
-    triggers:
-    - type: none
-      actions:
-      - type: message
-        status: 200
-        body: OK
+    actions:
+    - type: message
+      status: 200
+      body: OK
 - name: apiKeyQueryAuthenticationService
   method: POST
   path: /api/v1/apiKeyQueryAuthentication
@@ -38,12 +34,10 @@ services:
     key: api-key
     value: 123456
   response:
-    triggers:
-    - type: none
-      actions:
-      - type: message
-        status: 200
-        body: OK
+    actions:
+    - type: message
+      status: 200
+      body: OK
 - name: tokenAuthenticationService
   method: POST
   path: /api/v1/tokenAuthentication
@@ -51,9 +45,7 @@ services:
     type: token
     token: 123456
   response:
-    triggers:
-    - type: none
-      actions:
-      - type: message
-        status: 200
-        body: OK
+    actions:
+    - type: message
+      status: 200
+      body: OK

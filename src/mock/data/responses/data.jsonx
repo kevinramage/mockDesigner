@@ -1,7 +1,5 @@
 {
     "id": 1,
-    "username": "test",
-    "password": "****",
     "firstName": {{.data.firstname}},
     "lastName": {{.data.lastname}},
     "cityname": {{.data.cityname}},
