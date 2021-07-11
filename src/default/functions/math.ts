@@ -50,6 +50,11 @@ export class MathUtils {
         const maxValue = args.length > 1 ? args[1] as string : "";
         return Math.round(Math.random() * Number.parseInt(maxValue));
     }
+
+    public static parse(args: any[]) {
+        const content = args.length > 1 ? args[1] as string : "";
+        return Number.parseInt(content);
+    }
 }
 
 function register(functions: {[name: string]: Function}) {
@@ -57,4 +62,5 @@ function register(functions: {[name: string]: Function}) {
     functions["Math.Increment"] = MathUtils.increment;
     functions["Math.RandomInteger"] = MathUtils.random;
     functions["Math.UniqueID"] = MathUtils.uniqueID;
+    functions["Math.Parse"] = MathUtils.parse;
 }
