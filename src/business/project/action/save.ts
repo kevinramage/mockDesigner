@@ -25,7 +25,7 @@ export class SaveAction extends Action {
             try {
                 for (var key in this.expressions) {
                     const expression = this.expressions[key];
-                    let value = ExpressionManager.instance.evaluateExpression(context, expression.value);
+                    let value = await ExpressionManager.instance.evaluateExpression(context, expression.value);
                     value = ExpressionManager.instance.expressionToString(value);
                     await StorageManager.instance.storeValue(this.key, expression.key, value);
                 }

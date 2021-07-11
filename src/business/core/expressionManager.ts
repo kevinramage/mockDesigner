@@ -6,20 +6,83 @@ import { Context } from "./context";
 export class ExpressionManager {
     private static _instance : ExpressionManager;
 
-    public evaluateExpression(context: Context, expression: string) : string{
-        if (expression.startsWith("{{") && expression.endsWith("}}")) {
-            const expressionComputed = expression.substr(2, expression.length - 4).trim();
-            
+    public evaluateExpression(context: Context, expression: string) {
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                const regex = /\"?\s*{{\s*[a-zA-Z0-9|\.|$|_|{|}|(|)|,|\\|"]+\s*}}\s*\"?/g;
+                const match = regex.exec(expression);
+                if (match) {
+                    const contentToEvaluate = match[0].replace(/\\\"/g, "\"");
+                    const evaluation = await this.evaluateLimitedExpression(context, contentToEvaluate);
+                    const newInput = expression.replace(match[0], evaluation);
+                    resolve(this.evaluateExpression(context, newInput));
+                } else {
+                    resolve(expression);
+                }
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    private evaluateLimitedExpression(context: Context, expression: string) : Promise<string> {
+        return new Promise<string>(async (resolve, reject) => {
+            const startIndex = expression.indexOf("{{") + 2;
+            const endIndex = expression.lastIndexOf("}}");
+            let expressionComputed = expression.substr(startIndex, endIndex - startIndex).trim();
+
+            // Computed expression inside
+            try {
+                expressionComputed = await this.evaluateExpression(context, expressionComputed);
+                if (expressionComputed) {
+                    expressionComputed = expressionComputed.trim();
+                } else {
+                    resolve(expressionComputed);
+                }
+            } catch (err) {
+                reject(err);
+            }
+
+            // Request
+            if (expressionComputed.startsWith(".request")) {
+                resolve(context.variables[expressionComputed] || null);
+
             // Data
+            } else if (expressionComputed.startsWith(".data")) {
+                ///TODO
+                resolve("");
 
             // Storage
+            } else if (expressionComputed.startsWith(".store")) {
+                ///TODO
+                resolve("");
 
             // Function
+            } else if (!expressionComputed.startsWith(".")) {
+                const leftParenthesisIndex = expressionComputed.indexOf("(");
+                const rightParenthesisIndex = expressionComputed.indexOf(")");
+            
+                if (leftParenthesisIndex > -1 && rightParenthesisIndex > leftParenthesisIndex) {
+                    const functionName = expressionComputed.substr(0, leftParenthesisIndex);
+                    const argText = expressionComputed.substr(leftParenthesisIndex+1, (rightParenthesisIndex - leftParenthesisIndex-1));
+                    const args = argText.split(",");
 
-            return context.variables[expressionComputed] || null;
-        } else {
-            return expression;
-        }
+                    try {
+                        const evaluation = await this.evaluateFunction(functionName, args, context);
+                        resolve(evaluation as string);
+
+                    } catch (err) {
+                        reject(err);
+                    }
+                } else {
+                    reject(new Error("Invalid function: " + expressionComputed));
+                }
+
+            // Invalid expression
+            } else {
+                reject(new Error("Invalid expression: " + expressionComputed));
+            }
+        });
     }
 
     public evaluateVariableExpression(variableName: string, context: Context) {
@@ -33,7 +96,7 @@ export class ExpressionManager {
     }
 
     public evaluateFunction(functionName: string, expressions: string[], context: Context) {
-        return new Promise<string>(async (resolve, reject) => {
+        return new Promise<any>(async (resolve, reject) => {
             try {
                 const value = await context.evaluateFunction(functionName, expressions);
                 resolve(this.expressionToString(value));
@@ -43,44 +106,46 @@ export class ExpressionManager {
         });
     }
 
-    public evaluateCondition(context: Context, condition: Condition) : boolean {
-        let values : string[] = [];
-        let regex : RegExp;
-        const leftOp = this.evaluateExpression(context, condition.left);
-        const rightOp = this.evaluateExpression(context, condition.right);
-        switch (condition.operation) {
-            case OPERATION.EQUALS:
-                return leftOp == rightOp;
-
-            case OPERATION.NOT_EQUALS:
-                return leftOp != rightOp;
-
-            case OPERATION.MATCHES:
-                regex = new RegExp(rightOp);
-                return regex.exec(leftOp) !== null;
-
-            case OPERATION.NOT_MATCHES:
-                regex = new RegExp(rightOp);
-                return regex.exec(leftOp) !== null;
-
-            case OPERATION.IN:
-                values = (rightOp as string).split(";");
-                return values.includes(leftOp);
-
-            case OPERATION.NOT_IN:
-                values = (rightOp as string).split(";");
-                return !values.includes(leftOp);
-
-            case OPERATION.RANGE:
-                values = (rightOp as string).split("...");
-                const actual = Number.parseInt((leftOp as string));
-                const min = Number.parseInt(values[0]);
-                const max = Number.parseInt(values[1]);
-                return actual >= min && actual <= max;
-
-            default:
-                throw new Error("Invalid operation: " + condition.operation)
-        }
+    public evaluateCondition(context: Context, condition: Condition) {
+        return new Promise<boolean>(async (resolve, reject) => {
+            let values : string[] = [];
+            let regex : RegExp;
+            const leftOp = await this.evaluateExpression(context, condition.left);
+            const rightOp = await this.evaluateExpression(context, condition.right);
+            switch (condition.operation) {
+                case OPERATION.EQUALS:
+                    resolve(leftOp == rightOp);
+    
+                case OPERATION.NOT_EQUALS:
+                    resolve(leftOp != rightOp);
+    
+                case OPERATION.MATCHES:
+                    regex = new RegExp(rightOp);
+                    resolve(regex.exec(leftOp) !== null);
+    
+                case OPERATION.NOT_MATCHES:
+                    regex = new RegExp(rightOp);
+                    resolve(regex.exec(leftOp) !== null);
+    
+                case OPERATION.IN:
+                    values = (rightOp as string).split(";");
+                    resolve(values.includes(leftOp));
+    
+                case OPERATION.NOT_IN:
+                    values = (rightOp as string).split(";");
+                    resolve(!values.includes(leftOp));
+    
+                case OPERATION.RANGE:
+                    values = (rightOp as string).split("...");
+                    const actual = Number.parseInt((leftOp as string));
+                    const min = Number.parseInt(values[0]);
+                    const max = Number.parseInt(values[1]);
+                    resolve(actual >= min && actual <= max);
+    
+                default:
+                    reject(new Error("Invalid operation: " + condition.operation));
+            }
+        });
     }
 
     public expressionToString(value: any) {

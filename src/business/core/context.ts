@@ -108,7 +108,7 @@ export class Context {
     }
 
     public evaluateFunction(functionName: string, args: string[]) {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise<any>((resolve, reject) => {
             const func = this.functionManager.functions[functionName];
             const argsUpdated = this.evaluateFunctionArguments(args);
             if (func) {
