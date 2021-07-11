@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { DataManager } from "./dataManager";
 import { FunctionManager } from "./functionManager";
+import { OptionsManager } from "./optionsManager";
+import * as winston from "winston";
 
 export class Context {
 
@@ -16,6 +18,12 @@ export class Context {
         this._response = response;
         this._variables = {};
         this.updateRequestVariables();
+
+        // Display context
+        if (OptionsManager.instance.isDisplayContextMemory) {
+            winston.info("Context.construct - Display context");
+            console.info(this.variables);
+        }
     }
 
     private updateRequestVariables() {

@@ -55,6 +55,11 @@ export class OptionsManager {
         return (option != undefined) ? option : true;
     }
 
+    public get isDisplayContextMemory() {
+        const option = this.getBoolean(OPTIONS.DISPLAY_CTXMEMORY);
+        return (option != undefined) ? option : false;
+    }
+
     public get options() {
         return this._options;
     }
@@ -93,6 +98,7 @@ export class OptionsManager {
         this._options[OPTIONS.AUTHORIZED_METHODS] = this.authorizedMethods;
         this._options[OPTIONS.CONTENTTYPE_DETECTION_ENABLED] = this.isContentTypeDetectionEnabled;
         this._options[OPTIONS.PORT] = this.port;
+        this._options[OPTIONS.DISPLAY_CTXMEMORY] = this.isDisplayContextMemory;
     }
 
     public static get instance() {

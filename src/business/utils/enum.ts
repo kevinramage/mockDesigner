@@ -43,6 +43,7 @@ export module OPTIONS {
     export const DEBUG = "system.debug";
     export const VERSION = "system.version";
     export const MOCK_WORKDIR = "system.workingDirectory";
+    export const DISPLAY_CTXMEMORY = "system.displayContextMemory";
     export const AUTHORIZED_METHODS = "app.authorizedMethods";
     export const CONTENTTYPE_DETECTION_ENABLED = "app.contentTypeDetection.enabled";
     export const PORT = "system.port";
