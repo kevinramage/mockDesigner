@@ -2,6 +2,7 @@ import { OptionsManager } from "./business/core/optionsManager";
 import * as winston from "winston";
 import DailyRotateFile = require("winston-daily-rotate-file");
 import app from "./app";
+import { RedisManager } from "./business/core/redisManager";
 
 export class Main {
 
@@ -24,6 +25,10 @@ export class Main {
 
         // Load options
         OptionsManager.instance.loadOptions();
+
+        // Init redis client
+        RedisManager.instance;
+
 
         // Listen
         const port = OptionsManager.instance.port;

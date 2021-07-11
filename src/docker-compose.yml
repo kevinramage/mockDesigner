@@ -5,7 +5,7 @@ services:
     hostname: redis
     networks:
     - md_network
-  was:
+  node:
     build:
       context: .
     ports:
