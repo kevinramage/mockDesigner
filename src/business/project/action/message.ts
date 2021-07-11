@@ -9,6 +9,7 @@ import { ContentTypeDetection } from "../../utils/contentTypeDetection";
 import { OptionsManager } from "../../core/optionsManager";
 
 import * as winston from "winston";
+import { ExpressionManager } from "../../core/expressionManager";
 
 export class ActionMessage extends Action {
 
@@ -116,11 +117,25 @@ export class ActionMessage extends Action {
                 if (this.template) {
                     value = await new JSONTemplateRender(context).render(input);
                 }
+                value = this.evaluateStringExpression(value, context);
                 resolve(value);
             } catch (err) {
                 reject(err);
             }
         });
+    }
+
+    private evaluateStringExpression(input: string, context: Context) {
+        const regex = /{{\s*[a-zA-Z0-9|\.|$|_]+\s*}}/g;
+        const match = regex.exec(input);
+        if (match) {
+            const evaluation = ExpressionManager.instance.evaluateExpression(context, match[0]);
+            const newInput = input.replace(match[0], evaluation);
+            return this.evaluateStringExpression(newInput, context);
+
+        } else {
+            return input;
+        }
     }
 
     public addHeader(name: string, value: string) {

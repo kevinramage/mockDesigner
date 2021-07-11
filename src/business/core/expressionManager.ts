@@ -8,15 +8,13 @@ export class ExpressionManager {
 
     public evaluateExpression(context: Context, expression: string) : string{
         if (expression.startsWith("{{") && expression.endsWith("}}")) {
-            const expressionComputed = expression.substr(2, expression.length - 4);
+            const expressionComputed = expression.substr(2, expression.length - 4).trim();
             
             // Data
 
             // Storage
 
             // Function
-
-            // Expression
 
             return context.variables[expressionComputed] || null;
         } else {
