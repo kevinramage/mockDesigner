@@ -4,6 +4,7 @@ import { FunctionManager } from "./functionManager";
 
 export class Context {
 
+    private static INTEGER_HEADERS = ["age", "content-length", "dt", "downlink"];
     private _request : Request;
     private _response : Response;
     private _variables : {[name: string]: any};
@@ -60,7 +61,11 @@ export class Context {
 
     private updateRequestHeadersVariables(){
         Object.keys(this.request.headers).forEach((key) => {
-            this.variables[".request.headers." + key] = this.request.headers[key];
+            if (Context.INTEGER_HEADERS.includes(key)) {
+                this.variables[".request.headers." + key] = Number.parseInt(this.request.headers[key] as string);
+            } else {
+                this.variables[".request.headers." + key] = this.request.headers[key];
+            }
         });
     }
 
