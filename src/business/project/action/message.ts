@@ -5,9 +5,10 @@ import { Context } from "../../core/context";
 import { Action } from "../action";
 import { MonitoringManager } from "../../core/monitoringManager";
 import { ACTIONS } from "../../utils/enum";
-import * as winston from "winston";
 import { ContentTypeDetection } from "../../utils/contentTypeDetection";
 import { OptionsManager } from "../../core/optionsManager";
+
+import * as winston from "winston";
 
 export class ActionMessage extends Action {
 
@@ -35,6 +36,7 @@ export class ActionMessage extends Action {
                 if (!context.response.writableEnded) {
                     await this.sendResponse(context);
                 } else {
+                    winston.warn("ActionMessage.execute - A response already sent, the current action message is ignored");
                     resolve();
                 }
 
