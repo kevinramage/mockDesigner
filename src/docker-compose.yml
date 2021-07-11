@@ -9,7 +9,7 @@ services:
     build:
       context: .
     ports:
-    - 7001
+    - 7001:7001
     links:
     - redis
     environment:
