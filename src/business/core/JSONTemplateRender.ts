@@ -1,4 +1,4 @@
-import { Token } from "antlr4ts";
+import { ANTLRErrorListener, RecognitionException, Recognizer, Token } from "antlr4ts";
 import { CharStreams, CommonTokenStream } from "antlr4ts";
 import { ErrorNode } from "antlr4ts/tree/ErrorNode";
 import { ParseTree } from "antlr4ts/tree/ParseTree";
@@ -12,16 +12,19 @@ import { Context } from "./context";
 import { ExpressionManager } from "./expressionManager";
 import { StorageManager } from "./storageManager";
 
+import * as winston from "winston";
+
 export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
     private _context : Context;
+    private _error ?: Error;
 
     constructor(context: Context)  {
         this._context = context;
     }
 
     visitJson (ctx: JsonContext) {
-        return new Promise<string>(async (resolve, reject) => {
+        return new Promise<string>(async (resolve) => {
             if (ctx.children) {
                 let result = "";
                 for( var key in ctx.children) {
@@ -29,7 +32,8 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
                 }
                 resolve(result);
             } else {
-                reject(new Error("No children found on json tree"));
+                this._error = new Error("No children found on json tree");
+                resolve("");
             }
         });
     }
@@ -53,7 +57,8 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
             } else if (ctx._null) {
                 resolve(ctx._null.text as string);
             } else {
-                throw new Error("Invalid context, a value must be defined");   
+                this._error = new Error("Invalid context, a value must be defined");
+                resolve(""); 
             }
         });
     }
@@ -112,8 +117,13 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
             // Storage
             } else if (ctx._idKey) {
-                const evaluation = await this.visitStorage(ctx._idKey, ctx._exp1 as Token);
-                resolve(evaluation);
+                try {
+                    const evaluation = await this.visitStorage(ctx._idKey, ctx._exp1 as Token);
+                    resolve(evaluation);
+                } catch (err) {
+                    this._error = err;
+                    resolve("");
+                }
 
             // Data source
             } else if (ctx._idData1) {
@@ -122,8 +132,8 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
             // Function
             } else if (ctx._idClass) {
-                const evalation = await this.visitFunctionExpression(ctx._idClass, ctx._idFunc, ctx._arg, ctx._argRemaining);
-                resolve(evalation);
+                const evaluation = await this.visitFunctionExpression(ctx._idClass, ctx._idFunc, ctx._arg, ctx._argRemaining);
+                resolve(evaluation);
             }
         });
     }
@@ -152,23 +162,29 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
     visitFunctionExpression(idClass: Token, idFunc?: Token, arg ?: ValueContext, argRemaining ?: ValueContext[]) {
         return new Promise<string>(async (resolve) => {
-            let functionName = idClass.text || "";
-            if (idFunc) {
-                functionName += "." + idFunc.text;
-            }
-            let expressions : string[] = [];
-            if (arg) {
-                let argumentEvaluated = await this.visitValue(arg);
-                expressions.push(argumentEvaluated);
-                if (argRemaining) {
-                    for (var key in argRemaining) {
-                        argumentEvaluated = await this.visitValue(argRemaining[key]); 
-                        expressions.push(argumentEvaluated);
+            try {
+                let functionName = idClass.text || "";
+                if (idFunc) {
+                    functionName += "." + idFunc.text;
+                }
+                let expressions : string[] = [];
+                if (arg) {
+                    let argumentEvaluated = await this.visitValue(arg);
+                    expressions.push(argumentEvaluated);
+                    if (argRemaining) {
+                        for (var key in argRemaining) {
+                            argumentEvaluated = await this.visitValue(argRemaining[key]); 
+                            expressions.push(argumentEvaluated);
+                        }
                     }
                 }
+                const result = await ExpressionManager.instance.evaluateFunction(functionName, expressions, this.context);
+                resolve(result);
+
+            } catch (err) {
+                this._error = err;
+                resolve("");
             }
-            const result = await ExpressionManager.instance.evaluateFunction(functionName, expressions, this.context);
-            resolve(result);
         });
         
     }
@@ -181,27 +197,69 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
         return await tree.accept(this);
     }
     visitChildren(node: RuleNode): Promise<string> {
-        throw new Error("Method not implemented.");
+        return new Promise<string>((resolve) => {
+            this._error = new Error("Method not implemented.");
+            resolve("");
+        });
     }
     visitTerminal(node: TerminalNode): Promise<string> {
-        throw new Error("Method not implemented.");
+        return new Promise<string>((resolve) => {
+            this._error = new Error("Method not implemented.");
+            resolve("");
+        });
     }
     visitErrorNode(node: ErrorNode): Promise<string> {
-        throw new Error("Method not implemented.");
+        return new Promise<string>((resolve) => {
+            this._error = new Error("Method not implemented.");
+            resolve("");
+        });
     }
 
     public render(input: string) {
         return new Promise<string>(async (resolve, reject) => {
-            let inputStream = CharStreams.fromString(input);
-            let lexer = new JSONLexer(inputStream);
-            let tokenStream = new CommonTokenStream(lexer);
-            let parser = new JSONParser(tokenStream);
-            const tree = parser.json();
-            const result = await this.visit(tree);
             try {
-                const resultPrettyPrint = JSON.stringify(JSON.parse(result));
-                resolve(resultPrettyPrint);
+                // Lexer
+                const lexerError = new LexerError();
+                const inputStream = CharStreams.fromString(input);
+                const lexer = new JSONLexer(inputStream);
+                lexer.removeErrorListeners();
+                lexer.addErrorListener(lexerError);
+
+                // Parser
+                const tokenError = new ParserError();
+                const tokenStream = new CommonTokenStream(lexer);
+                const parser = new JSONParser(tokenStream);
+                parser.removeErrorListeners();
+                parser.addErrorListener(tokenError);
+                const tree = parser.json();
+
+                if (!lexerError.isInError && !tokenError.isInError) {
+
+                    // Visit
+                    const result = await this.visit(tree);
+                    
+                    if ( !this._error) {
+
+                        // Pretty print result
+                        const resultPrettyPrint = JSON.stringify(JSON.parse(result));
+                        resolve(resultPrettyPrint);
+
+                    } else {
+                        winston.error("JSONTemplateRender - Parsing error ", this._error);
+                        reject(this._error);
+                    }
+
+                } else if (lexerError.isInError) {
+                    const error = new Error(lexerError.errors.join(", "));
+                    winston.error("JSONTemplateRender - Parsing error ", error);
+                    reject(error);
+                } else {
+                    const error = new Error(tokenError.errors.join(", "));
+                    winston.error("JSONTemplateRender - Parsing error ", error);
+                    reject(error);
+                }
             } catch (err) {
+                winston.error("JSONTemplateRender - Parsing error ", err);
                 reject(err);
             }
         });
@@ -209,5 +267,55 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
 
     public get context() {
         return this._context;
+    }
+}
+
+class LexerError implements ANTLRErrorListener<number> {
+
+    private _isInError : boolean;
+    private _errors: string[];
+
+    constructor() {
+        this._isInError = false;
+        this._errors = [];
+    }
+
+    public syntaxError(recognizer: Recognizer<number, any>, offendingSymbol: number | undefined, line: number, charPositionInLine: number, msg: string, e: RecognitionException | undefined) {
+        const error = format("line %d:%d %s", line, charPositionInLine, msg);
+        this._errors.push(error);
+        this._isInError = true;
+    }
+
+    public get isInError() {
+        return this._isInError;
+    }
+
+    public get errors() {
+        return this._errors;
+    }
+}
+
+class ParserError implements ANTLRErrorListener<Token> {
+
+    private _isInError : boolean;
+    private _errors : string[];
+
+    constructor() {
+        this._isInError = false;
+        this._errors = [];
+    }
+
+    public syntaxError(recognizer: Recognizer<Token, any>, offendingSymbol: Token | undefined, line: number, charPositionInLine: number, msg: string, e: RecognitionException | undefined) {
+        const error = format("line %d:%d %s", line, charPositionInLine, msg);
+        this._errors.push(error);
+        this._isInError = true;
+    }
+
+    public get isInError() {
+        return this._isInError;
+    }
+
+    public get errors() {
+        return this._errors;
     }
 }

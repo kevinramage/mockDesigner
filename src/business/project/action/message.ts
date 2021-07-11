@@ -65,8 +65,23 @@ export class ActionMessage extends Action {
                 // Save response
                 MonitoringManager.instance.saveResponse(this.status, this.headers, content, context.response);
 
+                resolve();
+
             } catch (err)  {
-                reject(err);
+                
+                // Send error
+                const headers = {};
+                headers["Content-Type"] = "application/json";
+                const data = JSON.stringify({code: 500, message: "Error during action message processing", error: err.message });
+                context.response.status(500);
+                context.response.setHeader("Content-Type", "application/json");
+                context.response.send(data);
+                context.response.end();
+
+                // Save response
+                MonitoringManager.instance.saveResponse(500, headers, data, context.response);
+
+                resolve();
             }
         });
     }

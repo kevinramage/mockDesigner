@@ -35,9 +35,13 @@ export class ExpressionManager {
     }
 
     public evaluateFunction(functionName: string, expressions: string[], context: Context) {
-        return new Promise<string>(async (resolve) => {
-            const value = await context.evaluateFunction(functionName, expressions);
-            resolve(this.expressionToString(value));
+        return new Promise<string>(async (resolve, reject) => {
+            try {
+                const value = await context.evaluateFunction(functionName, expressions);
+                resolve(this.expressionToString(value));
+            } catch (err) {
+                reject(err);
+            }
         });
     }
 
