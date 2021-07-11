@@ -34,6 +34,11 @@ export class ActionFactory {
         if (actionData.body) { action.bodyText = actionData.body; }
         if (actionData.bodyFile) { action.bodyFile = actionData.bodyFile; }
         if (actionData.template) { action.template = actionData.template; }
+        
+        // Set template if body file defined with jsonx extension
+        if (!actionData.template && action.bodyFile && action.bodyFile.toLowerCase().endsWith("jsonx")) {
+            action.template = true;
+        }
 
         return action;
     }
