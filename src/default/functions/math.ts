@@ -1,19 +1,14 @@
 import { format } from "util";
-import { v4 } from "uuid";
-import { RedisManager } from "types/RedisManager";
+import { Context } from "../../types/Context";
+import { RedisManager } from "../../types/RedisManager";
 
 export class MathUtils {
-
-    public static UUID() {
-        return v4();
-    }
-
     
     private static _counters : { [key: string] : number } = {};
-    public static increment(args: any[]) {
+    public static increment(context: Context, objectNameArg: string, persistArg: string) {
         return new Promise<number>(async (resolve) => {
-            const objectName = args.length > 1 ? args[1] : "";
-            const persist = args.length > 2 && args[2] == "true" ? true : false;
+            const objectName = objectNameArg ? objectNameArg : "";
+            const persist = persistArg ? (persistArg.toLowerCase() == "true") : false;
             if (persist) {
                 const increment = await MathUtils.incrementPersist(objectName);
                 resolve(increment);
@@ -45,22 +40,15 @@ export class MathUtils {
         .replace(/\./g, "").replace('T', '').replace('Z', '');
         return Number.parseInt(id);
     }
-
-    public static random(args: any[]) {
-        const maxValue = args.length > 1 ? args[1] as string : "";
-        return Math.round(Math.random() * Number.parseInt(maxValue));
-    }
-
-    public static parse(args: any[]) {
-        const content = args.length > 1 ? args[1] as string : "";
+    
+    public static parse(context: Context, contentArg: string) {
+        const content = contentArg ? contentArg : "";
         return Number.parseInt(content);
     }
 }
 
 function register(functions: {[name: string]: Function}) {
-    functions["Math.UUID"] = MathUtils.UUID;
     functions["Math.Increment"] = MathUtils.increment;
-    functions["Math.RandomInteger"] = MathUtils.random;
     functions["Math.UniqueID"] = MathUtils.uniqueID;
     functions["Math.Parse"] = MathUtils.parse;
 }

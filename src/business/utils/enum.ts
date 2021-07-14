@@ -46,5 +46,8 @@ export module OPTIONS {
     export const DISPLAY_CTXMEMORY = "system.displayContextMemory";
     export const AUTHORIZED_METHODS = "app.authorizedMethods";
     export const CONTENTTYPE_DETECTION_ENABLED = "app.contentTypeDetection.enabled";
+    export const DISPLAY_LISTENERS = "app.displayListeners";
+    export const DISPLAY_DATASOURCES = "app.displayDataSources";
+    export const DISPLAY_FUNCTIONS = "app.displayFunctions";
     export const PORT = "system.port";
 }

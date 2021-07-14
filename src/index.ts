@@ -3,6 +3,8 @@ import * as winston from "winston";
 import DailyRotateFile = require("winston-daily-rotate-file");
 import app from "./app";
 import { RedisManager } from "./business/core/redisManager";
+import { FunctionManager } from "./business/core/functionManager";
+import { DataManager } from "./business/core/dataManager";
 
 export class Main {
 
@@ -23,12 +25,17 @@ export class Main {
             winston.error(err.stack);
         });
 
-        // Load options
-        OptionsManager.instance.loadOptions();
-
         // Init redis client
         RedisManager.instance;
 
+        // Load options
+        OptionsManager.instance.loadOptions();
+
+        // Load data sources
+        DataManager.initializeGlobalFunctions();
+
+        // Functions
+        new FunctionManager().displayFunctions();
 
         // Listen
         const port = OptionsManager.instance.port;

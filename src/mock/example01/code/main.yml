@@ -1,0 +1,18 @@
+name: myFirstProject
+services:
+  - name: myFirstService
+    method: GET
+    path: /example/01/myService
+    response:
+      actions:
+      - type: message
+        status: 200
+        body: OK
+  - name: mySecondService
+    method: GET
+    path: /example/01/myService2
+    response:
+      actions:
+      - type: message
+        status: 200
+        bodyFile: response.jsonx

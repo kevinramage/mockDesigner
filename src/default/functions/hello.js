@@ -2,8 +2,8 @@ function hello() {
     return "Hello"
 }
 
-function helloWorld(args) {
-    const name = args.length > 1 ? args[1] : undefined;
+function helloWorld(context, nameArg) {
+    const name = nameArg ? nameArg : "unamed";
     return "Hello world " + name;
 }
 

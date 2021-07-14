@@ -10,6 +10,10 @@ export class OptionsManager {
     public get port() : number;
     public get isContentTypeDetectionEnabled() : boolean;
     public get options() : {[key: string] : string};
+    public get isDisplayContextMemory() : boolean;
+    public get isDisplayListeners() : boolean;
+    public get isDisplayFunctions() : boolean;
+    public get isDisplayDataSources() : boolean;
 
     public static instance : OptionsManager;
 }

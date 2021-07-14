@@ -157,7 +157,15 @@ export class JSONTemplateRender implements JSONVisitor<Promise<string>> {
         if (expression.length > 0) {
             expression = expression.substr(0, expression.length - 1);
         }
-        return ExpressionManager.instance.evaluateDataSource(dataSource, expression, this.context);
+        try {
+            const evaluation = ExpressionManager.instance.evaluateDataSource(dataSource, expression, this.context);
+            return evaluation;
+
+        } catch (err) {
+            winston.error("JSONTemplateRender.visitDataSourceExpression - An error occured during dataSource evaluation: ", err);
+            this._error = err;
+            return "";
+        }
     } 
 
     visitFunctionExpression(idClass: Token, idFunc?: Token, arg ?: ValueContext, argRemaining ?: ValueContext[]) {

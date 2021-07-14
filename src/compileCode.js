@@ -1,4 +1,4 @@
-const { readdirSync, lstatSync, existsSync, readFile, writeFile } =  require("fs");
+const { readdirSync, lstatSync, existsSync, readFile, writeFile, statSync } =  require("fs");
 const { exec } = require("child_process");
 const { join } = require("path");
 const { format } = require("util");
@@ -29,20 +29,39 @@ directories.forEach(d => {
 });
 
 function compileLibrary(dir, file) {
-    console.info("Compiling " + file);
-    exec(format("npx ts --target es6 --module commonjs --outDir %s %s", dir, file), (err, stdout, stderr) => {
-        if (!err) {
-            const jsFile = file.substr(0, file.length - 3) + ".js";
-            readFile(jsFile, (err, buffer) => {
-                if (!err) {
-                    let data = buffer.toString();
-                    data = data.replace("require(\"types/Context\");", "require(\"./context\");");
-                    data = data.replace("require(\"types/RedisManager\");", "require(\"./redisManager\");");
-                    data = data.replace("require(\"types/DataManager\");", "require(\"./dataManager\");");
-                    data = data.replace("require(\"types/FunctionManager\");", "require(\"./functionManager\");");
-                    writeFile(jsFile, data, (err)=> {});
-                }
-            });
-        }
-    });
+
+    // Get informations about ts and js files
+    let jsLastUpdated = new Date(null);
+    const tsLastUpdated = statSync(file).mtime;
+    const jsFile = file.substr(0, file.length - 3) + ".js";
+    if (existsSync(jsFile)) {
+        jsLastUpdated = statSync(jsFile).mtime;
+    }
+
+    // Check if compilation required
+    if (tsLastUpdated.getTime() > jsLastUpdated.getTime()) {
+
+        // Compile ts code
+        console.info("Compiling " + file);
+        exec(format("npx ts --target es6 --module commonjs --outDir %s %s", dir, file), (err, stdout, stderr) => {
+            if (!err) {
+
+                // Update JS import
+                readFile(jsFile, (err, buffer) => {
+                    if (!err) {
+                        let data = buffer.toString();
+                        data = data.replace("require(\"../../types/Context\");", "require(\"./context\");");
+                        data = data.replace("require(\"../../types/RedisManager\");", "require(\"./redisManager\");");
+                        data = data.replace("require(\"../../types/DataManager\");", "require(\"./dataManager\");");
+                        data = data.replace("require(\"../../types/FunctionManager\");", "require(\"./functionManager\");");
+                        writeFile(jsFile, data, (err)=> {});
+                    }
+                });
+            } else {
+                console.error("Internal error during compilation " + err);
+            }
+        });
+    } else {
+        console.info("Compiling " + file + " (skip)");
+    }
 }

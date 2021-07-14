@@ -2,6 +2,7 @@ import { format } from "util";
 import { OPERATION } from "../utils/enum";
 import { Condition } from "./condition";
 import { Context } from "./context";
+import * as winston from "winston";
 
 export class ExpressionManager {
     private static _instance : ExpressionManager;
@@ -9,11 +10,12 @@ export class ExpressionManager {
     public evaluateExpression(context: Context, expression: string) {
         return new Promise<string>(async (resolve, reject) => {
             try {
-                const regex = /\"?\s*{{\s*[a-zA-Z0-9|\.|$|_|{|}|(|)|,|\\|"]+\s*}}\s*\"?/g;
+                const regex = /\"\s*{{\s*([a-zA-Z0-9|\.|$|_|{|}|(|)|,]|(\\\"))+\s*}}\s*\"/g;
                 const match = regex.exec(expression);
                 if (match) {
                     const contentToEvaluate = match[0].replace(/\\\"/g, "\"");
-                    const evaluation = await this.evaluateLimitedExpression(context, contentToEvaluate);
+                    let evaluation = await this.evaluateLimitedExpression(context, contentToEvaluate);
+                    evaluation = this.expressionToString(evaluation);
                     const newInput = expression.replace(match[0], evaluation);
                     resolve(this.evaluateExpression(context, newInput));
                 } else {
@@ -25,7 +27,7 @@ export class ExpressionManager {
         });
     }
 
-    private evaluateLimitedExpression(context: Context, expression: string) : Promise<string> {
+    private evaluateLimitedExpression(context: Context, expression: string) : Promise<any> {
         return new Promise<string>(async (resolve, reject) => {
             const startIndex = expression.indexOf("{{") + 2;
             const endIndex = expression.lastIndexOf("}}");
@@ -49,7 +51,27 @@ export class ExpressionManager {
 
             // Data
             } else if (expressionComputed.startsWith(".data")) {
-                ///TODO
+                let dataSourceName = "";
+                let expression = "";
+                const indexStartDataSource = expressionComputed.indexOf(".", (".data").length);
+                if (indexStartDataSource > -1) {
+
+                    // Identify data source and expression
+                    const indexEndDataSource = expressionComputed.indexOf(".", indexStartDataSource+1);
+                    if (indexEndDataSource > -1) {
+                        dataSourceName = expressionComputed.substr(indexStartDataSource+1, indexEndDataSource - indexStartDataSource -1);
+                        expression = expressionComputed.substr(indexEndDataSource+1);
+                    } else {
+                        dataSourceName = expressionComputed.substr(indexStartDataSource+1);
+                    }
+
+                    // Evaluate data source
+                    const evaluation = this.evaluateDataSource(dataSourceName, expression, context);
+                    resolve(evaluation);
+                
+                } else {
+                    reject(new Error("Invalid data source expression: " + expressionComputed));
+                }
                 resolve("");
 
             // Storage
@@ -91,8 +113,14 @@ export class ExpressionManager {
     }
 
     public evaluateDataSource(dataSource: string, expression: string, context: Context) {
-        const value = context.evaluateDataSource(dataSource, expression);
-        return this.expressionToString(value);
+        try {
+            const value = context.evaluateDataSource(dataSource, expression);
+            return this.expressionToString(value);
+
+        } catch (err) {
+            winston.error("ExpressionManager.evaluateDataSource: An error occured during data source evaluation", err);
+            throw err;
+        }
     }
 
     public evaluateFunction(functionName: string, expressions: string[], context: Context) {
@@ -150,7 +178,12 @@ export class ExpressionManager {
 
     public expressionToString(value: any) {
         if (typeof value === "string") {
-            return format("\"%s\"", value);
+            const string = value as string;
+            if (string.startsWith("\"") && string.endsWith("\"")) {
+                return value;
+            } else {
+                return format("\"%s\"", value);
+            }
         } else if (typeof value === "number" || typeof value === "boolean") {
             return value.toString();
         } else if (value === null) {

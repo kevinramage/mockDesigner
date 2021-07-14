@@ -3,6 +3,7 @@ import { DataManager } from "./dataManager";
 import { FunctionManager } from "./functionManager";
 import { OptionsManager } from "./optionsManager";
 import * as winston from "winston";
+import { format } from "util";
 
 export class Context {
 
@@ -17,6 +18,8 @@ export class Context {
         this._request = request;
         this._response = response;
         this._variables = {};
+
+        // Add request infos
         this.updateRequestVariables();
 
         // Display context
@@ -93,9 +96,19 @@ export class Context {
     }
 
     public evaluateDataSource(dataSource: string, expression: string) {
-        const source = this.dataManager.dataSources[dataSource];
-        const index = Math.round(Math.random() * dataSource.length - 1);
+
+        // Select data source
+        const source = this.dataManager.dataSources[dataSource] as object[];
+        if (!source) {
+            const sources = Object.keys(this.dataManager.dataSources).join(", ");
+            throw new Error(format("Invalid data source: '%s', valid sources: '%s'", dataSource, sources));
+        }
+
+        // Select element
+        const index = Math.round(Math.random() * (source.length - 1));
         let result = source[index];
+        
+        // Navigate through structured element
         let currentExp = expression;
         while (currentExp != "") {
             let extract = currentExp;
@@ -114,7 +127,7 @@ export class Context {
             if (func) {
                 let allArgs : any[] = [this];
                 allArgs = allArgs.concat(argsUpdated);
-                const result : string | Promise<string> = func.call(this, allArgs);
+                const result : string | Promise<string> = func.call(this, ...allArgs);
                 if ( result instanceof Promise) {
                     resolve(Promise.resolve(result))
                 } else {
@@ -164,6 +177,11 @@ export class Context {
 
     public set dataManager(value) {
         this._dataManager = value;
+
+        // Initialize data manager during context built
+        if (value) {
+            value.init();
+        }
     }
 
     public get functionManager() {

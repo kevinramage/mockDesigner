@@ -1,11 +1,33 @@
 {
     "id": 1,
-    "firstName": {{.data.firstname}},
-    "lastName": {{.data.lastname}},
-    "cityname": {{.data.cityname}},
-    "postalcode": {{.data.postalcode_fr}},
+    "firstName": "{{.data.firstname}}",
+    "lastName": "{{.data.lastname}}",
+    "cityname": "{{.data.cityname}}",
+    "postalcode": "{{.data.postalcode_fr}}",
     "city": {
-        "postalCode": {{.data.city_fr.codePostal}},
-        "name": {{.data.city_fr.nomCommune}}
-    }
+        "postalCode": "{{.data.city_fr.codePostal}}",
+        "name": "{{.data.city_fr.nomCommune}}"
+    },
+    "integer1": "{{ Generation.Integer(100) }}",
+    "integer2": "{{ Generation.Integer() }}",
+    "float1": "{{ Generation.Float(10) }}",
+    "float2": "{{ Generation.Float() }}",
+    "hexa1": "{{ Generation.Hexa(6) }}",
+    "hexa2": "{{ Generation.Hexa() }}",
+    "string": "{{ Generation.String() }}",
+    "firstName": "{{ Generation.FirstName() }}",
+    "lastName": "{{ Generation.LastName() }}",
+    "mail": "{{ Generation.Mail() }}",
+    "fileName": "{{ Generation.FileName() }}",
+    "phoneNumber_FR": "{{ Generation.PhoneNumber_FR() }}",
+    "phoneNumber_US": "{{ Generation.PhoneNumber_US() }}",
+    "phoneNumber_UK": "{{ Generation.PhoneNumber_UK() }}",
+    "IPV4": "{{ Generation.IPV4() }}",
+    "IPV6": "{{ Generation.IPV6() }}",
+    "MacAddress": "{{ Generation.MacAddress() }}",
+    "MD5": "{{ Generation.MD5() }}",
+    "SHA1": "{{ Generation.SHA1() }}",
+    "SHA256": "{{ Generation.SHA256() }}",
+    "UUIDV1": "{{ Generation.UUIDV1() }}",
+    "UUIDV4": "{{ Generation.UUIDV4() }}"
 }

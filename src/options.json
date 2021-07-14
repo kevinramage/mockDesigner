@@ -10,5 +10,8 @@
     ],
     "app.contentTypeDetection.enabled": true,
     "system.port": 7001,
-    "system.displayContextMemory": false
+    "system.displayContextMemory": false,
+    "app.displayListeners": false,
+    "app.displayDataSources": true,
+    "app.displayFunctions": true
 }

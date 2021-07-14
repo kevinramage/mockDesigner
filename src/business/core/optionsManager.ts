@@ -60,6 +60,21 @@ export class OptionsManager {
         return (option != undefined) ? option : false;
     }
 
+    public get isDisplayListeners() {
+        const option = this.getBoolean(OPTIONS.DISPLAY_LISTENERS);
+        return (option != undefined) ? option : false;
+    }
+
+    public get isDisplayFunctions() {
+        const option = this.getBoolean(OPTIONS.DISPLAY_FUNCTIONS);
+        return (option != undefined) ? option : false;
+    }
+
+    public get isDisplayDataSources() {
+        const option = this.getBoolean(OPTIONS.DISPLAY_DATASOURCES);
+        return (option != undefined) ? option : false;
+    }
+
     public get options() {
         return this._options;
     }

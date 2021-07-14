@@ -1,11 +1,11 @@
-import { Projects } from "./business/project/projects";
 import express, { Request, Response } from "express";
+import * as winston from "winston";
 import morgan from "morgan";
+import { Projects } from "./business/project/projects";
 import DefaultRoute from "./routes";
 import { Project } from "./business/project/project";
 import { Context } from "./business/core/context";
 import { Service } from "./business/project/service";
-import * as winston from "winston";
 import { format } from "util";
 import { METHODS } from "./business/utils/enum";
 import { BehaviourService } from "./behaviourService";
@@ -77,11 +77,14 @@ export class App {
             }
         }
         DefaultRoute.listeners = this._listeners;
+        if (OptionsManager.instance.isDisplayListeners) {
+            console.info("Listeners:");
+            console.info(this._listeners);
+        }
     }
 
     private addListener(service: Service){
-        winston.info(format("App.addListener - Add a listener for path %s %s", service.method, service.path));
-        this._listeners.push(service.path);
+        this._listeners.push(format("%s %s", service.method, service.path));
         const handler = async(req : Request, res: Response, next: any) => {
             try {
 

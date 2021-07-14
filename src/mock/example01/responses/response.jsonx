@@ -1,0 +1,7 @@
+{
+    "status": "COMPLETED",
+    "userId": 1234,
+    "channelId": {{ .request.headers.channelid }},
+    "channelName": "{{ .request.headers.channelname }}",
+    "queryNumber": "{{ Math.Parse(\"{{.request.query.test}}\")}}"
+}

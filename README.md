@@ -11,6 +11,7 @@ Docker and npm tools required to use Mock Designer.
 ## Usage
 
 To use it describe your mock behaviour in yaml file and execute the tool to generate the code link.
+[Documentation](https://kevinramage.github.io/mockDesigner/)
 
 ## Contribution
 
