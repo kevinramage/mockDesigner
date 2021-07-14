@@ -1,6 +1,7 @@
 ## Get started
 
 Install MockDesigner system and create your first mock
+[Get started](./getStarted.md)
 
 ## Manage your data
 
@@ -14,4 +15,7 @@ Add dynamism in your mock to simulate different kind of responses: nominal case,
 
 Use MockDesigner API to collect requests received to check your application behaviours during integration tests  
 
-## Advanced features
+## Key features
+
+[Expression](./expression.md)
+[Data](./data.md)

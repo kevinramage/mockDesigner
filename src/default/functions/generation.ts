@@ -139,11 +139,8 @@ export class GenerationUtils {
     }
 
     public static generateMD5(context: Context) {
-        console.info("generateMD5");
         let content = GenerationUtils.generateString(context);
-        console.info("generateMD5-content");
         const secret = GenerationUtils.generateString(context);
-        console.info("generateMD5-secret");
         const hash = createHmac('md5', secret);
         hash.update(content);
         return hash.digest("hex").toString();
