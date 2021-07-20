@@ -13,5 +13,7 @@
     "system.displayContextMemory": false,
     "app.displayListeners": false,
     "app.displayDataSources": true,
-    "app.displayFunctions": true
+    "app.displayFunctions": true,
+    "app.monitoring.maxrequests": 100,
+    "app.monitoring.maxresponses": 100
 }

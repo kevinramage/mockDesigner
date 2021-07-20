@@ -49,5 +49,7 @@ export module OPTIONS {
     export const DISPLAY_LISTENERS = "app.displayListeners";
     export const DISPLAY_DATASOURCES = "app.displayDataSources";
     export const DISPLAY_FUNCTIONS = "app.displayFunctions";
+    export const MONITORING_MAXREQUESTS = "app.monitoring.maxrequests";
+    export const MONITORING_MAXRESPONSES = "app.monitoring.maxresponses";
     export const PORT = "system.port";
 }

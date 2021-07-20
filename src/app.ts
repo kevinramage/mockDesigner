@@ -51,6 +51,9 @@ export class App {
         // API
         this.app.get("/mockdesigner/api/project/:pjname", ProjectService.getProject);
         this.app.get("/mockdesigner/api/project", ProjectService.getAllProjects);
+        this.app.post("/mockdesigner/api/project", ProjectService.createProject);
+
+        // Options
         this.app.get("/mockdesigner/api/option/:key", OptionService.getAllOptions);
         this.app.get("/mockdesigner/api/option", OptionService.getAllOptions);
         this.app.put("/mockdesigner/api/option", OptionService.updateOption);

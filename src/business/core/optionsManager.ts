@@ -75,6 +75,16 @@ export class OptionsManager {
         return (option != undefined) ? option : false;
     }
 
+    public get monitoringMaxRequests() {
+        const option = this.getNumber(OPTIONS.MONITORING_MAXREQUESTS);
+        return (option != undefined) ? option : 100;
+    }
+
+    public get monitoringMaxResponses() {
+        const option = this.getNumber(OPTIONS.MONITORING_MAXRESPONSES);
+        return (option != undefined) ? option : 100;
+    }
+
     public get options() {
         return this._options;
     }
@@ -114,6 +124,8 @@ export class OptionsManager {
         this._options[OPTIONS.CONTENTTYPE_DETECTION_ENABLED] = this.isContentTypeDetectionEnabled;
         this._options[OPTIONS.PORT] = this.port;
         this._options[OPTIONS.DISPLAY_CTXMEMORY] = this.isDisplayContextMemory;
+        this._options[OPTIONS.MONITORING_MAXREQUESTS] = this.monitoringMaxRequests;
+        this._options[OPTIONS.MONITORING_MAXRESPONSES] = this.monitoringMaxResponses;
     }
 
     public static get instance() {

@@ -4,9 +4,7 @@ import { ServiceFactory } from "./service";
 
 export class ProjectFactory {
 
-    public static build(projectData: IProject, workspace: string) {
-
-        const project = new Project();
+    public static build(project: Project, projectData: IProject, workspace: string) {
 
         if (projectData.name) { project.name = projectData.name; }
         if ( projectData.services ) {

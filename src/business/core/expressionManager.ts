@@ -138,8 +138,18 @@ export class ExpressionManager {
         return new Promise<boolean>(async (resolve, reject) => {
             let values : string[] = [];
             let regex : RegExp;
-            const leftOp = await this.evaluateExpression(context, condition.left);
-            const rightOp = await this.evaluateExpression(context, condition.right);
+
+            // Evaluate operand
+            let leftOp = "";
+            let rightOp = "";
+            try {
+                leftOp = await this.evaluateExpression(context, condition.left);
+                rightOp = await this.evaluateExpression(context, condition.right);
+            } catch (err) {
+                reject(err);
+            }
+
+            // Evaluate operation
             switch (condition.operation) {
                 case OPERATION.EQUALS:
                     resolve(leftOp == rightOp);
@@ -148,27 +158,52 @@ export class ExpressionManager {
                     resolve(leftOp != rightOp);
     
                 case OPERATION.MATCHES:
-                    regex = new RegExp(rightOp);
-                    resolve(regex.exec(leftOp) !== null);
+                    try {
+                        regex = new RegExp(rightOp);
+                        resolve(regex.exec(leftOp) !== null);
+                    } catch (err) {
+                        winston.error("ExpressionManager.evaluateCondition: An error occured during MATCHES operation evaluation", err);
+                        reject(err);
+                    }
     
                 case OPERATION.NOT_MATCHES:
-                    regex = new RegExp(rightOp);
-                    resolve(regex.exec(leftOp) !== null);
+                    try {
+                        regex = new RegExp(rightOp);
+                        resolve(regex.exec(leftOp) !== null);
+                    } catch (err) {
+                        winston.error("ExpressionManager.evaluateCondition: An error occured during NOT MATCHES operation evaluation", err);
+                        reject(err);
+                    }
     
                 case OPERATION.IN:
-                    values = (rightOp as string).split(";");
-                    resolve(values.includes(leftOp));
+                    try {
+                        values = (rightOp as string).split(";");
+                        resolve(values.includes(leftOp));
+                    } catch (err) {
+                        winston.error("ExpressionManager.evaluateCondition: An error occured during IN operation evaluation", err);
+                        reject(err);
+                    }
     
                 case OPERATION.NOT_IN:
-                    values = (rightOp as string).split(";");
-                    resolve(!values.includes(leftOp));
+                    try {
+                        values = (rightOp as string).split(";");
+                        resolve(!values.includes(leftOp));
+                    } catch (err) {
+                        winston.error("ExpressionManager.evaluateCondition: An error occured during NOT IN operation evaluation", err);
+                        reject(err);
+                    }
     
                 case OPERATION.RANGE:
-                    values = (rightOp as string).split("...");
-                    const actual = Number.parseInt((leftOp as string));
-                    const min = Number.parseInt(values[0]);
-                    const max = Number.parseInt(values[1]);
-                    resolve(actual >= min && actual <= max);
+                    try {
+                        values = (rightOp as string).split("...");
+                        const actual = Number.parseInt((leftOp as string));
+                        const min = Number.parseInt(values[0]);
+                        const max = Number.parseInt(values[1]);
+                        resolve(actual >= min && actual <= max);
+                    } catch (err) {
+                        winston.error("ExpressionManager.evaluateCondition: An error occured during RANGE operation evaluation", err);
+                        reject(err);
+                    }
     
                 default:
                     reject(new Error("Invalid operation: " + condition.operation));
