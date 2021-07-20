@@ -97,4 +97,4 @@ Add following code to main.yml (src/mock/myFirstProject/code/main.yml):
 Note: By default, Mock designer detect body file extension and if the extension is 'jsonx', Mock Designer will interpret body file as template file
 Note: By default, Mock designer detect content type sent and assign content type header if your forget it
 
-Next step: [Understand mock description](./data.md)
+Next step: [Understand mock description](./mockDescription.md)
