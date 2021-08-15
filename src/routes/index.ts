@@ -15,42 +15,6 @@ class DefaultRoute {
       this.listeners = [];
     }
 
-    public addRoute(path: string, method: string, handler: ((req: any, res: any, next: any) => void )) {
-        switch (method) {
-            case METHODS.GET:
-                this.addGETRoute(path, handler);
-            break;
-
-            case METHODS.POST:
-                this.addPOSTRoute(path, handler);
-            break;
-
-            case METHODS.PUT:
-                this.addPUTRoute(path, handler);
-            break;
-
-            case METHODS.DELETE:
-                this.addDELETERoute(path, handler);
-            break;
-        } 
-    }
-
-    private addGETRoute(path: string, handler: ((req: any, res: any, next: any) => void )) {
-        this.router.get(path, handler);
-    }
-
-    private addPOSTRoute(path: string, handler: ((req: any, res: any, next: any) => void )) {
-        this.router.post(path, handler);
-    }
-
-    private addPUTRoute(path: string, handler: ((req: any, res: any, next: any) => void )) {
-        this.router.put(path, handler);
-    }
-
-    private addDELETERoute(path: string, handler: ((req: any, res: any, next: any) => void )) {
-        this.router.delete(path, handler);
-    }
-
     public middleware(req: express.Request, res: express.Response, next: Function) {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

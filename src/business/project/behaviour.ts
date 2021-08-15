@@ -4,6 +4,8 @@ import { Context } from "../core/context";
 import { ExpressionManager } from "../core/expressionManager";
 import { Action } from "./action";
 import * as winston from "winston";
+import { Service } from "./service";
+import { IBehaviour } from "interface/behaviour";
 
 export class Behaviour {
     private _name: string;
@@ -70,6 +72,37 @@ export class Behaviour {
             name: this.name,
             conditions: this.conditions.map(c => { return c.toObject() }),
             actions: this.actions.map(a => { return a.toObject() })
+        }
+    }
+
+    public toCode() {
+        return {
+            name: this.name,
+            conditions: this.conditions.map(c => { return c.toCode(); }),
+            actions: this.actions.map(a => { return a.toCode(); })
+        }
+    }
+
+    public static getBehaviour(service: Service, name: string) {
+        return service.response.behaviours[name];
+    }
+
+    public static createBehaviour(service: Service, name: string, behaviour: IBehaviour) {
+
+    }
+
+    public static updateBehaviour(service: Service, name: string, behaviour: IBehaviour) {
+
+    }
+
+    public static deleteBehaviour(service: Service, name: string) {
+
+    }
+
+    private static checkBehaviourNameAvailable(service: Service, name: string) {
+        const behaviourExisting = Object.keys(service.response.behaviours).find(x => { return x == name; });
+        if (behaviourExisting) {
+            throw new Error("Invalid behaviour name");
         }
     }
 

@@ -39,7 +39,16 @@ export class SaveAction extends Action {
     public toObject() {
         return {
             type: ACTIONS.SAVE,
-            key: this.key
+            key: this.key,
+            expressions: this.expressions.map(e => { return e.toObject(); })
+        }
+    }
+
+    public toCode() {
+        return {
+            type: this.type,
+            key: this.key,
+            expressions: this.expressions.map(e => { return e.toCode(); })
         }
     }
 
@@ -62,6 +71,20 @@ export class SaveExpression {
     constructor() {
         this._key = "";
         this._value = "";
+    }
+
+    public toObject() {
+        return {
+            key: this.key,
+            value: this.value
+        }
+    }
+
+    public toCode() {
+        return {
+            key: this.key,
+            value: this.value
+        }
     }
 
     public get key() {

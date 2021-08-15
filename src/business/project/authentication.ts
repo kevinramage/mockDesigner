@@ -21,4 +21,8 @@ export class Authentication {
     public toObject() {
         return {};
     }
+
+    public toCode() {
+        return {};
+    }
 }

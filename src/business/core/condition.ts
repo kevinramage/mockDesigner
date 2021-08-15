@@ -24,6 +24,14 @@ export class Condition {
         }
     }
 
+    public toCode() {
+        return {
+            leftOperand: this.left,
+            operation: this.operation,
+            rightOperand: this.right
+        }
+    }
+
     public get left() {
         return this._left;
     }

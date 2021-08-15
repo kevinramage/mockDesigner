@@ -1,3 +1,5 @@
+import * as winston from "winston";
+import { stringify } from "yaml";
 import { readdir, readFile, readFileSync } from "fs";
 import { IProject } from "../../interface/project";
 import { join } from "path";
@@ -5,10 +7,11 @@ import { format } from "util";
 import { Service } from "./service";
 import { parse } from "yaml";
 import { ProjectFactory } from "../../factory/project";
-import * as winston from "winston";
 import { ProjectFile } from "./projectFile";
 import { lstat } from "fs/promises";
 import { FileUtils } from "../utils/fileUtils";
+import { ProjectManager } from "../core/projectManager";
+import { OptionsManager } from "../core/optionsManager";
 
 export class Project {
     private _folderPath : string;
@@ -66,7 +69,7 @@ export class Project {
                     Promise.all(promises).then((files) => {
                         const projectFiles = files.reduce((a, b) => {
                             return a.concat(b);
-                        });
+                        }, []);
                         resolve(projectFiles);
                     }).catch((err) => {
                         reject(err);
@@ -112,12 +115,20 @@ export class Project {
             try {
 
                 // Create directories
-                await FileUtils.updateFolder("mock");
-                await FileUtils.updateFolder(join("mock", this.folderName));
-                await FileUtils.updateFolder(join("mock", this.folderName, "code"));
-                await FileUtils.updateFolder(join("mock", this.folderName, "data"));
-                await FileUtils.updateFolder(join("mock", this.folderName, "responses"));
-                await FileUtils.updateFolder(join("mock", this.folderName, "functions"));
+                const mockDirectory = OptionsManager.instance.mockWorkingDirectory;
+                await FileUtils.updateFolder(mockDirectory);
+                await FileUtils.updateFolder(join(mockDirectory, this.folderName));
+                await FileUtils.updateFolder(join(mockDirectory, this.folderName, "code"));
+                await FileUtils.updateFolder(join(mockDirectory, this.folderName, "data"));
+                await FileUtils.updateFolder(join(mockDirectory, this.folderName, "responses"));
+                await FileUtils.updateFolder(join(mockDirectory, this.folderName, "functions"));
+
+                // Save code file
+                const path = join(mockDirectory, this.folderName, "code", "main.yml");
+                const projectFile = this.files.find(f => { return f.name == path; });
+                if (projectFile) {
+                    projectFile.content = stringify(this.toCode());
+                }
 
                 // Save project files
                 for (var index in this.files) {
@@ -151,9 +162,7 @@ export class Project {
     }
 
     public toObject() {
-        const keys = Object.keys(this.services);
-        const services = keys.map(k => { return this.services[k].toObject() });
-        return { name: this.folderName, applicationName: this.name, services: services};
+        return { name: this.folderName, applicationName: this.name };
     }
 
     public toObjectFull() {
@@ -168,6 +177,13 @@ export class Project {
         return { name: this.folderName, applicationName: this.name, services: services, files: files};
     }
 
+    public toCode() {
+        return {
+            name: this.name,
+            services: Object.values(this.services).map(s => { return s.toCode(); })
+        }
+    }
+
 
     public static buildFromFile(folderPath: string, folderName: string) {
         return new Promise<Project|null>((resolve, reject) => {
@@ -179,6 +195,9 @@ export class Project {
                         project.folderName = folderName;
                     }
                     resolve(project);
+                } else if (err.message.startsWith("ENOENT: no such file or directory")) {
+                    winston.warn(format("Project.buildFromFile - Project '%s' ignored because code not found (code/main.yml)", folderName))
+                    resolve(null);
                 } else {
                     reject(err);
                 }
@@ -206,48 +225,70 @@ export class Project {
                 resolve(project);
 
             } catch (err) {
-                winston.error("Projects.loadFromContent - Error during project loading: ", err);
+                winston.error("Project.loadFromContent - Error during project loading: ", err);
                 resolve(null);
             }
         });
     }
 
-    public static createProject(name: string, method: string, path: string) {
-        return new Promise<Project>(async(resolve, reject) => {
-            try {
-                // Create project file
-                let projectFileContent = `
-                name: {{NAME}}
-                services:
-                  - name: {{NAME}}
-                    method: {{METHOD}}
-                    path: {{PATH}}
-                    response:
-                      actions:
-                      - type: message
-                        status: 200
-                        body: OK";`;
-                projectFileContent = projectFileContent.replace(/{{NAME}}/g, name).replace(/METHOD/g, method).replace(/PATH/g, path);
-                const filePath = join("mock", name, "code", "main.yml");
+    public static getProject(name: string) {
+        return new Promise<Project>(async (resolve) => {
+            resolve(ProjectManager.instance.getProject(name));
+        });
+    }
 
-                // Create project and add project file
+    public static createProject(name: string) {
+
+        return new Promise<Project>(async (resolve, reject) => {
+            try {
+                // Create project
                 const project = new Project();
+                project.name = name;
                 project.folderName = name;
-                const projectFile = new ProjectFile(filePath, projectFileContent);
+
+                // Create code file
+                const mockDirectory = OptionsManager.instance.mockWorkingDirectory;
+                const path = join(mockDirectory, name, "code", "main.yml");
+                const projectFile = new ProjectFile(path, "");
                 project.addProjectFile(projectFile);
+
+                // Add project
+                ProjectManager.instance.addProject(project);
+
+                // Save
                 await project.save();
 
-                // Load content
-                const content = parse(projectFileContent, { prettyErrors: true}) as IProject;
-                ProjectFactory.build(project, content, name);
                 resolve(project);
 
             } catch (err) {
-                winston.error("Project.createProject - Impossible to create project " + name, err);
+                //winston.error("Project.createProject - Internal error occured: ", err);
                 reject(err);
             }
         });
-        
+    }
+
+    public static deleteProject(name: string) {
+        return new Promise<void>(async (resolve, reject) => {
+            try {
+
+                // Delete project
+                ProjectManager.instance.removeProject(name);
+
+                // Delete folder
+                const mockDirectory = OptionsManager.instance.mockWorkingDirectory;
+                const path = join(mockDirectory, name);
+                const folderExists = await FileUtils.isFolderExists(path);
+                if (folderExists) {
+                    await FileUtils.deleteFolder(path);
+                }
+
+                resolve()
+
+            } catch (err) {
+                winston.error("Project.deleteProject - Internal error occured: ", err);
+                reject(err);
+            }
+        });
     }
 
 
@@ -273,6 +314,10 @@ export class Project {
 
     public get services() {
         return this._services;
+    }
+
+    public set services(value) {
+        this._services = value;
     }
 
     public get files() {

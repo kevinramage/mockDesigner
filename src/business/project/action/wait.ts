@@ -20,7 +20,14 @@ export class WaitAction extends Action {
 
     public toObject() {
         return {
-            type: ACTIONS.WAIT,
+            type: this.type,
+            time: this.time
+        }
+    }
+
+    public toCode() {
+        return { 
+            type: this.type,
             time: this.time
         }
     }

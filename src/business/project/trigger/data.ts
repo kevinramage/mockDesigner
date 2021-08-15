@@ -27,10 +27,18 @@ export class DataTrigger extends Trigger {
 
     public toObject() {
         return {
-            type: TRIGGERS.DATA,
+            type: this.type,
             conditions: this.conditions.map(c => { return c.toObject() }),
             actions: this.actions.map(a => { return a.toObject() })
         }
+    }
+
+    public toCode() : any{
+        return {
+            type: this.type,
+            conditions: this.conditions.map(c => { return c.toCode(); }),
+            actions: this.actions.map(a => { return a.toObject(); })
+        };
     }
 
     public get conditions() {

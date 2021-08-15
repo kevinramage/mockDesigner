@@ -133,8 +133,30 @@ export class ActionMessage extends Action {
         return {
             type: ACTIONS.MESSAGE,
             status: this.status,
+            headers: this.headers,
             body: this.bodyFile != "" ? "File: " + this.bodyFile : this.bodyText
         }
+    }
+
+    public toCode() {
+        let result : any = {
+            type: this.type,
+            status: this.status,
+        }
+
+        // Headers
+        if (this.headers) {
+            result.headers = this.headers
+        }
+
+        // Body
+        if (this.bodyFile != "") {
+            result.bodyFile = this.bodyFile
+        } else {
+            result.body = this.bodyText;
+        }
+
+        return result;
     }
 
     public get status() {

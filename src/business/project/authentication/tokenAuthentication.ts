@@ -35,6 +35,13 @@ export class TokenAutentication extends Authentication {
         }
     }
 
+    public toCode() {
+        return {
+            type: AUTHENTICATIONS.TOKEN,
+            token: this.token
+        }
+    }
+
     public get token() {
         return this._token;
     }

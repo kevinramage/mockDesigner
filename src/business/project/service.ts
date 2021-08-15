@@ -1,12 +1,19 @@
+import { join } from "path";
+import { access, readdir } from "fs";
+import * as winston from "winston";
 import { DataManager } from "../core/dataManager";
 import { Context } from "../core/context";
 import { METHODS } from "../utils/enum";
 import { Authentication } from "./authentication";
 import { Response } from "./response";
-import { join } from "path";
-import { access, readdir } from "fs";
 import { FunctionManager } from "../core/functionManager";
-import * as winston from "winston";
+import { Project } from "./project";
+import { OptionsManager } from "../core/optionsManager";
+import { RouteManager } from "../core/routeManager";
+import { IAuthentication } from "../../interface/authentication";
+import { AuthenticationFactory } from "../../factory/authentication";
+import { ResourceNotFoundError } from "../utils/common";
+import { DictionnaryUtils } from "../utils/dictionnaryUtils";
 
 export class Service {
     private _workspace : string;
@@ -91,6 +98,67 @@ export class Service {
         });
     }
 
+    public static getService(project: Project, name: string) {
+        return project.services[name];
+    }
+
+    public static createService(project: Project, name: string, method: string, path: string, authentication: IAuthentication) {
+
+        // Check service name available
+        Service.checkServiceNameAvailable(project, name);
+
+        // Create service        
+        const workspace = join(OptionsManager.instance.mockWorkingDirectory, project.folderName);
+        const service = new Service(workspace);
+        service.name = name;
+        service.method = method;
+        service.path = path;
+        if (authentication) {
+            service.authentication = AuthenticationFactory.build(authentication);
+        }
+
+        // Add service to project
+        project.addService(service);
+
+        // Add route
+        RouteManager.instance.addListener(service);
+
+        return service;
+    }
+
+    public static updateService(project: Project, name: string, method: string, path: string, authentication: IAuthentication) {
+
+        // Delete existing service
+        Service.deleteService(project, name);
+
+        // Create new service
+        return Service.createService(project, name, method, path, authentication);
+    }
+
+    public static deleteService(project: Project, name: string) {
+
+        // Identify service
+        const service = project.services[name];
+        if (service) {
+
+            // Remove service from project
+            project.services = DictionnaryUtils.removeElement(name, project.services);
+
+            // Remove route
+            RouteManager.instance.removeListener(service);
+
+        } else {
+            throw new ResourceNotFoundError("Service not found");
+        }
+    }
+
+    private static checkServiceNameAvailable(project: Project, serviceName: string) {
+        const serviceExisting = Object.keys(project.services).find(x => { return x == serviceName; });
+        if (serviceExisting) {
+            throw new Error("Invalid service name");
+        }
+    }
+
     public toObject() {
         return {
             name: this.name,
@@ -105,10 +173,27 @@ export class Service {
             name: this.name,
             method: this.method,
             path: this.path,
-            workspace: this.workspace,
             authentication: this.authentication ? this.authentication.toObject() : null,
             response: this.response.toObject()
         }
+    }
+
+    public toCode() {
+
+        // Base
+        let result : any = {
+            name: this.name,
+            method: this.method,
+            path: this.path,
+            response: this.response.toCode()
+        };
+
+        // Authentication
+        if (this.authentication) {
+            result.authentication = this.authentication.toCode();
+        }
+
+        return result;
     }
 
     public get name() {

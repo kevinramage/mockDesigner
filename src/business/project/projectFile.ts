@@ -46,4 +46,7 @@ export class ProjectFile {
     public get content() {
         return this._content;
     }
+    public set content(value) {
+        this._content = value;
+    }
 }

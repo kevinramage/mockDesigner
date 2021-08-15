@@ -46,6 +46,14 @@ export class BasicAuthentication extends Authentication {
         }
     }
 
+    public toCode() {
+        return {
+            type: AUTHENTICATIONS.BASIC,
+            username: this.username,
+            password: this.password
+        }
+    }
+
     public get username() {
         return this._username;
     }

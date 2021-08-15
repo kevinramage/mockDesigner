@@ -1,5 +1,6 @@
 import { Context } from "../../business/core/context";
 import { ACTIONS } from "../utils/enum";
+import { Trigger } from "./trigger";
 
 export class Action {
     private _type : string;
@@ -16,6 +17,12 @@ export class Action {
 
     public toObject() {
         return {}
+    }
+
+    public toCode() {
+        return {
+            type: this.type
+        }
     }
 
     public get type() {

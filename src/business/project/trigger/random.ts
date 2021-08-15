@@ -51,8 +51,15 @@ export class RandomTrigger extends Trigger {
 
     public toObject() {
         return {
-            type: TRIGGERS.RANDOM,
+            type: this.type,
             actions: this.actions.map(a => { return a.toObject() })
+        }
+    }
+
+    public toCode() : any {
+        return {
+            type: this.type,
+            messages: this.messages.map(m => { return m.toCode(); })
         }
     }
 
@@ -90,6 +97,13 @@ export class RandomMessageTrigger {
 
     public addAction(action: Action) {
         this._actions.push(action);
+    }
+
+    public toCode() {
+        return {
+            probability: this.probability,
+            actions: this.actions.map(a => { return a.toCode(); })
+        }
     }
 
     public get probability() {

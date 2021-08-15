@@ -3,6 +3,7 @@ import { join } from "path";
 import { format } from "util";
 import { Project } from "./project";
 import * as winston from "winston";
+import { ProjectManager } from "../core/projectManager";
 
 export class Projects {
 
@@ -17,6 +18,7 @@ export class Projects {
                     if (isDirectory) {
                         const project = await Project.buildFromFile(path, files[key]);
                         if (project) {
+                            ProjectManager.instance.addProject(project);
                             projects.push(project);
                         } else {
                             winston.error(format("Projects.buildProjects - project '%s' ignored due previous errors", files[key]))

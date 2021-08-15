@@ -56,6 +56,15 @@ export class ApiKeyAuthentication extends Authentication {
         }
     }
 
+    public toCode() {
+        return {
+            type: AUTHENTICATIONS.APIKEY,
+            source: this.source,
+            key: this.key,
+            value: this.value
+        }
+    }
+
     public get key() {
         return this._key;
     }

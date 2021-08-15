@@ -15,8 +15,20 @@ export class Response {
         this._triggers.push(trigger);
     }
 
+    public removeTrigger(index: number) {
+        if (index >= 0 && index < this.triggers.length) {
+            this.triggers.splice(index, 1);
+        }
+    }
+
     public addBehaviour(behaviour: Behaviour) {
         this._behaviours.push(behaviour);
+    }
+
+    public removeBehaviour(index: number) {
+        if (index >= 0 && index < this.behaviours.length) {
+            this.behaviours.splice(index, 1);
+        }
     }
 
     public execute(context: Context, serviceName: string) {
@@ -83,6 +95,13 @@ export class Response {
         return {
             behaviours: this.behaviours.map(b => { return b.toObject(); }),
             triggers: this.triggers.map(t => { return t.toObject(); }),
+        }
+    }
+
+    public toCode() {
+        return {
+            behaviours: this.behaviours.map(b => { return b.toCode(); }),
+            triggers: this.triggers.map(t => { return t.toCode(); })
         }
     }
 

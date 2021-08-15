@@ -1,13 +1,11 @@
 import { OptionsManager } from "../core/optionsManager";
 import { Request, Response } from "express";
+import { ServiceBase } from "./base";
 
-export class OptionService {
+export class OptionService extends ServiceBase {
 
     public static getAllOptions(req: Request, res: Response) {
-        res.status(200);
-        res.setHeader("content-type", "application/json");
-        res.send(JSON.stringify(OptionsManager.instance.options));
-        res.end();
+        OptionService.sendData(res, OptionsManager.instance.options);
     }
 
     public static getOption(req: Request, res: Response) {
@@ -15,21 +13,12 @@ export class OptionService {
         if (key) {
             const option = OptionsManager.instance.options[key];
             if (option) {
-                res.status(200);
-                res.setHeader("content-type", "application/json");
-                res.send(JSON.stringify(option));
-                res.end();
+                OptionService.sendData(res, option);
             } else {
-                res.status(404);
-                res.setHeader("content-type", "application/json");
-                res.send(JSON.stringify({ code: 404, message: "Resource not found", error: "Option not found" }));
-                res.end();
+                OptionService.sendResourceNotFound(res, "Option");
             }
         } else {
-            res.status(400);
-            res.setHeader("content-type", "application/json");
-            res.send(JSON.stringify({ code: 400, message: "Invalid request", error: "Query key must be defined" }));
-            res.end();
+            OptionService.sendInvalidRequest(res, "Query key must be defined");
         }
     }
 
@@ -41,32 +30,17 @@ export class OptionService {
                 OptionsManager.instance.options[key] = value;
                 const isSaved = OptionsManager.instance.saveOptions();
                 if (isSaved) {
-                    res.status(200);
-                    res.setHeader("content-type", "application/json");
-                    res.send(JSON.stringify(value));
-                    res.end();
+                    OptionService.sendData(res, value);
                 } else {
-                    res.status(500);
-                    res.setHeader("content-type", "application/json");
-                    res.send(JSON.stringify({ code: 500, message: "Internal error", error: "Impossible to save options"}));
-                    res.end();
+                    OptionService.sendInternalError(res);
                 }
             } else {
-                res.status(404);
-                res.setHeader("content-type", "application/json");
-                res.send(JSON.stringify({ code: 404, message: "Resource not found", error: "Option not found" }));
-                res.end();
+                OptionService.sendResourceNotFound(res, "Option");
             }
         } else if (!key) {
-            res.status(400);
-            res.setHeader("content-type", "application/json");
-            res.send(JSON.stringify({ code: 400, message: "Invalid request", error: "Option key must be defined" }));
-            res.end();
+            OptionService.sendInvalidRequest(res, "Option key must be defined");
         } else {
-            res.status(400);
-            res.setHeader("content-type", "application/json");
-            res.send(JSON.stringify({ code: 400, message: "Invalid request", error: "Option value must be defined" }));
-            res.end();
+            OptionService.sendInvalidRequest(res, "Option value must be defined");
         }
     }
 
@@ -74,15 +48,9 @@ export class OptionService {
         OptionsManager.instance.reset();
         const isSaved = OptionsManager.instance.saveOptions();
         if (isSaved) {
-            res.status(200);
-            res.setHeader("content-type", "application/json");
-            res.send(JSON.stringify(OptionsManager.instance.options));
-            res.end();
+            OptionService.sendData(res, OptionsManager.instance.options);
         } else {
-            res.status(500);
-            res.setHeader("content-type", "application/json");
-            res.send(JSON.stringify({ code: 500, message: "Internal error", error: "Impossible to save options"}));
-            res.end();
+            OptionService.sendInternalError(res);
         }
     }
 }

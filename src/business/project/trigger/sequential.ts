@@ -40,6 +40,20 @@ export class SequentialTrigger extends Trigger {
         this._messages.push(message);
     }
 
+    public toObject() {
+        return {
+            type: this.type,
+            messages: this.messages.map(m => { return m.toCode(); })
+        }
+    }
+
+    public toCode() : any {
+        return {
+            type: this.type,
+            messages: this.messages.map(m => { return m.toCode(); })
+        }
+    }
+
     public get messages(){
         return this._messages;
     }
@@ -78,8 +92,15 @@ export class SequentialMessageTrigger {
 
     public toObject() {
         return {
-            type: TRIGGERS.SEQUENTIAL,
+            repeat: this.repeat,
             actions: this.actions.map(a => { return a.toObject() })
+        }
+    }
+
+    public toCode() {
+        return {
+            repeat: this.repeat,
+            actions: this.actions.map(a => { return a.toCode() })
         }
     }
 
