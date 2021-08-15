@@ -32,8 +32,13 @@ instead of:
 
 ### Organization
 
-**Mock organisation**
-**Project organisation**
+In /mock directory, each directory represent a project.
+In this directory, you can have these directories:
+* code: This directory contains mock description(s)
+* responses: This directory contains responses to sent
+* data: This directory contains data source to use
+* functions: This directory contains functions code to use
 
+The /default directory is a directory to store globales functions and data sources.
 
 Next step: [Manage data](./data.md)

@@ -17,7 +17,7 @@ For computed data, use functions, [a generation library](./functions/generateFun
 
 ### Create your own data source
 
-Create a file to store a list of values.
+Create a file to store a list of values, this file must use JSON format.
 
 **Global data source**
 Global data source is accessible to all mocks.
@@ -26,3 +26,5 @@ Use the /default/data/simple or /default/data/structured directory to store data
 **Specific data source**
 Specific data source is accessible to one mock.
 Use the /mock/XXXX/data to store data sources.
+
+[Add dynamism in your response](./dynamism.md)
